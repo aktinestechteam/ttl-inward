@@ -1,0 +1,108 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Chat Option
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-12
+				.card
+					.card-body
+						h4.card-title Chat Option
+						.chat-box.scrollable(style='height:475px;')
+							// chat Row
+							ul.chat-list
+								// chat Row
+								li.chat-item
+									.chat-img
+										img(src='/images/users/1.jpg', alt='user')
+									.chat-content
+										h6.font-medium James Anderson
+										.box.bg-light-info Lorem Ipsum is simply dummy text of the printing & type setting industry.
+									.chat-time 10:56 am
+								// chat Row
+								li.chat-item
+									.chat-img
+										img(src='/images/users/2.jpg', alt='user')
+									.chat-content
+										h6.font-medium Bianca Doe
+										.box.bg-light-info It’s Great opportunity to work.
+									.chat-time 10:57 am
+								// chat Row
+								li.odd.chat-item
+									.chat-content
+										.box.bg-light-inverse I would love to join the team.
+										br
+								// chat Row
+								li.odd.chat-item
+									.chat-content
+										.box.bg-light-inverse Whats budget of the new project.
+										br
+									.chat-time 10:59 am
+								// chat Row
+								li.chat-item
+									.chat-img
+										img(src='/images/users/3.jpg', alt='user')
+									.chat-content
+										h6.font-medium Angelina Rhodes
+										.box.bg-light-info Well we have good budget for the project
+									.chat-time 11:00 am
+								// chat Row
+					.card-body.border-top
+						.row
+							.col-9
+								.input-field.m-t-0.m-b-0
+									textarea#textarea1.form-control.border-0(placeholder='Type and enter')
+							.col-3
+								a.btn-circle.btn-lg.btn-cyan.float-right.text-white(href='javascript:void(0)')
+									i.fas.fa-paper-plane
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+
+block specific-js
+	script(type='text/javascript').

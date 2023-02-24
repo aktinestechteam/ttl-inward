@@ -1,0 +1,14 @@
+mixin dateformat(num)
+	- var date = new Date(num);
+	- var month = date.getMonth()+ 1;
+	- var year = date.getFullYear();
+	- var day = date.getDate();
+	-var str = ''
+	if (month < 10)
+		- month = '0' + month;
+		- str = str + day +'/' + month +'/'+ year;
+		b #{str}
+	else
+		- month = month;
+		- str = str + day +'/' + month +'/'+ year;
+		b #{str}

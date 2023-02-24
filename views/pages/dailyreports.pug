@@ -1,0 +1,577 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	//link(rel='stylesheet', type='text/css', href='https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/af-2.3.0/b-1.5.2/b-colvis-1.5.2/b-flash-1.5.2/b-html5-1.5.2/b-print-1.5.2/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.4.0/r-2.2.2/rg-1.0.3/rr-1.2.4/sc-1.5.0/sl-1.2.6/datatables.min.css')
+	link(rel='stylesheet', type='text/css', href='/dist/css/datatables.min.css')
+	link(rel='stylesheet', href='//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')
+
+
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row.mb-3
+			.card(style='width: 100%;')
+				.card-body
+					h4   Daily Challan Reports
+					form(enctype='multipart/form-data', action='/generatedailychallanreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-3
+								label Station
+								select#inwardcargo_dailychallanreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_dailychallanreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label Payment Mode
+								select#inwardcargo_dailychallanreports_paymentmode.select2.form-control.custom-select(type='text', name='inwardcargo_dailychallanreports_paymentmode', autocomplete="off")
+									option(value='CASH', selected='') CASH
+									option(value='CHQ') CHQ/DD
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_dailychallanreports_from_date_input.form-control(type='text', name='inwardcargo_dailychallanreports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_dailychallanreports_to_date_input.form-control(type='text', name='inwardcargo_dailychallanreports_to_date_input', autocomplete="off")
+							.col-lg-3
+								label &nbsp
+								button#inwardcargo_dailychallanreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit')
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Challan Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4   Daily GST Reports
+					form(enctype='multipart/form-data', action='/generatedailygstreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_dailygstreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_dailygstreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-3
+								label Payment Mode
+								select#inwardcargo_dailygstreports_paymentmode.select2.form-control.custom-select(type='text', name='inwardcargo_dailygstreports_paymentmode', autocomplete="off")
+									//option(value='ALL', selected='') ALL(CASH/CHQ/DD/RTGS)
+									option(value='CASH') CASH
+									option(value='CHQ') CHQ
+									option(value='DD') DD
+									option(value='RTGS') RTGS
+									option(value='UPI') UPI
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_dailygstreports_from_date_input_v2.form-control(type='text', name='inwardcargo_dailygstreports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_dailygstreports_to_date_input_v2.form-control(type='text', name='inwardcargo_dailygstreports_to_date_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_dailygstreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp GST Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4   Daily GST Reports (v2)
+					form(enctype='multipart/form-data', action='/generatedailygstreports_v2', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_dailygstreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_dailygstreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-3
+								label Payment Mode
+								select#inwardcargo_dailygstreports_paymentmode.select2.form-control.custom-select(type='text', name='inwardcargo_dailygstreports_paymentmode', autocomplete="off")
+									//option(value='ALL', selected='') ALL(CASH/CHQ/DD/RTGS)
+									option(value='CASH') CASH
+									option(value='CHQ') CHQ
+									option(value='DD') DD
+									option(value='RTGS') RTGS
+									option(value='UPI') UPI
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_dailygstreports_from_date_input.form-control(type='text', name='inwardcargo_dailygstreports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_dailygstreports_to_date_input.form-control(type='text', name='inwardcargo_dailygstreports_to_date_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_dailygstreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp GST Reports (v2)
+			.card(style='width: 100%;')
+				.card-body
+					h4  Cheque / Cash Deposit Statement
+					form(enctype='multipart/form-data', action='/cashchqstatement', method='POST', target='_blank')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_dailycheckcashdepositstatemnt_city.select2.form-control.custom-select(type='text', name='inwardcargo_dailycheckcashdepositstatemnt_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label Payment Mode
+								select#inwardcargo_dailycheckcashdepositstatemnt_paymentmode.select2.form-control.custom-select(type='text', name='inwardcargo_dailycheckcashdepositstatemnt_paymentmode', autocomplete="off")
+									option(value='CASH', selected='') CASH
+									option(value='CHQ') CHQ
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_dailycheckcashdepositstatemnt_from_date_input.form-control(type='text', name='inwardcargo_dailycheckcashdepositstatemnt_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_dailycheckcashdepositstatemnt_to_date_input.form-control(type='text', name='inwardcargo_dailycheckcashdepositstatemnt_to_date_input', autocomplete="off")
+							.col-lg-2
+								label Challan No. (optional)
+								.input-group
+									input#inwardcargo_dailycheckcashdepositstatemnt_challan_no_input.form-control(type='text', name='inwardcargo_dailycheckcashdepositstatemnt_challan_no_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_dailycheckcashdepositstatemnt_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit')
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbspDeposit Statement
+							.col-lg-12
+								.badge.badge-warning.mt-1 Add Challan No. only when you want to include it in the statement. Adding it is an irreversible process. It links all AWB to this challan number.
+			.card(style='width: 100%;')
+				.card-body
+					h4   Monthly GST Reports
+					form(enctype='multipart/form-data', action='/generatemonthlyreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_monthlygstreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_monthlygstreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							input#inwardcargo_monthlygstreports_date_input.form-control(type='hidden', name='inwardcargo_monthlygstreports_date_input', autocomplete="off")
+							.col-lg-2
+								label Select Month
+								select.select2.custom-select.form-control#inwardcargo_monthlygstreports_select_month
+									- var current_month = new Date().getMonth();
+									- var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+									each month, i in months
+										if current_month === i
+											option(value=i, selected)=month
+										else
+											option(value=i)=month
+							.col-lg-2
+								label Select Year
+								select.select2.custom-select.form-control#inwardcargo_monthlygstreports_select_year
+									- var current_year = new Date().getFullYear();
+									- for(let i = current_year - 2; i <= current_year + 1; i++)
+										if current_year === i
+											option(value=i, selected)=i
+										else
+											option(value=i)=i
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_monthlygstreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp GST Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4   Import Statistics Reports
+					form(enctype='multipart/form-data', action='/generateimportstatisticsreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_importstatisticsreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_importstatisticsreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_importstatisticsreports_from_date_input.form-control(type='text', name='inwardcargo_importstatisticsreports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_importstatisticsreports_to_date_input.form-control(type='text', name='inwardcargo_importstatisticsreports_to_date_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_importstatisticsreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Import Statistics Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4 Import CSR Reports
+					form(enctype='multipart/form-data', action='/generateimportcsrreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_importcsrreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_importcsrreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label Customer Type
+								select#inwardcargo_importcsrreports_customertype.select2.form-control.custom-select(type='text', name='inwardcargo_importcsrreports_customertype', autocomplete="off")
+									option(value='All' selected) All
+									option(value='Agent') Agent
+									option(value='Direct') Direct
+									option(value='Bank') Bank
+									option(value='Direct Agent') Direct Agent
+
+							.col-lg-2
+								label Payment Mode
+								select#inwardcargo_importcsrreports_paymentmode.select2.form-control.custom-select(type='text', name='inwardcargo_importcsrreports_paymentmode', autocomplete="off")
+									option(value='All' selected) All
+									option(value='CASH') CASH
+									option(value='CHQ') CHQ
+									option(value='RTGS') RTGS
+									//-option(value='NEFT') NEFT
+									option(value='DD') DD
+									option(value='UPI') UPI
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_importcsrreports_from_date_input.form-control(type='text', name='inwardcargo_importcsrreports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_importcsrreports_to_date_input.form-control(type='text', name='inwardcargo_importcsrreports_to_date_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_importcsrreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbspImport CSR Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4 Pending DO Reports
+					form(enctype='multipart/form-data', action='/generatependingdoreports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_pendingdoreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_pendingdoreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_pendingdoreports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Pending DO Reports
+			.card(style='width: 100%;')
+				.card-body
+					h4 Agent Performance Report
+					form(enctype='multipart/form-data', action='/generateagentperformancereports', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_agentperformancereports_city.select2.form-control.custom-select(type='text', name='inwardcargo_agentperformancereports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label Customer Type
+								select#inwardcargo_agentperformancereports_customertype.select2.form-control.custom-select(type='text', name='inwardcargo_agentperformancereports_customertype', autocomplete="off")
+									option(value='All' selected) All
+									option(value='Agent') Agent
+									option(value='Direct') Direct
+									option(value='Bank') Bank
+									option(value='Direct Agent') Direct Agent
+							.col-lg-2
+								label From Date
+								.input-group
+									input#inwardcargo_agentperformancereports_from_date_input.form-control(type='text', name='inwardcargo_agentperformancereports_from_date_input', autocomplete="off")
+							.col-lg-2
+								label To Date
+								.input-group
+									input#inwardcargo_agentperformancereports_to_date_input.form-control(type='text', name='inwardcargo_agentperformancereports_to_date_input', autocomplete="off")
+							.col-lg-2
+								label &nbsp
+								button#inwardcargo_agentperformancereports_get_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Agent Performance Report
+									
+			.card(style='width: 100%;')
+				.card-body
+					h4 Consignee List
+					form(enctype='multipart/form-data', action='/getconsigneelistreport', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_consignee_list_city.select2.form-control.custom-select(type='text', name='inwardcargo_consignee_list_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-2
+								label Customer Type
+								select#inwardcargo_consignee_list_customertype.select2.form-control.custom-select(type='text', name='inwardcargo_consignee_list_customertype', autocomplete="off")
+									option(value='All' selected) All
+									option(value='Agent') Agent
+									option(value='Direct') Direct
+									option(value='Bank') Bank
+									option(value='Direct Agent') Direct Agent
+							.col-lg-1
+								label &nbsp
+								button#inwardcargo_consignee_list_get_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') 
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Consignee List
+			
+			.card(style='width: 100%;')
+				.card-body
+					h4 All Pending Documents
+					form(enctype='multipart/form-data', action='/getpendingdocumentsreport', method='POST')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.row.mb-3
+							.col-lg-2
+								label Station
+								select#inwardcargo_dailychallanreports_city.select2.form-control.custom-select(type='text', name='inwardcargo_dailychallanreports_city', autocomplete="off")
+									each airport in airportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							.col-lg-3
+								.custom-control.custom-radio
+									input#inwardcargo_all_pending_documents_option_date_range.custom-control-input(type='radio', name='inwardcargo_all_pending_documents_option', value='inwardcargo_all_pending_documents_option_date_range',checked='')
+									label.custom-control-label(for='inwardcargo_all_pending_documents_option_date_range') Date Range
+									.input-group
+										.input-group-prepend
+											span.input-group-text.badge-warning From
+										input#inwardcargo_all_pending_documents_option_date_range_from.form-control(type='text', name='inwardcargo_all_pending_documents_option_date_range_from', autocomplete="off")
+									.input-group
+										.input-group-prepend
+											span.input-group-text.badge-warning To
+										input#inwardcargo_all_pending_documents_option_date_range_to.form-control(type='text', name='inwardcargo_all_pending_documents_option_date_range_to', autocomplete="off")
+								//-.col-lg-2
+								.custom-control.custom-radio
+									input#inwardcargo_all_pending_documents_option_awb_number.custom-control-input(type='radio', name='inwardcargo_all_pending_documents_option', value='inwardcargo_all_pending_documents_option_awb_number')
+									label.custom-control-label(for='inwardcargo_all_pending_documents_option_awb_number') AWB number
+									input#inwardcargo_all_pending_documents_awb_number.form-control(type='text', placeholder='Enter AWB Number', name='inwardcargo_all_pending_documents_awb_number', disabled)
+								//-.col-lg-2
+								.custom-control.custom-radio
+									input#inwardcargo_all_pending_documents_option_igm_number.custom-control-input(type='radio', name='inwardcargo_all_pending_documents_option', value='inwardcargo_all_pending_documents_option_igm_number')
+									label.custom-control-label(for='inwardcargo_all_pending_documents_option_igm_number') IGM Number
+									input#inwardcargo_all_pending_documents_igm_number.form-control(type='text', placeholder='Enter IGM Number', name='inwardcargo_all_pending_documents_igm_number', disabled)
+							.col-lg-2
+								label Document Type
+								select#inwardcargo_all_pending_documents_document_type.select2.form-control.custom-select(type='text', name='inwardcargo_all_pending_documents_document_type', autocomplete="off")
+									option(value='All' selected) All
+									option(value='can') Pending Can
+									option(value='do') Pending DO
+									option(value='invoice') Pending Invoice
+							.col-lg-3
+								label &nbsp
+								button#inwardcargo_all_pending_documents_option_get_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='submit')
+									i.fas.fa-file-excel(aria-hidden='true')
+									| &nbsp&nbsp Pending Documents
+			
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/js/swal_helper.js')
+	script.
+		$("#inwardcargo_monthlygstreports_select_month").change(function () {
+			setMonthlyReportTimestamp();
+		});
+		
+		$("#inwardcargo_monthlygstreports_select_year").change(function () {
+			setMonthlyReportTimestamp();
+		});
+		
+		function setMonthlyReportTimestamp() {
+			let month = $("#inwardcargo_monthlygstreports_select_month option:selected").val();
+			let year = $("#inwardcargo_monthlygstreports_select_year option:selected").val();
+			
+			let date = new Date();
+			date.setDate(5);
+			date.setMonth(month);
+			date.setYear(year);
+			
+			$('#inwardcargo_monthlygstreports_date_input').val(date.getTime());
+		}
+	
+		//	Set the time stamp at the load time so that we have a default value to work with
+		setMonthlyReportTimestamp();
+		$("#inwardcargo_all_pending_documents_option_date_range_to").datepicker();
+		$("#inwardcargo_all_pending_documents_option_date_range_to").datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$("#inwardcargo_all_pending_documents_option_date_range_to").datepicker('setDate', new Date());
+		$("#inwardcargo_all_pending_documents_option_date_range_from").datepicker();
+		$("#inwardcargo_all_pending_documents_option_date_range_from").datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$("#inwardcargo_all_pending_documents_option_date_range_from").datepicker('setDate', new Date());
+		
+		$("input[name=inwardcargo_all_pending_documents_option]:radio").click(function() {
+			console.log($(this).attr("value"));
+			switch($(this).attr("value")) {
+				case 'inwardcargo_all_pending_documents_option_date_range': {
+					$("#inwardcargo_all_pending_documents_option_date_range_to").removeAttr('disabled');
+					$("#inwardcargo_all_pending_documents_option_date_range_from").removeAttr('disabled');
+					$("#inwardcargo_all_pending_documents_document_type").removeAttr('disabled');
+					
+					$('#inwardcargo_all_pending_documents_awb_number').attr('disabled', '');
+					$('#inwardcargo_all_pending_documents_igm_number').attr('disabled', '');
+				}
+				break;
+				
+				case 'inwardcargo_all_pending_documents_option_awb_number': {
+					$("#inwardcargo_all_pending_documents_option_date_range_to").attr('disabled', '');
+					$("#inwardcargo_all_pending_documents_option_date_range_from").attr('disabled', '');
+					$("#inwardcargo_all_pending_documents_document_type").attr('disabled', '');
+					
+					$('#inwardcargo_all_pending_documents_awb_number').removeAttr('disabled');
+					$('#inwardcargo_all_pending_documents_igm_number').attr('disabled', '');
+				}
+				break;
+				
+				case 'inwardcargo_all_pending_documents_option_igm_number': {
+					$("#inwardcargo_all_pending_documents_option_date_range_to").attr('disabled', '');
+					$("#inwardcargo_all_pending_documents_option_date_range_from").attr('disabled', '');
+					$("#inwardcargo_all_pending_documents_document_type").attr('disabled', '');
+					
+					$('#inwardcargo_all_pending_documents_awb_number').attr('disabled', '');
+					$('#inwardcargo_all_pending_documents_igm_number').removeAttr('disabled');
+				}
+				break;
+			}
+		});
+		
+		$( "#inwardcargo_dailychallanreports_from_date_input" ).datepicker();
+		$( "#inwardcargo_dailychallanreports_to_date_input" ).datepicker();
+		$( "#inwardcargo_dailychallanreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailychallanreports_to_date_input').datepicker('setDate', new Date());
+		$( "#inwardcargo_dailychallanreports_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailychallanreports_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_dailychallanreports_from_date_input').change(function() {
+			$( "#inwardcargo_dailychallanreports_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_dailychallanreports_from_date_input").val();
+			$( "#inwardcargo_dailychallanreports_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_dailychallanreports_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_dailychallanreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		$( "#inwardcargo_dailygstreports_from_date_input" ).datepicker();
+		$( "#inwardcargo_dailygstreports_from_date_input_v2" ).datepicker();
+		$( "#inwardcargo_dailygstreports_to_date_input" ).datepicker();
+		$( "#inwardcargo_dailygstreports_to_date_input_v2" ).datepicker();
+		$( "#inwardcargo_dailygstreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$( "#inwardcargo_dailygstreports_to_date_input_v2" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailygstreports_to_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_dailygstreports_to_date_input_v2').datepicker('setDate', new Date());
+		$( "#inwardcargo_dailygstreports_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$( "#inwardcargo_dailygstreports_from_date_input_v2" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailygstreports_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_dailygstreports_from_date_input_v2').datepicker('setDate', new Date());
+		$('#inwardcargo_dailygstreports_from_date_input').change(function() {
+			$( "#inwardcargo_dailygstreports_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_dailygstreports_from_date_input").val();
+			$( "#inwardcargo_dailygstreports_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_dailygstreports_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_dailygstreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		$('#inwardcargo_dailygstreports_from_date_input_v2').change(function() {
+			$( "#inwardcargo_dailygstreports_to_date_input_v2" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_dailygstreports_from_date_input").val();
+			$( "#inwardcargo_dailygstreports_to_date_input_v2" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_dailygstreports_to_date_input_v2').datepicker('setDate', new Date());
+			$( "#inwardcargo_dailygstreports_to_date_input_v2" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		$( "#inwardcargo_dailycheckcashdepositstatemnt_from_date_input" ).datepicker();
+		$( "#inwardcargo_dailycheckcashdepositstatemnt_to_date_input" ).datepicker();
+		$( "#inwardcargo_dailycheckcashdepositstatemnt_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailycheckcashdepositstatemnt_to_date_input').datepicker('setDate', new Date());
+		$( "#inwardcargo_dailycheckcashdepositstatemnt_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_dailycheckcashdepositstatemnt_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_dailycheckcashdepositstatemnt_from_date_input').change(function() {
+			$( "#inwardcargo_dailycheckcashdepositstatemnt_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_dailycheckcashdepositstatemnt_from_date_input").val();
+			$( "#inwardcargo_dailycheckcashdepositstatemnt_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_dailycheckcashdepositstatemnt_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_dailycheckcashdepositstatemnt_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		
+		/*$( "#inwardcargo_monthlygstreports_date_input" ).datepicker({
+			altFormat: 'MM yy',
+			changeMonth: true,
+			changeYear: true,
+			showButtonPanel: true,
+			dateFormat: 'MM yy',
+			onClose: function(dateText, inst) { 
+				$(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+			},
+			onSelect: function(el, dp) {
+				//$('#ui-datepicker-div').toggleClass('hide-calendar', $(el).is('[data-calendar="false"]'));
+				$('.ui-datepicker-calendar').hide();
+			}
+		});
+		$( "#inwardcargo_monthlygstreports_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_monthlygstreports_date_input').datepicker('setDate', new Date());*/
+		
+		
+		$( "#inwardcargo_importstatisticsreports_from_date_input" ).datepicker();
+		$( "#inwardcargo_importstatisticsreports_to_date_input" ).datepicker();
+		$( "#inwardcargo_importstatisticsreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_importstatisticsreports_to_date_input').datepicker('setDate', new Date());
+		$( "#inwardcargo_importstatisticsreports_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_importstatisticsreports_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_importstatisticsreports_from_date_input').change(function() {
+			$( "#inwardcargo_importstatisticsreports_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_importstatisticsreports_from_date_input").val();
+			$( "#inwardcargo_importstatisticsreports_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_importstatisticsreports_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_importstatisticsreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		
+		$( "#inwardcargo_importcsrreports_from_date_input" ).datepicker();
+		$( "#inwardcargo_importcsrreports_to_date_input" ).datepicker();
+		$( "#inwardcargo_importcsrreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_importcsrreports_to_date_input').datepicker('setDate', new Date());
+		$( "#inwardcargo_importcsrreports_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_importcsrreports_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_importcsrreports_from_date_input').change(function() {
+			$( "#inwardcargo_importcsrreports_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_importcsrreports_from_date_input").val();
+			$( "#inwardcargo_importcsrreports_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_importcsrreports_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_importcsrreports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		$( "#inwardcargo_agentperformancereports_from_date_input" ).datepicker();
+		$( "#inwardcargo_agentperformancereports_to_date_input" ).datepicker();
+		$( "#inwardcargo_agentperformancereports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_agentperformancereports_to_date_input').datepicker('setDate', new Date());
+		$( "#inwardcargo_agentperformancereports_from_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		$('#inwardcargo_agentperformancereports_from_date_input').datepicker('setDate', new Date());
+		$('#inwardcargo_agentperformancereports_from_date_input').change(function() {
+			$( "#inwardcargo_agentperformancereports_to_date_input" ).removeClass( "hasDatepicker" )
+			var date = $("#inwardcargo_agentperformancereports_from_date_input").val();
+			$( "#inwardcargo_agentperformancereports_to_date_input" ).datepicker({minDate: new Date(date)});
+			$('#inwardcargo_agentperformancereports_to_date_input').datepicker('setDate', new Date());
+			$( "#inwardcargo_agentperformancereports_to_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+		});
+		
+		// Read a page's GET URL variables and return them as an associative array.
+		function getUrlVars()
+		{
+			var vars = [], hash;
+			var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+			for(var i = 0; i < hashes.length; i++)
+			{
+				hash = hashes[i].split('=');
+				vars.push(hash[0]);
+				vars[hash[0]] = hash[1];
+			}
+			return vars;
+		}

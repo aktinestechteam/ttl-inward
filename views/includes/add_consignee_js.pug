@@ -1,0 +1,447 @@
+include ../includes/csrf.pug
+script(src='/js/pincodes.js')
+script.
+	$('#zero_config').DataTable();
+	$('#menu_consignees').addClass("selected");
+	$('#inwardcargo_consignees_list_gst_exemption_upto_date').datepicker({
+		dateFormat: 'yy-mm-dd',
+		minDate: new Date()
+	});
+	
+	$('#inwardcargo_consignees_list_gst_exemption').on('change', function(value) {
+		manageGSTExemptionChecks();
+	});
+	
+	function manageGSTExemptionChecks() {
+		if(!{sails.config.custom.access_allowed(req.user.role, 'AppAdmin')}) {
+			if($('#inwardcargo_consignees_list_gst_exemption').is(':checked')) {
+				$("#inwardcargo_consignees_list_gst_exemption_upto_date").removeAttr('disabled');
+			} else {
+				$("#inwardcargo_consignees_list_gst_exemption_upto_date").attr('disabled', '');
+			}
+		}
+	}
+
+	function addGSTINCodeOnStateChange() {
+		var selectedCountry = $("#inwardcargo_consignees_list_state_input option:selected").attr('id');
+		$('#inwardcargo_consignees_list_gstin_input').val(selectedCountry);
+	}
+
+	$(document).ready(function () {
+		$("#inwardcargo_consignees_list_state_input").change(function () {
+			addGSTINCodeOnStateChange();
+		});
+	});
+
+	function searchusingconsigneename() {
+		var city = $("#inwardcargo_consignees_list_new_city option:selected").val();
+		var consigneename = $('#inwardcargo_consignees_list_consignee_name_search_input').val();
+		location.href = '/consignees?inwardcargo_consignees_list_new_city=' + city + '&inwardcargo_consignees_list_consignee_name_search_input=' + consigneename;
+	}
+	
+	function showConsigneeModal(role,id, fullname, statename, email, phone, address, address2, cityname, gstin, pincode, creditperiod,customer,issez,isenableconsignee,isgstexemption, gstexemptiontilldate) {
+		if ((fullname) && (statename)/*&& (email)&& (phone)*/&& (cityname)&& (address)) {
+			$('#inwardcargo_consignees_list_fullname_input').val(unescape(fullname));
+			$('#inwardcargo_consignees_list_state_input').val(statename);
+			$('#inwardcargo_consignees_list_email_input').val(email);
+			$('#inwardcargo_consignees_list_phone_input').val(phone);
+			$('#inwardcargo_consignees_list_address_input').val(unescape(address));
+			$('#inwardcargo_consignees_list_address2_input').val(unescape(address2));
+			$('#inwardcargo_consignees_list_city_input').val(cityname);
+			$('#inwardcargo_consignees_list_gstin_input').val(gstin);
+			$('#inwardcargo_consignees_list_pincode_input').val(pincode);
+			$('#inwardcargo_consignees_list_credit_period_input').val(creditperiod);
+			$('#inwardcargo_consignees_list_customer_input').val(customer);
+			if(!{sails.config.custom.access_allowed(req.user.role, 'User')} && customer =='Direct Agent'){
+				$('#inwardcargo_consignees_list_customer_input').remove();
+				$( '<input class="form-control form-white", id="inwardcargo_consignees_list_customer_input", type="text", name="inwardcargo_consignees_list_customer_input", readonly/>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+				$('#inwardcargo_consignees_list_customer_input').val(customer);
+				//$('#inwardcargo_consignees_list_customer_input').prop("disabled", true);
+			} else if(!{sails.config.custom.access_allowed(req.user.role, 'AppAdmin')}){
+				$('#inwardcargo_consignees_list_customer_input').remove();
+				$( '<select class="select2 form-control custom-select" id="inwardcargo_consignees_list_customer_input" style="width: 100%; height:36px;" type="text" name="inwardcargo_consignees_list_customer_input"><option value="Agent">Agent</option><option value="Direct">Direct</option><option value="Bank">Bank</option><option value="Direct Agent">Direct Agent</option></select>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+				$('#inwardcargo_consignees_list_customer_input').val(customer);
+			} else {
+				$('#inwardcargo_consignees_list_customer_input').remove();
+				//$( '<select class="select2 form-control custom-select" id="inwardcargo_consignees_list_customer_input" style="width: 100%; height:36px;" type="text" name="inwardcargo_consignees_list_customer_input"><option value="Agent">Agent</option><option value="Direct">Direct</option><option value="Bank">Bank</option><option value="Direct Agent">Direct Agent</option></select>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+				$( '<select class="select2 form-control custom-select" id="inwardcargo_consignees_list_customer_input" style="width: 100%; height:36px;" type="text" name="inwardcargo_consignees_list_customer_input"><option value="Agent">Agent</option><option value="Direct">Direct</option><option value="Bank">Bank</option></select>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+				//$('#inwardcargo_consignees_list_customer_input').prop("readonly", false);
+				$('#inwardcargo_consignees_list_customer_input').val(customer);
+			}
+			$('#inwardcargo_consignees_list_id').val(id);
+			if (issez == 'true') {
+				$("#inwardcargo_consignees_list_is_sez").prop("checked", true);
+			} else {
+				$("#inwardcargo_consignees_list_is_sez").prop("checked", false);
+			}
+			if (isenableconsignee == 'true') {
+				$("#inwardcargo_consignees_list_enable_consignee").prop("checked", true);
+			} else {
+				$("#inwardcargo_consignees_list_enable_consignee").prop("checked", false);
+			}
+			if (isgstexemption == 'true') {
+				$("#inwardcargo_consignees_list_gst_exemption").prop("checked", true);
+			} else {
+				$("#inwardcargo_consignees_list_gst_exemption").prop("checked", false);
+			}
+			$('#inwardcargo-consignees-list-add-new-consignees-modal-title').text(' Edit Consignee');
+		} else {
+			$('#inwardcargo_consignees_list_id').val('');
+			$('#inwardcargo_consignees_list_fullname_input').val('');
+			$('#inwardcargo_consignees_list_gstin_input').val('');
+			$('#inwardcargo_consignees_list_state_input').prop('selectedIndex', 0);
+			$('#inwardcargo_consignees_list_email_input').val('');
+			$('#inwardcargo_consignees_list_phone_input').val('');
+			$('#inwardcargo_consignees_list_address_input').val('');
+			$('#inwardcargo_consignees_list_address2_input').val('');
+			$('#inwardcargo_consignees_list_pincode_input').val('');
+			$('#inwardcargo_consignees_list_customer_input').remove();
+			if(role === 'user') {
+				$('#inwardcargo_consignees_list_credit_period_input').val('none');
+				$( '<select class="select2 form-control custom-select" id="inwardcargo_consignees_list_customer_input" style="width: 100%; height:36px;" type="text" name="inwardcargo_consignees_list_customer_input"><option value="Agent">Agent</option><option value="Direct">Direct</option><option value="Bank">Bank</option></select>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+			}
+			else {
+				$('#inwardcargo_consignees_list_credit_period_input').prop('selectedIndex', 0);
+				$( '<select class="select2 form-control custom-select" id="inwardcargo_consignees_list_customer_input" style="width: 100%; height:36px;" type="text" name="inwardcargo_consignees_list_customer_input"><option value="Agent">Agent</option><option value="Direct">Direct</option><option value="Bank">Bank</option><option value="Direct Agent">Direct Agent</option></select>').insertAfter( "#inwardcargo_consignees_list_customer_input_label" );
+			}
+			//$('#inwardcargo_consignees_list_customer_input').prop("readonly", false);
+			$('#inwardcargo_consignees_list_customer_input').prop('selectedIndex', 1);
+			$("#inwardcargo_consignees_list_is_sez").prop("checked", false);
+			$("#inwardcargo_consignees_list_enable_consignee").prop("checked", false);
+			$("#inwardcargo_consignees_list_gst_exemption").prop("checked", false);
+			$('#inwardcargo-consignees-list-add-new-consignees-modal-title').text(' Add New Consignee');
+			
+			addGSTINCodeOnStateChange();
+		}
+		$('#inwardcargo-consignees-list-add-new-consignees-modal').modal('show');
+		
+		if(gstexemptiontilldate) {
+			if(gstexemptiontilldate >= Date.now()) {
+				$('#inwardcargo_consignees_list_gst_exemption_upto_date').datepicker('setDate', new Date(gstexemptiontilldate));
+				$('#inwardcargo_consignees_list_gst_exemption_status').addClass('badge-success');
+				$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-info');
+				$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-danger');
+				$('#inwardcargo_consignees_list_gst_exemption_status').html('EXEMPTION ACTIVE');
+			} else {
+				$('#inwardcargo_consignees_list_gst_exemption_upto_date').val('');
+				$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-info');
+				$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-success');
+				$('#inwardcargo_consignees_list_gst_exemption_status').addClass('badge-danger');
+				$('#inwardcargo_consignees_list_gst_exemption_status').html('EXEMPTION EXPIRED');
+			}
+		}
+		else {
+			$('#inwardcargo_consignees_list_gst_exemption_upto_date').val('');
+			$('#inwardcargo_consignees_list_gst_exemption_status').addClass('badge-info');
+			$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-danger');
+			$('#inwardcargo_consignees_list_gst_exemption_status').removeClass('badge-success');
+			$('#inwardcargo_consignees_list_gst_exemption_status').html('EXPIRY NOT SET');
+		}
+			
+		manageGSTExemptionChecks();
+	}
+
+	$(document).ready(function () {
+		$("#inwardcargo_consignees_list_new_city").change(function () {
+			var city = $("#inwardcargo_consignees_list_new_city option:selected").val();
+			getCity(city);
+			//alert();
+			//alert($("select[name='inwardcargo_reason_list_reason_type_input'] option:selected").index());
+		});
+		//getReasons($("#inwardcargo_reason_list_reason_type_input option:selected").val())
+	});
+
+	function getCity(city) {
+		location.href = '/consignees?inwardcargo_consignees_list_new_city=' + city;
+	}
+
+	function saveConsignee() {
+		var fullname = $('#inwardcargo_consignees_list_fullname_input').val();
+		var statename = $('#inwardcargo_consignees_list_state_input').val();
+		var state_gst_code = $('#inwardcargo_consignees_list_state_input').find('option:selected').attr('id');
+		var email = $('#inwardcargo_consignees_list_email_input').val();
+		var phone = $('#inwardcargo_consignees_list_phone_input').val();
+		var address = $('#inwardcargo_consignees_list_address_input').val();
+		var address2 = $('#inwardcargo_consignees_list_address2_input').val();
+		var cityname = $('#inwardcargo_consignees_list_city_input').val();
+		var gstin = $('#inwardcargo_consignees_list_gstin_input').val();
+		var pincode = $('#inwardcargo_consignees_list_pincode_input').val();
+		var creditperiod = $('#inwardcargo_consignees_list_credit_period_input').val();
+		var customer = $('#inwardcargo_consignees_list_customer_input').val();
+		var issez = ($('#inwardcargo_consignees_list_is_sez').prop("checked")==true) ? true : false;
+		var isenableconsignee = ($('#inwardcargo_consignees_list_enable_consignee').prop("checked")==true)?true:false;
+		var isgstexemption = ($('#inwardcargo_consignees_list_gst_exemption').prop("checked")==true)?true:false;
+		var id = $("#inwardcargo_consignees_list_id").val();
+		var isFullNameNum = /^\d+$/.test(fullname);
+		var isNameInRange = (fullname.length >= 3 && fullname.length <= 100)
+		var isPhoneNumber = /^\d{10}/.test(phone);
+		var isPincode = /^\d{6}/.test(pincode);
+		{
+			switch(state_gst_code) {
+				case '01': {isPincode = (jammukashmir.indexOf(pincode) != -1)} break
+				case '02': {isPincode = (himachalpradesh.indexOf(pincode) != -1)} break
+				case '03': {isPincode = (punjab.indexOf(pincode) != -1)} break
+				case '04': {isPincode = (chandigarh.indexOf(pincode) != -1)} break
+				case '05': {isPincode = (uttarakhand.indexOf(pincode) != -1)} break
+				case '06': {isPincode = (haryana.indexOf(pincode) != -1)} break
+				case '07': {isPincode = (delhi.indexOf(pincode) != -1)} break
+				case '08': {isPincode = (rajasthan.indexOf(pincode) != -1)} break
+				case '09': {isPincode = (uttarpradesh.indexOf(pincode) != -1)} break
+				case '10': {isPincode = (bihar.indexOf(pincode) != -1)} break
+				case '11': {isPincode = (sikkim.indexOf(pincode) != -1)} break
+				case '12': {isPincode = (arunachalpradesh.indexOf(pincode) != -1)} break
+				case '13': {isPincode = (nagaland.indexOf(pincode) != -1)} break
+				case '14': {isPincode = (manipur.indexOf(pincode) != -1)} break
+				case '15': {isPincode = (mizoram.indexOf(pincode) != -1)} break
+				case '16': {isPincode = (tripura.indexOf(pincode) != -1)} break
+				case '17': {isPincode = (meghalaya.indexOf(pincode) != -1)} break
+				case '18': {isPincode = (assam.indexOf(pincode) != -1)} break
+				case '19': {isPincode = (westbengal.indexOf(pincode) != -1)} break
+				case '20': {isPincode = (jharkhand.indexOf(pincode) != -1)} break
+				case '21': {isPincode = (odisha.indexOf(pincode) != -1)} break
+				case '22': {isPincode = (chattisgarh.indexOf(pincode) != -1)} break
+				case '23': {isPincode = (madhyapradesh.indexOf(pincode) != -1)} break
+				case '24': {isPincode = (gujarat.indexOf(pincode) != -1)} break
+				case '25': {isPincode = (dadranagarhaveli.indexOf(pincode) != -1)} break
+				case '26': {isPincode = (dadranagarhaveli.indexOf(pincode) != -1)} break
+				case '27': {isPincode = (maharashtra.indexOf(pincode) != -1)} break
+				case '28': {isPincode = (andhrapradesh.indexOf(pincode) != -1)} break
+				case '29': {isPincode = (karnataka.indexOf(pincode) != -1)} break
+				case '30': {isPincode = (goa.indexOf(pincode) != -1)} break
+				case '31': {isPincode = (lakshwadweep.indexOf(pincode) != -1)} break
+				case '32': {isPincode = (kerala.indexOf(pincode) != -1)} break
+				case '33': {isPincode = (tamilnadu.indexOf(pincode) != -1)} break
+				case '34': {isPincode = (puducherry.indexOf(pincode) != -1)} break
+				case '35': {isPincode = (andamannicobar.indexOf(pincode) != -1)} break
+				case '36': {isPincode = (telangana.indexOf(pincode) != -1)} break
+				case '37': {isPincode = (andhrapradesh.indexOf(pincode) != -1)} break	
+			}
+		}
+		var isGst = gstin ? /^([0-2][0-9]|[3][0-7]|[9][7])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/.test(gstin) : true;
+		//var isEmail = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);;
+		let emails = email.replace(' ', '').split(',');
+		let filtered_emails = emails.filter(one_email => {return !/^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(one_email)});
+		var isEmail = filtered_emails.length === 0;
+		
+		var is_valid_state_gst_code = true;
+		var gst_exemption_date_selection_required = false;
+		
+		if(isgstexemption) {
+			if($('#inwardcargo_consignees_list_gst_exemption_upto_date').val()) {} else {
+				gst_exemption_date_selection_required = true;
+			}
+			
+			is_valid_state_gst_code = false;
+		}
+		
+		if(isGst) {
+			if(gstin) {
+				var gst_start_code = gstin.slice(0,2);
+				//	only admin is allowed to enter 97 URN
+				is_valid_state_gst_code = gst_start_code === state_gst_code || (!{sails.config.custom.access_allowed(req.user.role, 'AppAdmin')} ? gst_start_code === '97' : false);
+			}
+		}
+		
+		$( ".invalid-feedback" ).remove();
+		$( ".invalid-fullname" ).remove();
+		$( ".invalid-address" ).remove();
+		$( ".invalid-email" ).remove();
+		$( ".invalid-city" ).remove();
+		$( ".invalid-phone" ).remove();
+		$( ".invalid-state" ).remove();
+		$( ".invalid-gst" ).remove();
+		$( ".invalid-pincode" ).remove();
+		$( ".invalid-gst-exemption-date" ).remove();
+		$("#inwardcargo_consignees_list_gstin_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_state_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_fullname_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_address_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_address2_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_email_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_city_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_phone_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_pincode_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_gst_exemption_upto_date").removeClass('is-invalid');
+		if(fullname == '' || fullname == null || fullname == undefined) {
+			$("#inwardcargo_consignees_list_fullname_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_fullname_input" ).after( "<div class='invalid-feedback invalid-fullname'>Name Cannot be blank</div>");
+		} else if(isFullNameNum) {
+			$("#inwardcargo_consignees_list_fullname_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_fullname_input" ).after( "<div class='invalid-feedback invalid-fullname'>Full Name cannot be number</div>");
+		} else if(!isNameInRange) {
+			$("#inwardcargo_consignees_list_fullname_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_fullname_input" ).after( "<div class='invalid-feedback invalid-fullname'>Name must be between 3-100 characters</div>");
+		} else if(cityname == '' || cityname == null || cityname == undefined) {
+			$("#inwardcargo_consignees_list_city_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_city_input" ).after( "<div class='invalid-feedback invalid-city'>City Cannot be blank</div>" );
+		} else if(statename == '' || statename == null || statename == undefined){
+			$("#inwardcargo_consignees_list_state_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_state_input" ).after( "<div class='invalid-feedback invalid-state'>State Cannot be blank</div>" );
+		} else if(!isPincode) {
+			$("#inwardcargo_consignees_list_pincode_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_pincode_input" ).after( "<div class='invalid-feedback invalid-pincode'>invalid Pin Code</div>" );
+		} else if((email == '' || email == null || email == undefined) && (customer === 'Agent')){
+			$("#inwardcargo_consignees_list_email_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_email_input" ).after( "<div class='invalid-feedback invalid-email'>Email Cannot be blank for Agent</div>" );
+		} else if(email && !isEmail) {
+			$("#inwardcargo_consignees_list_email_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_email_input" ).after( "<div class='invalid-feedback invalid-email'>invalid Email - must separate by comma</div>" );
+		}/* else if(phone == '' || phone == null || phone == undefined) {
+			$("#inwardcargo_consignees_list_phone_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_phone_input" ).after( "<div class='invalid-feedback invalid-phone'>Phone Cannot be blank</div>" );
+		}*/else if(phone && !isPhoneNumber) {
+			$("#inwardcargo_consignees_list_phone_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_phone_input" ).after( "<div class='invalid-feedback invalid-phone'>invalid Phone number</div>" );
+		} else if(address == '' || address == null || address == undefined) {
+			$("#inwardcargo_consignees_list_address_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_address_input" ).after( "<div class='invalid-feedback invalid-address'>Address Cannot be blank</div>" );
+		} else if(address.length < 3 || address.length > 100) {
+			$("#inwardcargo_consignees_list_address_input").addClass('is-invalid');
+			$( "#inwardcargo_consignees_list_address_input" ).after( "<div class='invalid-feedback invalid-address'>Address should be between 3-100 characters</div>" );
+		} else if(gst_exemption_date_selection_required) {
+			$('#inwardcargo_consignees_list_gst_exemption_upto_date').addClass('is-invalid');
+			$('#inwardcargo_consignees_list_gst_exemption_upto_date').after("<div class='invalid-feedback invalid-gst-exemption-date'>Exemption Date is required</div>");
+		} else {
+			//	validate the gstin
+			if(!isGst ) {
+				$("#inwardcargo_consignees_list_gstin_input").addClass('is-invalid');
+				$( "#inwardcargo_consignees_list_gstin_input" ).after( "<div class='invalid-feedback invalid-gst'>invalid GSTIN number</div>" );
+			} else if (!is_valid_state_gst_code) {
+				$("#inwardcargo_consignees_list_gstin_input").addClass('is-invalid');
+				$( "#inwardcargo_consignees_list_gstin_input" ).after( "<div class='invalid-feedback invalid-gst'>GST number for " + statename + " must start with " + state_gst_code + "</div>" );
+			}else {
+				$('#inwardcargo_consignees_list_id').attr('disabled','disabled');
+				let inwardcargo_consignees_list_gst_exemption_upto_date;
+				if($('#inwardcargo_consignees_list_gst_exemption_upto_date').val()) {
+					inwardcargo_consignees_list_gst_exemption_upto_date = new Date($('#inwardcargo_consignees_list_gst_exemption_upto_date').val());
+					inwardcargo_consignees_list_gst_exemption_upto_date.setHours(23);
+					inwardcargo_consignees_list_gst_exemption_upto_date.setMinutes(59);
+					inwardcargo_consignees_list_gst_exemption_upto_date.setSeconds(59);
+					inwardcargo_consignees_list_gst_exemption_upto_date.setMilliseconds(999);
+				}
+				getCSRFToken(function(_csrf) {
+					$.post("consignees", {
+						_csrf: _csrf,
+						inwardcargo_consignees_list_fullname_input: fullname,
+						inwardcargo_consignees_list_state_input: statename,
+						inwardcargo_consignees_list_email_input: email,
+						inwardcargo_consignees_list_phone_input: phone,
+						inwardcargo_consignees_list_address_input: address,
+						inwardcargo_consignees_list_address2_input: address2,
+						inwardcargo_consignees_list_city_input: cityname,
+						inwardcargo_consignees_list_gstin_input: gstin,
+						inwardcargo_consignees_list_pincode_input: pincode,
+						inwardcargo_consignees_list_credit_period_input: creditperiod,
+						inwardcargo_consignees_list_customer_input: customer,
+						inwardcargo_consignees_list_is_sez: issez,
+						inwardcargo_consignees_list_gst_exemption: isgstexemption,
+						inwardcargo_consignees_list_gst_exemption_upto_date: inwardcargo_consignees_list_gst_exemption_upto_date ? inwardcargo_consignees_list_gst_exemption_upto_date.getTime() : 0,
+						inwardcargo_consignees_list_enable_consignee: isenableconsignee,
+						inwardcargo_consignees_list_id: id
+					}, function (data) {
+						if(data.error_code) {
+							$('#inwardcargo_consignees_list_id').removeAttr("disabled");
+						}
+						//-console.log(data);
+						$("#inwardcargo_consignees_list_fullname_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_address_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_email_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_city_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_phone_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_state_input").removeClass('is-invalid');
+						$("#inwardcargo_consignees_list_pincode_input").removeClass('is-invalid');
+						$( ".invalid-gst" ).remove();
+						$( ".invalid-pincode" ).remove();
+						$( ".invalid-address" ).remove();
+						$( ".invalid-email" ).remove();
+						$( ".invalid-city" ).remove();
+						$( ".invalid-phone" ).remove();
+						$( ".invalid-state" ).remove();
+						$("#inwardcargo_consignees_list_gstin_input").removeClass('is-invalid');
+						if (data.error_code == 'ERR_C_NAME_BLANK') {
+							$("#inwardcargo_consignees_list_fullname_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_fullname_input" ).after( "<div class='invalid-feedback invalid-fullname'>"+data.error+"</div>");
+						} else if (data.error_code ==  'ERR_C_ADDRESS_BLANK') {
+							$("#inwardcargo_consignees_list_address_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_address_input" ).after( "<div class='invalid-feedback invalid-address'>"+data.error+"</div>" );
+						} else if (data.error_code ==  'ERR_C_EMAIL_BLANK') {
+							$("#inwardcargo_consignees_list_email_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_email_input" ).after( "<div class='invalid-feedback invalid-email'>"+data.error+"</div>" );
+						} else if (data.error_code ==  'ERR_C_CITY_BLANK') {
+							$("#inwardcargo_consignees_list_city_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_city_input" ).after( "<div class='invalid-feedback invalid-city'>"+data.error+"</div>" );
+						} else if (data.error_code ==  'ERR_C_PHONE_BLANK') {
+							$("#inwardcargo_consignees_list_phone_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_phone_input" ).after( "<div class='invalid-feedback invalid-phone'>"+data.error+"</div>" );
+						} else if (data.error_code ==  'ERR_C_STATE_BLANK') {
+							$("#inwardcargo_consignees_list_state_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_state_input" ).after( "<div class='invalid-feedback invalid-state'>"+data.error+"</div>" );
+						} else if(data.error_code == 'ERR_C_NAME_NOTNUMBER') {
+							$("#inwardcargo_consignees_list_fullname_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_fullname_input" ).after( "<div class='invalid-feedback invalid-fullname'>"+data.error+"</div>");
+						} else if(data.error_code == 'ERR_C_PHONE_INVALID') {
+							$("#inwardcargo_consignees_list_phone_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_phone_input" ).after( "<div class='invalid-feedback invalid-phone'>"+data.error+"</div>" );
+						} else if(data.error_code == 'ERR_C_PINCODE_INVALID') {
+							$("#inwardcargo_consignees_list_pincode_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_pincode_input" ).after( "<div class='invalid-feedback invalid-pincode'>invalid Pin Code</div>" );
+						} else if(data.error_code == 'ERR_C_EMAIL_INVALID') {
+							$("#inwardcargo_consignees_list_email_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_email_input" ).after( "<div class='invalid-feedback invalid-email'>"+data.error+"</div>" );
+						} else if(data.error_code == 'ERR_C_GSTIN_INVALID') {
+							$("#inwardcargo_consignees_list_gstin_input").addClass('is-invalid');
+							$( "#inwardcargo_consignees_list_gstin_input" ).after( "<div class='invalid-feedback invalid-gst'>"+data.error+"</div>" );
+						} else if (data.value) {
+							toast({
+								type: 'success',
+								title: 'Consignee added successfully'
+							});
+							location.reload();
+							/*if(window.location.pathname == '/consignees') {
+								showFakeLoader('inwardcargo-consignees-list-add-new-consignees-modal', '/consignees?inwardcargo_consignees_list_new_city=' + data.value.city_iata_code)
+							} else if(window.location.pathname == '/awb'){
+								showFakeLoader('inwardcargo-consignees-list-add-new-consignees-modal', '/awb?inwardcargo_igm_awb_number=' + data.value.city_iata_code)
+							} else {
+								showFakeLoader('inwardcargo-consignees-list-add-new-consignees-modal', '/consignees?inwardcargo_consignees_list_new_city=' + data.value.city_iata_code)
+							}*/
+						} else if (data.error_code == 'Entry Already Exist') {
+							toast({
+								type: 'error',
+								title: data.error
+							})
+						}
+					});
+				});
+			}
+		}
+	}
+
+	/*$("#inwardcargo_consignees_list_gstin_input").on('keydown', function(evt) {
+		var charCode = evt.charCode || evt.keyCode || evt.which;
+		console.log(charCode)
+		if (charCode === 46 ||charCode === 37 ||charCode === 17 || charCode === 16 && this.value.length < 3) {
+			return false;
+		}
+	});*/
+
+	function hideModal() {
+		$( ".invalid-fullname" ).remove();
+		$( ".invalid-address" ).remove();
+		$( ".invalid-email" ).remove();
+		$( ".invalid-city" ).remove();
+		$( ".invalid-phone" ).remove();
+		$( ".invalid-state" ).remove();
+		$( ".invalid-gst" ).remove();
+		$( ".invalid-pincode" ).remove();
+		$( ".invalid-gst-exemption-date" ).remove();
+		$("#inwardcargo_consignees_list_gstin_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_state_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_fullname_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_address_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_email_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_city_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_phone_input").removeClass('is-invalid');
+		$("#inwardcargo_consignees_list_pincode_input").removeClass('is-invalid');
+		$('#inwardcargo_consignees_list_gst_exemption_upto_date').removeClass('is-invalid');
+		$('#inwardcargo-consignees-list-add-new-consignees-modal').modal('hide');
+	}

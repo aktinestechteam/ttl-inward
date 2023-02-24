@@ -1,0 +1,278 @@
+doctype html
+html(dir='ltr')
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.min.css', rel='stylesheet')
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			//- script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')-cdn
+			//- script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')-cdn
+			script(src='/dist/js/html5shiv.js')
+			script(src='/dist/js/respond.min.js')
+	body
+		//input#canfront(type='hidden', name='canfront', value=constants.can_front, autocomplete="off")
+		//input#canback(type='hidden', name='canfront', value=constants.can_back, autocomplete="off")
+						
+		.main-wrapper
+			.container
+				.row
+					.col-12.text-center.pb-3
+						img(src='/images/airways_logo.png', alt='', style='margin-top:10px')
+				
+				.row
+					.col
+						b#cantolabel(style='font-size: 16px;font-weight: 600;') To ,
+						p#cantoaddress(style='font-size: 16px;font-weight: 600; white-space: pre-wrap;')
+							| #{awb_user_data.consignee_name}
+							| #{awb_user_data.consignee_address} #{awb_user_data.consignee_address2}
+							| Pincode - #{awb_user_data.consignee_pincode}
+							| State - #{awb_user_data.consignee_state}
+							| GST - #{awb_user_data.consignee_gstn}
+							| Phone - #{awb_user_data.consignee_phone}
+							| Email - #{awb_user_data.consignee_email}
+						//.row.pb-5
+							.col-sm-12
+								b#canfromphone(style='font-size: 22px;font-weight: 600;') Phone :  
+									| 01125652002
+					//.col-sm-4
+					.col.text-right
+						b#cantolabel(style='font-size: 16px;font-weight: 600;') From ,
+						p#cantoaddress(style='font-size: 16px;font-weight: 600; white-space: pre-wrap')
+							| #{constants.delivery_address}
+						//.row.pb-5
+							.col-sm-12
+								b#canfromphone(style='font-size: 22px;font-weight: 600;') Phone :  
+									| 01125652002
+				.row.pb-5
+					.col.text-right
+						b#canfromdate(style='font-size: 20px;font-weight: 600;') Date : #{new Date(can.can_issue_date).toLocaleString('en-US', date_format_options)}
+				
+				if awb_user_data.notify_type === 'Bank'
+					.row.pb-5
+						.col-sm-6
+							b#canfromdate(style='font-size: 16px;font-weight: 600;white-space: pre-wrap;')
+								| Also Notify
+								| #{awb_user_data.notify_address}
+							
+				.row.pb-3
+					.col-sm-12.text-center
+						b
+							u#cancargoarivalnoticelabel(style='font-size: 25px;font-weight: 1000;') CARGO ARRIVAL NOTICE
+				.row
+					.col-sm-12
+						p#canawbinfo(style='font-size: 20px;')
+							| Dear Sir / Madam,
+				.row.pb-3
+					.col-sm-12
+						table.table.table-bordered.w-100.text-center
+							tbody.customtable.thead-light
+								tr
+									th.p-0
+										strong AWB No.
+									th.p-0
+										strong Flight No.
+									th.p-0
+										strong Flight Date
+									th.p-0
+										strong IGM No.
+									th.p-0
+										strong IGM Date
+									th.p-0
+										strong Origin
+									th.p-0
+										strong No of Packages
+									th.p-0
+										strong Weight (kg)
+									th.p-0
+										strong Commodity
+								tr
+									td.p-0 #{part_awb.awb_number}
+									td.p-0 #{part_awb.flight_number}
+									td.p-0 #{new Date(igm.inward_date).toLocaleString('en-US', date_format_options)}
+									td.p-0 #{part_awb.igm_number}
+									td.p-0 #{new Date(igm.igm_date).toLocaleString('en-US', date_format_options)}
+									td.p-0 #{part_awb.origin}
+									
+									- var show_out_of_format = false;
+									//-	Display the format x/y if the received pieces are in partshipment, else display full
+									if(awb_user_data.expected_no_of_pieces === part_awb.no_of_pieces_received)
+										td.p-0 #{part_awb.no_of_pieces_received}
+									else
+										- show_out_of_format = true;
+										td.p-0 #{part_awb.no_of_pieces_received} / #{awb_user_data.expected_no_of_pieces} 
+									
+									//-	Same for weight, however we do not measure the weight for deciding total shipment as weight can be here and there, so banking on number of pieces received
+									if(show_out_of_format)
+										td.p-0 #{Number(part_awb.weight_received).toFixed(2)} / #{Number(awb_user_data.expected_weight).toFixed(2)}
+									else
+										td.p-0 #{Number(part_awb.weight_received).toFixed(2)}
+										
+									td.p-0 #{part_awb.commodity}
+								
+						//p#canawbinfo(style='font-size: 20px;')
+							| AWB #{part_awb.awb_number} arrive #{part_awb.flight_number} of #{new Date(igm.inward_date).toLocaleString('en-US', date_format_options)} under IGM No #{part_awb.igm_number} of 19-04-2018 from #{part_awb.origin} pkg #{part_awb.no_of_pieces_received} wt. #{part_awb.weight_received}
+				.row.pb-3
+					.col-sm-12!= constants.can_front
+						//#can_front_desc 
+				//.row.pb-2
+					.col-sm-12
+						table.table.table-bordered.w-100
+							tbody.customtable.thead-light
+								tr
+									td(style='font-size: 18px;') Commodity
+									td(style='font-size: 18px;') #{part_awb.commodity}
+				//- This is to ensure that we show payable charges only if DO is not issued
+				if part_awb.can_issued_with_charges
+					.row.pb-3
+						.col-sm-6
+							p(style='font-size: 20px;')
+								| PAYABLE CHARGE
+				.row.pb-2
+					.col-sm-12
+						//- This is to ensure that we show payable charges only if DO is not issued
+						if can.can_issued_with_charges
+							table.table.table-borderless.w-100
+								thead
+									col(width='30%')
+									col(width='10%')
+									col(width='25%')
+									col(width='10%')
+									col(width='25%')
+								tbody.customtable.thead-light
+									tr
+										td.py-0(style='font-size: 18px;') Delivery Order Fees Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.do_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Break Bulk charges Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.break_bulk_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Baggage Charges Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.baggage_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Direct Delivery Charges Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.direct_delivery_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Cartage Charges Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.cartage_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Freight Charges Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.collect_charge)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') Collect Fees Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.collect_fee)}
+										td.py-0
+										td.py-0
+										td.py-0(align='right', style='font-size: 18px;') Yours faithfully,
+									tr
+										td.py-0(style='font-size: 18px;') Miscellaneous Charges
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.misc_charges)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') IGST 18.00% Rs. 
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.igst)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') SGST 9.00% Rs.
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.sgst)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;') CGST 9.00% Rs. 
+										td.py-0(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(awb_user_data.cgst)}
+										td.py-0
+										td.py-0
+										td.py-0
+									tr
+										td.py-0(style='font-size: 18px;')
+											strong Total Rs.
+										td.py-0(align='right', style='font-size: 18px;')
+											strong #{sails.config.globals.price_formatter(Math.ceil(awb_user_data.do_charge + awb_user_data.break_bulk_charge + awb_user_data.baggage_charge + awb_user_data.cartage_charge + awb_user_data.collect_charge + awb_user_data.collect_fee + awb_user_data.misc_charges + awb_user_data.igst + awb_user_data.sgst + awb_user_data.cgst + awb_user_data.direct_delivery_charge))}
+										td.py-0
+										td.py-0
+										td.py-0(align='right', style='font-size: 18px;') #{constants.designation}
+					
+					//.col-sm-6(style='position: absolute;bottom: 6rem;')
+						.row.text-right.pb-5
+							.col-sm-6
+							.col-sm-6
+								p(style='font-size: 20px;')
+									| Yours faithfully,
+						.row.text-right.pt-5
+							.col-sm-6
+							.col-sm-6
+								p(style='font-size: 20px;')
+									| #{constants.designation}
+				.row.pt-3.pb-3
+					.col-sm-12.pt-3.pb-3
+						i(style='font-size: 18px;font-weight: 300;')
+							| (The above charges are indicative and exact applicable charges will be payable at the point of document collection)
+			.pagebreak(style='page-break-after: always')
+			.container
+				.pt-5#can_back_desc!= constants.can_back
+			// ==============================================================
+			// Login box.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+		// ==============================================================
+		// All Required js
+		// ==============================================================
+		script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$( "#can_back_desc" ).after($('#canback').val());
+			$( "#can_front_desc" ).after($('#canfront').val());
+			$('[data-toggle="tooltip"]').tooltip();
+			function pdf() {
+				location.href = '/canpdf';
+			}

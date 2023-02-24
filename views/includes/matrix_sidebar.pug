@@ -1,0 +1,217 @@
+aside.left-sidebar(data-sidebarbg='skin5')
+	// Sidebar scroll
+	.scroll-sidebar
+		// Sidebar navigation
+		nav.sidebar-nav
+			ul#sidebarnav.p-t-30
+				//if(req.user.role === 'user')
+					li.sidebar-item#menu_reports
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/dailyreports', aria-expanded='false')
+							i.mdi.mdi-chart-pie
+							span.hide-menu Daily Reports
+				- console.log(sails.config.custom.access_allowed(req.user.role, 'AppAdmin'));
+				if(sails.config.custom.access_allowed(req.user.role, 'AppAdmin'))
+					li.sidebar-item#menu_airportlist
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/airportlist', aria-expanded='false')
+							i.mdi.mdi-airplane
+							span.hide-menu Airport List
+					li.sidebar-item#menu_gstcodes
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/gstcodes', aria-expanded='false')
+							//i.mdi.mdi-database-plus
+							i.mdi.mdi-tag-plus
+							span.hide-menu GST Codes
+					li.sidebar-item#menu_reasons
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/reasons', aria-expanded='false')
+							i.mdi.mdi-comment-multiple-outline
+							span.hide-menu Reasons
+					//li.sidebar-item#menu_users
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/register', aria-expanded='false')
+							i.fas.fa-users
+							span.hide-menu Users
+					hr(style='border:1px solid white;', noshade)
+				
+				li.sidebar-item#menu_exchangerates
+					a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/exchangerates', aria-expanded='false')
+						i.mdi.mdi-currency-inr
+						span.hide-menu Exchange Rates
+				li.sidebar-item#menu_constants
+					a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/constants', aria-expanded='false')
+						i.mdi.mdi-settings
+						span.hide-menu Constants
+				li.sidebar-item#menu_consignees
+					a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/consignees', aria-expanded='false')
+						i.mdi.mdi-account-settings-variant
+						span.hide-menu Consignees
+				hr(style='border:1px solid white;', noshade)
+						
+				if(sails.config.custom.access_allowed(req.user.role, 'User') || sails.config.custom.access_allowed(req.user.role, 'AppAdmin'))
+					li.sidebar-item#menu_igm
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/igm', aria-expanded='false')
+							i.mdi.mdi-airplane
+							span.hide-menu IGM
+					li.sidebar-item#menu_transhipment
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/transhipment', aria-expanded='false')
+							i.mdi.mdi-truck
+							span.hide-menu Transhipment
+					//-li.sidebar-item#menu_constants
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/constants', aria-expanded='false')
+							i.mdi.mdi-settings
+							span.hide-menu Constants
+					//-li.sidebar-item#menu_consignees
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/consignees', aria-expanded='false')
+							i.mdi.mdi-account-settings-variant
+							span.hide-menu Consignees
+					li.sidebar-item#menu_generatedinvoice
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/invoicelist', aria-expanded='false')
+							i.mdi.mdi-receipt
+							span.hide-menu Invoice History
+					li.sidebar-item#menu_generatecreditinvoice
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/generatecreditinvoice', aria-expanded='false')
+							i.mdi.mdi-stackexchange
+							span.hide-menu Generate Credit Invoice
+					//-li.sidebar-item#menu_exchangerates
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/exchangerates', aria-expanded='false')
+							i.mdi.mdi-currency-inr
+							span.hide-menu Exchange Rates
+					//-li.sidebar-item#menu_reports
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/dailyreports', aria-expanded='false')
+							i.mdi.mdi-chart-pie
+							span.hide-menu Reports
+					//-li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/scannedffm', aria-expanded='false')
+							i.mdi.mdi-scanner
+							span.hide-menu Scanned FFM
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-receipt
+							span.hide-menu Reports
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/dailyreports', aria-expanded='false')
+									i.mdi.mdi-chart-pie
+									span.hide-menu Excel Reports
+							li.sidebar-item
+								a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/scannedffm', aria-expanded='false')
+									i.mdi.mdi-scanner
+									span.hide-menu Scanned Manifest
+							li.sidebar-item
+								a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='/challans', aria-expanded='false')
+									i.mdi.mdi-scanner
+									span.hide-menu Challan
+					
+				//-hr(style='border:1px solid white;', noshade)
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='index', aria-expanded='false')
+							i.mdi.mdi-view-dashboard
+							span.hide-menu Dashboard
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='charts', aria-expanded='false')
+							i.mdi.mdi-chart-bar
+							span.hide-menu Charts
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='widgets', aria-expanded='false')
+							i.mdi.mdi-chart-bubble
+							span.hide-menu Widgets
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='tables', aria-expanded='false')
+							i.mdi.mdi-border-inside
+							span.hide-menu Tables
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='grid', aria-expanded='false')
+							i.mdi.mdi-blur-linear
+							span.hide-menu Full Width
+					li.sidebar-item
+						a.sidebar-link.has-arrow.waves-effect.waves-dark(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-receipt
+							span.hide-menu Forms 
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link(href='form-basic')
+									i.mdi.mdi-note-outline
+									span.hide-menu  Form Basic 
+							li.sidebar-item
+								a.sidebar-link(href='form-wizard')
+									i.mdi.mdi-note-plus
+									span.hide-menu  Form Wizard 
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='pages-buttons', aria-expanded='false')
+							i.mdi.mdi-relative-scale
+							span.hide-menu Buttons
+					li.sidebar-item
+						a.sidebar-link.has-arrow.waves-effect.waves-dark(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-face
+							span.hide-menu Icons 
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link(href='icon-material')
+									i.mdi.mdi-emoticon
+									span.hide-menu  Material Icons 
+							li.sidebar-item
+								a.sidebar-link(href='icon-fontawesome')
+									i.mdi.mdi-emoticon-cool
+									span.hide-menu  Font Awesome Icons 
+					li.sidebar-item
+						a.sidebar-link.waves-effect.waves-dark.sidebar-link(href='pages-elements', aria-expanded='false')
+							i.mdi.mdi-pencil
+							span.hide-menu Elements
+					li.sidebar-item
+						a.sidebar-link.has-arrow.waves-effect.waves-dark(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-move-resize-variant
+							span.hide-menu Addons 
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link(href='index2')
+									i.mdi.mdi-view-dashboard
+									span.hide-menu  Dashboard-2 
+							li.sidebar-item
+								a.sidebar-link(href='pages-gallery')
+									i.mdi.mdi-multiplication-box
+									span.hide-menu  Gallery 
+							li.sidebar-item
+								a.sidebar-link(href='pages-calendar')
+									i.mdi.mdi-calendar-check
+									span.hide-menu  Calendar 
+							li.sidebar-item
+								a.sidebar-link(href='pages-invoice')
+									i.mdi.mdi-bulletin-board
+									span.hide-menu  Invoice 
+							li.sidebar-item
+								a.sidebar-link(href='pages-chat')
+									i.mdi.mdi-message-outline
+									span.hide-menu  Chat Option 
+					li.sidebar-item
+						a.sidebar-link.has-arrow.waves-effect.waves-dark(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-account-key
+							span.hide-menu Authentication 
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link(href='/login')
+									i.mdi.mdi-all-inclusive
+									span.hide-menu  Login 
+							li.sidebar-item
+								a.sidebar-link(href='authentication-register')
+									i.mdi.mdi-all-inclusive
+									span.hide-menu  Register 
+					li.sidebar-item
+						a.sidebar-link.has-arrow.waves-effect.waves-dark(href='javascript:void(0)', aria-expanded='false')
+							i.mdi.mdi-alert
+							span.hide-menu Errors 
+						ul.collapse.first-level(aria-expanded='false')
+							li.sidebar-item
+								a.sidebar-link(href='error-403')
+									i.mdi.mdi-alert-octagon
+									span.hide-menu  Error 403 
+							li.sidebar-item
+								a.sidebar-link(href='error-404')
+									i.mdi.mdi-alert-octagon
+									span.hide-menu  Error 404 
+							li.sidebar-item
+								a.sidebar-link(href='error-405')
+									i.mdi.mdi-alert-octagon
+									span.hide-menu  Error 405 
+							li.sidebar-item
+								a.sidebar-link(href='error-500')
+									i.mdi.mdi-alert-octagon
+									span.hide-menu  Error 500 
+		// End Sidebar navigation
+	// End Sidebar scroll

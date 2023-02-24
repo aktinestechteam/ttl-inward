@@ -1,0 +1,1769 @@
+extends ../layouts/matrix_layout_nosidebar.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	//link(rel='stylesheet', type='text/css', href='https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/af-2.3.0/b-1.5.2/b-colvis-1.5.2/b-flash-1.5.2/b-html5-1.5.2/b-print-1.5.2/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.4.0/r-2.2.2/rg-1.0.3/rr-1.2.4/sc-1.5.0/sl-1.2.6/datatables.min.css')
+	link(rel='stylesheet', type='text/css', href='/dist/css/datatables.min.css')
+	//link(rel='stylesheet', href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')-cdn
+	link(rel='stylesheet', href='/dist/css/jquery-ui.css')
+	// Include quill stylesheet
+	//link(href='https://cdn.quilljs.com/1.3.6/quill.snow.css', rel='stylesheet')-cdn
+	link(href='/dist/css/quill.snow.css', rel='stylesheet')
+	
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	- var allow_edit = (awb_user_data.consignee === undefined || awb_user_data.consignee === '');
+	- var received_no_of_pieces = 0;
+	- var received_weight = 0;
+	- var chargable_weight = allow_edit ? 0 : awb_user_data.chargable_weight;
+	- var consigneeidforgstin = (awb_user_data.consignee) ? '' + awb_user_data.consignee : '';
+	- var awbidforgstin = (awb_user_data.id) ? '' + awb_user_data.id : '';
+	- var can_is_issued = false;
+	- var do_is_issued = false;
+	- var is_invoiced = awb_user_data.invoice_document;
+	- var is_credit_customer = awb_user_data.consignee_credit_period != 'none';
+	- var invoice_voidable = false;
+	- var dcm_issued = false;
+	- var cityCode = awb.destination;
+
+	- let inward_ports = {}
+	each airportuser in airportlistuser
+		- inward_ports['' + airportuser.iata_code + ''] = airportuser.iata_code + ' (' + airportuser.city_name + ')'
+		
+	each part_awb in part_awbs
+		- received_no_of_pieces += part_awb.no_of_pieces_received;
+		- received_weight += part_awb.weight_received;
+		- chargable_weight += allow_edit ? part_awb.weight_received : 0;
+		- can_is_issued = (part_awb.can_document != '' || can_is_issued);
+		- do_is_issued = part_awb.do_document != '' || do_is_issued;
+
+	- var expected_no_of_pieces = allow_edit ? received_no_of_pieces : awb_user_data.expected_no_of_pieces;
+	- var expected_weight = allow_edit ? received_weight : awb_user_data.expected_weight;
+	
+	each invoice in invoices
+		if invoice.void_on === 0
+			- invoice_voidable = sails.config.globals.check_voidable(invoice.invoice_issue_date, invoice_irn)
+			- dcm_issued = invoice.dcm_document != '';
+	
+	- var show = false;
+	if(show)
+		p #{error}
+	else
+		form.container-fluid(action='/awb', method='post', onsubmit='return checkFormData()')
+			input(type='hidden', name='_csrf', value=_csrf)
+			.alert.alert-info.text-center
+				.row
+					//.col-lg-2
+						label.control-label IGM Number
+						input#inwardcargo_awb_igm_number_input.form-control.form-white( type='text', name='inwardcargo_awb_igm_input' , value=igmdetail.igm_number, autocomplete="off", readonly='')
+					//.col-lg-2
+						label.control-label Flight Date
+						input#inwardcargo_awb_flight_date_select.form-control.form-white( type='text', name='inwardcargo_awb_flight_date_select' , value=new Date(igmdetail.flight_date).toLocaleString('en-US', date_format_options), autocomplete="off", readonly='') 
+					//.col-lg-2
+						label.control-label Flight Inward Date
+						input#iinwardcargo_awb_flight_inward_date_select.form-control.form-white( type='text', name='inwardcargo_awb_flight_inward_date_select' , value=new Date(igmdetail.inward_date).toLocaleString('en-US', date_format_options), autocomplete="off", readonly='') 
+					.col-lg-2
+						label.control-label AWB Number
+						input#inwardcargo_awb_awb_number_input.form-control.form-white( type='text', name='inwardcargo_awb_awb_number_input' , value=awb.awb_number, autocomplete="off", readonly='')
+					.col-lg-2
+						label.control-label From
+						select#inwardcargo_awb_flight_from_select.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_flight_from_select', autocomplete="off", readonly='')
+							- var source_found_for_selection = false;
+							each airport in airportlistdetails
+								if(awb.origin === airport.iata_code)
+									option(value=airport.iata_code, selected='') #{airport.iata_code} (#{airport.city_name})
+									- source_found_for_selection = true;
+								else
+									option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							if(source_found_for_selection == false)
+								option(value=awb.origin, selected='') #{awb.origin}
+					.col-lg-2
+						label.control-label To
+						select#inwardcargo_awb_flight_to_select.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_flight_to_select', autocomplete="off", readonly='')
+							- var destination_found_for_selection = false;
+							each airport in airportlistdetails
+								if(awb.destination === airport.iata_code)
+									option(value=airport.iata_code, selected='') #{airport.iata_code} (#{airport.city_name})
+									- destination_found_for_selection = true;
+								else
+									option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							if(destination_found_for_selection == false)
+								option(value=awb.destination, selected='') #{awb.destination}
+					.col-lg-2
+						label.control-label Type Of Shipment
+						if allow_edit
+							p.badge.badge-danger.badge-pill.w-100 ATTENTION REQUIRED !
+						else
+							if expected_no_of_pieces > received_no_of_pieces
+								p.badge.badge-warning.badge-pill.w-100 PART RECEIVED, #{part_awbs.length} part(s) received
+							else
+								p.badge.badge-success.badge-pill.w-100 FULL SHIPMENT RECEIVED
+							
+					.col-lg-2
+						label.control-label Status Of AWB
+						if allow_edit
+							p.badge.badge-danger.badge-pill.w-100 Consignee Not Selected
+						else if can_is_issued === false
+							p.badge.badge-primary.badge-pill.w-100 CAN not issued
+						else if do_is_issued === false
+							p.badge.badge-info.badge-pill.w-100 DO not issued
+						else if is_invoiced
+							p.badge.badge-success.badge-pill.w-100 INVOICED
+						else
+							p.badge.badge-secondary.badge-pill.w-100 Not Invoiced
+					
+					.col-lg-2.my-auto
+						if do_is_issued == false && is_invoiced == false && allow_edit == false
+							button.btn.btn-warning(type='button', onclick='showVoidReasonModal(\'' + awb.awb_number + '\', "Void AWB")') Void AWB
+						else if allow_edit == true
+							div.btn.btn-info(onClick='changeDestinationOfAWB()') Change Destination
+			
+			if transhipments.length > 0
+				.row
+					.col-lg-12
+						.card.text-white.bg-info.p-2
+							h3 Transhipment Info
+							each transhipment in transhipments
+								div This AWB is arrived at 
+									label.badge.badge-warning #{transhipment.igm_city}
+									| on Flight No. 
+									label.badge.badge-warning #{transhipment.flight_no_rx}
+									| having IGM 
+									label.badge.badge-warning #{transhipment.igm_no_rx}, #{transhipment.no_of_pieces_rx}pcs / #{transhipment.weight_rx}kg [#{transhipment.commodity}]		
+
+			.row
+				.col-lg-6
+					.card.alert.alert-info
+						.row
+							h3.col-lg-9 Consignee Selection
+							if allow_edit
+								button.btn.col-lg-3(type='button', style='background-color:#e29a63', onclick="showConsigneeModal('"+req.user.role+"', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)") Add Consignee
+						//#headingTwo.card-header
+							h5.mb-0
+								i.m-r-5(aria-hidden='true')
+								span Consignees Details
+						#collapseTwo.collapse.show(aria-labelledby='headingTwo', data-parent='#accordionExample')
+							.card-body
+								.col-lg-12
+									label.control-label Consignees
+									if allow_edit
+										select#inwardcargo_awb_consignee.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_consignee', autocomplete="off")
+											option.selected(value="") Select Consignee
+											each consignee in consigneedetails
+												if(consignee.id === awb_user_data.consignee)
+													option(value=consignee.id selected) #{consignee.name}
+												else
+													option(value=consignee.id) #{consignee.name}
+									else
+										input.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', value=awb_user_data.consignee_name, autocomplete="off", disabled)
+								.col-lg-12
+									label.control-label Type
+									if allow_edit
+										select#inwardcargo_awb_consignee_type.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_consignee_type', autocomplete="off") 
+									else
+										input#inwardcargo_awb_consignee_type.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_consignee_type',value=awb_user_data.consignee_type, autocomplete="off" disabled='') 
+								.col-lg-12
+									label.control-label Notify
+									select#inwardcargo_awb_notify_select.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_notify_select', autocomplete="off")
+										- var notify_select_options = ['None', 'Bank', 'Agent'];
+										each notify_select_option in notify_select_options
+											if(notify_select_option === awb_user_data.notify_type)
+												option(value=notify_select_option, selected) #{notify_select_option}
+											else
+												option(value=notify_select_option) #{notify_select_option}
+												
+								.col-lg-12
+									label.control-label Notify Party Address
+									textarea.form-control#inwardcargo_awb_notify_address(name='inwardcargo_awb_notify_address', autocomplete="off", readonly) #{awb_user_data.notify_address}
+								.col-lg-12.mt-2
+									if(awb_user_data.bro_required)
+										if(awb_user_data.bro_received)
+											label.badge.badge-success.badge-pill BRO RECEIVED
+										else
+											label.badge.badge-danger.badge-pill BRO REQUIRED
+										
+				.col-lg-6.my-2
+					.card.alert.alert-info
+						h3 Consignee Information
+							span.ml-4
+								strong
+									p.badge.badge-primary.badge-pill#issez #{(awb_user_data && awb_user_data.consignee_is_sez) ? 'SEZ' : ''}
+						table.table.table-sm
+							tbody
+								tr
+									th 
+										strong Address
+									td(id=allow_edit ? 'inwardcargo_awb_address' : '' style='white-space: pre-wrap;') #{awb_user_data.consignee_address} #{awb_user_data.consignee_address2}
+								tr
+									th
+										strong Email
+									td(id=allow_edit ? 'inwardcargo_awb_consignee_email' : '') #{awb_user_data.consignee_email}
+								tr
+									th
+										strong Phone
+									td(id=allow_edit ? 'inwardcargo_awb_consignee_phone' : '') #{awb_user_data.consignee_phone}
+								tr
+									th
+										strong State
+									td#inwardcargo_awb_consignee_state #{awb_user_data.consignee_state}
+								tr
+									th
+										strong GSTN
+									td.consignee_info_gstin(id=allow_edit ? 'inwardcargo_awb_consignee_gst' : '') #{awb_user_data.consignee_gstn}
+										//- if(allow_edit == false && !awb_user_data.consignee_gstn)
+										//- 	button#consignee_info_gstin.btn.btn-warning.btn-sm(type='button', onclick="consignee_info_add_gstin(\''+data.value.id+'\')") Add GSTIN
+
+								tr
+									th
+										strong Credit Period
+									td(id=allow_edit ? 'inwardcargo_awb_consignee_credit_period' : '') #{awb_user_data.consignee_credit_period}
+								tr
+									th
+										strong Amount Balance
+									td.text-danger
+										strong#inwardcargo_consignee_amount_balance #{sails.config.globals.local_currency_symbol} #{sails.config.globals.price_formatter(Math.ceil(amt_balance))}
+								if !awb_user_data.do_document && !allow_edit
+									tr
+										th
+											button.btn.btn-dark(type='button', onclick='estimateDoCharges("' + awb_user_data.id + '", "' + awb_user_data.igm_city + '")') Estimate DO Amount
+										td.text-info
+											label#estimateDoCharges
+			.row.my-2
+				.col-sm-12
+					.table-responsive.alert.alert-info
+						h3 IGM / Shipment Information
+						table.table
+							thead.thead-light
+								tr
+									th(scope='col') Igm Number
+									//-th(scope='col') Origin - Destination
+									th(scope='col') Igm Date
+									th(scope='col') Flight Number
+									th(scope='col') Pieces Received
+									th(scope='col') Weight Received
+									th(scope='col') Commodity
+									th(scope='col') CAN
+									th(scope='col') DO
+									th(scope='col') Void-DO
+									th(scope='col') Invoice
+									th(scope='col') Void Invoice
+									th(scope='col') DCM
+							tbody.customtable
+								each part_awb in part_awbs
+									//- expected_no_of_pieces += allow_edit ? part_awb.no_of_pieces_received : 0;
+									//- expected_weight += allow_edit ? part_awb.weight_received : 0;
+									//- chargable_weight += allow_edit ? part_awb.weight_received : 0;
+									tr
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{part_awb.igm_number}
+										//-td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"')") (#{part_awb.origin} - #{part_awb.destination})
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{new Date(part_awb.inward_date).toLocaleString('en-US', date_format_options)}
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{part_awb.flight_number}
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{part_awb.no_of_pieces_received} pc(s)
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{sails.config.globals.price_formatter(part_awb.weight_received)} kg
+										td(onclick="showPartAwbModal('"+part_awb.id+"', '"+part_awb.flight_number+"','"+part_awb.no_of_pieces_received+"','"+part_awb.weight_received+"','"+part_awb.commodity+"','"+part_awb.can_document+"')") #{part_awb.commodity}
+										
+										if allow_edit
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Issue CAN
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Issue DO
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Void DO
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Issue Invoice
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Void Invoice
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Raise DCM
+										else if awb_user_data.invoice_document && part_awb.can_document && part_awb.do_document
+											td 
+												button.btn.btn-dark(type='button', onclick='window.open("/can?can=' + part_awb.can_document + '", "_blank");') Show CAN
+											td 
+												button.btn.btn-info(type='button', onclick='window.open("/do?do=' + part_awb.do_document + '", "_blank");') Show DO
+											td 
+												button.btn.btn-info(type='button', disabled) Void DO
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-success(type='button', onclick='window.open("/invoice?invoice_id=' + awb_user_data.invoice_document + '", "_blank");') Show Invoice
+											if invoice_voidable
+												td 
+													button.btn.btn-danger(type='button', onclick='showVoidReasonModal(\'' + awb_user_data.invoice_document + '\', "Void Invoice")') Void Invoice
+												td
+													button.btn.btn-outline-secondary(type='button', disabled) Raise DCM
+											else
+												td
+													button.btn.btn-danger(type='button', disabled) Void Invoice
+												td
+													button.btn.btn-primary(type='button', onclick='window.open("/dcm?invoice_id=' + awb_user_data.invoice_document + '&current_city=' + part_awb.igm_city + '", "_blank");') #{dcm_issued ? 'Show DCM' : 'Raise DCM'}
+										else if part_awb.do_document && part_awb.can_document
+											td 
+												button.btn.btn-dark(type='button', onclick='window.open("/can?can=' + part_awb.can_document + '", "_blank");') Show CAN
+											td 
+												button.btn.btn-info(type='button', onclick='window.open("/do?do=' + part_awb.do_document + '", "_blank");') Show DO
+											td 
+												//button.btn.btn-info(type='button', onclick='performDOVoid(\'' + part_awb.do_document + '\', null, null)') Void DO
+												button.btn.btn-info(type='button', onclick='showVoidReasonModal(\'' + part_awb.do_document + '\', "Void DO")') Void DO
+											td 
+												if(part_awb.part_awb_include_for_invoice && !is_credit_customer)
+													button.btn.btn-success(type='button', onclick='issueInvoice(\'' + part_awb.do_document + '\',\'' + part_awb.id + '\',\'' + part_awb.awb_number + '\',\'' + part_awb.igm_city + '\')') Issue Invoice
+												else
+													button.btn.btn-outline-secondary(type='button', disabled) Issue Invoice
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Void Invoice
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Raise DCM
+										else if part_awb.can_document
+											td 
+												button.btn.btn-dark(type='button', onclick='window.open("/can?can=' + part_awb.can_document + '", "_blank");') Show CAN
+											if awb_user_data.bro_required
+												if awb_user_data.bro_received
+													td 
+														button.btn.btn-info(type='button', onclick='issueDO(\'' + part_awb.id + '\',\'' + part_awb.awb_number + '\',\'' + part_awb.igm_city +  '\')') Issue DO
+												else
+													td 
+														button.btn.btn-warning(type='button', onclick='askForBRO(\'' + part_awb.awb_number + '\')') Obtain BRO
+											else
+												td 
+													button.btn.btn-info(type='button', onclick='issueDO(\'' + part_awb.id + '\',\'' + part_awb.awb_number + '\',\'' + part_awb.igm_city +  '\')') Issue DO
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Void DO
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Issue Invoice
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Void Invoice
+											td 
+												if(part_awb.part_awb_include_for_invoice)
+													button.btn.btn-outline-secondary(type='button', disabled) Raise DCM
+										else
+											td 
+												button.btn.btn-dark(type='button', onclick='issueCAN(\'' + part_awb.id + '\',\'' + part_awb.awb_number +  '\')') Issue CAN
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Issue DO
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Void DO
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Issue Invoice
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Void Invoice
+											td 
+												button.btn.btn-outline-secondary(type='button', disabled) Raise DCM	
+
+			.row
+				.col-sm-6.my-2
+					.card.alert.alert-info
+						h3 Fill Details From AWB
+						table.table.table-sm
+							tbody
+								tr
+									th
+										label Enter number of HAWBs
+									td
+										input#inwardcargo_awb_total_number_of_houses.form-control.form-white(placeholder='Number of Houses', value=awb_user_data.no_of_hawb type='text', name='inwardcargo_awb_total_number_of_houses', min='0', autocomplete="off", disabled='')
+								
+									th
+										label Select Cargo Type
+									td
+										select#inwardcargo_awb_delivery_option.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_delivery_option', autocomplete="off")
+											- var delivery_options = ['Normal', 'Baggage', 'Direct Delivery'/*, 'FOC'*/];
+											each delivery_option in delivery_options
+												if(delivery_option === awb_user_data.delivery_option)
+													option(value=delivery_option, selected) #{delivery_option}
+												else
+													option(value=delivery_option) #{delivery_option}
+								tr
+									th
+										label Total Number of Pieces
+									td
+										input#inwardcargo_awb_expected_no_of_pieces.form-control.form-white(placeholder='Total Number of Pieces', value=expected_no_of_pieces type='text', name='inwardcargo_awb_expected_no_of_pieces', min=expected_no_of_pieces, autocomplete="off")
+									th
+										label Total Gross Weight
+									td
+										input#inwardcargo_awb_expected_weight.form-control.form-white(placeholder='Gross Weight (kg)', value=Number(expected_weight).toFixed(2) type='text', name='inwardcargo_awb_expected_weight', min=expected_weight, step='0.01', autocomplete="off")
+								tr
+									th
+										label Chargeable Weight
+									td
+										input#inwardcargo_awb_chargable_weight_input.form-control.form-white(placeholder='Chargable Weight (kg)',value=Number(chargable_weight).toFixed(2),type='text',name='inwardcargo_awb_chargable_weight_input', min=expected_weight, step='0.01', autocomplete="off")
+									th
+										label Select Collect Charges Type
+									td
+										select#inwardcargo_awb_collect_charges_type.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_collect_charges_type', autocomplete="off")
+											- var collect_charges_type_options = ['PP', 'CC', 'PPCC'];
+											each collect_charges_type in collect_charges_type_options
+												if(collect_charges_type === awb_user_data.collect_charges_type)
+													option(value=collect_charges_type, selected) #{collect_charges_type}
+												else
+													option(value=collect_charges_type) #{collect_charges_type}
+								
+				.col-sm-6.my-2
+					.card.alert.alert-info
+						h3 Collect Charges
+						table.table.table-sm
+							tbody
+								tr
+									th
+										label Currency Name
+									td
+										select#inwardcargo_awb_collect_currency_name_input.form-control.select2.custom-select(name='inwardcargo_awb_collect_currency_name_input', autocomplete="off") 
+											each exchangerate in exchangerates
+												if(awb_user_data.collect_currency_name === exchangerate.currency)
+													option(value=exchangerate.currency, selected) #{exchangerate.currency} - #{exchangerate.value_local}
+												else
+													option(value=exchangerate.currency) #{exchangerate.currency} - #{exchangerate.value_local}
+								
+									th
+										label Weight Charge
+									td
+										input#inwardcargo_awb_collect_weight_charge_input.form-control.form-white(placeholder='Weight Charge', value=awb_user_data.collect_weight_charge type='text', name='inwardcargo_awb_collect_weight_charge_input', min='0', autocomplete="off")
+								tr
+									th
+										label Valuation Charge
+									td
+										input#inwardcargo_awb_collect_valuation_charge_input.form-control.form-white(placeholder='Valuation Charge', value=awb_user_data.collect_valuation_charge type='text', name='inwardcargo_awb_collect_valuation_charge_input', min='0', autocomplete="off")
+								
+									th
+										label Tax
+									td
+										input#inwardcargo_awb_collect_tax_input.form-control.form-white(placeholder='Tax', value=awb_user_data.collect_tax type='text', name='inwardcargo_awb_collect_tax_input', min='0', autocomplete="off")
+								tr
+									th
+										label Due Agent Charge
+									td
+										input#inwardcargo_awb_collect_due_agent_charge_input.form-control.form-white(placeholder='Due Agent Charge', value=awb_user_data.collect_due_agent_charge type='text', name='inwardcargo_awb_collect_due_agent_charge_input', min='0', autocomplete="off")
+									th
+										label Due Carrier Charge
+									td
+										input#inwardcargo_awb_collect_due_carrier_charge_input.form-control.form-white(placeholder='Due Carrier Charge', value=awb_user_data.collect_due_carrier_charge type='text', name='inwardcargo_awb_collect_due_carrier_charge_input', min='0', autocomplete="off")
+				
+				
+			.row.hawb_details_wrapper
+				.col-sm-12
+					.table-responsive.alert.alert-info
+						h3 HAWB Information
+						table#hawb_details.table
+							thead.thead-light
+								tr
+									th(scope='col') #
+									th(scope='col') HAWB No
+									th(scope='col') Origin
+									th(scope='col') Destination
+									th(scope='col') Pieces Received
+									th(scope='col') Total No of Pieces
+									th(scope='col') Weight Received
+									th(scope='col') Total weight
+									th(scope='col') Delete
+							tbody#hawb_rows
+								if(hawbs)
+									each hawb,i in hawbs
+										tr(id=hawb.id, class=hawb.deletedhawb_on === 0 ? hawb.total_no_of_pieces > hawb.no_of_pieces ? 'badge-warning count-me' : 'badge-success count-me' : 'badge-secondary')
+											th(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{(hawb.deletedhawb_on === 0) ? i+1 : ''}
+											th(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.hawb_no}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.origin}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.destination}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.no_of_pieces}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.total_no_of_pieces}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.weight}
+											td(onclick="showModal('"+hawb.id+"', '"+hawb.hawb_no+"','"+hawb.origin+"','"+hawb.destination+"','"+hawb.no_of_pieces+"','"+hawb.total_no_of_pieces+"','"+hawb.weight+"','"+hawb.total_weight+"')") #{hawb.total_weight}
+											td
+												if allow_edit && hawb.deletedhawb_on === 0
+													button.btn.btn-danger.waves-effect.waves-light.save-category(type='button', name='inwardcargo_airport_list_delete_airport', onclick="showConfirm('"+hawb.id+"')")
+														i.mdi.mdi-close
+								tr#no-click
+									td
+										if allow_edit
+											button#inwardcargo_awb_add_hawb_btn.btn.btn-info.waves-effect.waves-light(type='button', onclick='showModal("0", undefined, undefined, undefined, undefined, undefined, undefined, undefined)')
+												i.ti-plus
+												|  Add More HAWB
+									td
+									td
+									td
+									td
+									td 
+										//b Total Weight
+									td 
+										//b 0 kg		
+			.row
+				.col-lg-6.my-2
+					.card.alert.alert-info
+						h3 DO Void History
+						table.table
+							thead.badge-info
+								tr.badge-info
+									th(scope='col') DO Number
+									th(scope='col') Reasons
+							tbody
+								each single_do in dos
+									if single_do.void_on
+										tr.badge-danger(onclick='window.open("/do?do=' + single_do.id + '", "_blank");')
+											td(scope='row') 
+												label #{single_do.do_number}
+												p.m-0
+													label.badge.badge-secondary Issued By - #{single_do.issued_by}
+													label.badge.badge-light #{new Date(single_do.do_issue_date).toLocaleString('en-US', date_format_options)}
+													label.badge.badge-dark #{new Date(single_do.void_on).toLocaleString('en-US', date_format_options)}
+											td(scope='row')
+												label.badge-info.badge #{single_do.void_reason}
+												label #{single_do.void_explanation}
+									else
+										tr.badge-success(onclick='window.open("/do?do=' + single_do.id + '", "_blank");')
+											td(scope='row') #{single_do.do_number}
+												p.m-0 
+													label.badge.badge-secondary Issued By - #{single_do.issued_by}
+													label.badge.badge-info #{new Date(single_do.do_issue_date).toLocaleString('en-US', date_format_options)}
+											td(scope='row') ACTIVE
+
+				.col-lg-6.my-2
+					.card.alert.alert-info
+						h3 Invoice Void History
+						table.table
+							thead.badge-info
+								tr.badge-info
+									th(scope='col') Invoice Number
+									th(scope='col') Challan Number
+									th(scope='col') Reasons
+							tbody
+								each invoice in invoices
+									if invoice.void_on
+										tr.badge-danger
+											td(scope='row') 
+												a(onclick='window.open("/invoice?invoice_id=' + invoice.id + '", "_blank");') #{invoice.invoice_number}
+												p.m-0 
+													label.badge.badge-secondary Issued By - #{invoice.generated_by}
+													label.badge.badge-light #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+													label.badge.badge-dark #{new Date(invoice.void_on).toLocaleString('en-US', date_format_options)}
+													label.badge.badge-warning #{sails.config.globals.price_formatter(invoice.amount_billed)}
+											td(scope='row')
+												if invoice.challan_no
+													each challan in invoice.challan_no
+														a.text-white(href=challan.id)=challan.challan_no
+											td(scope='row')
+												label.badge-info.badge #{invoice.void_reason}
+												label #{invoice.void_explanation}
+											
+									else
+										tr(class=(invoice.dcm_document ? "badge-primary" : "badge-success"))
+											td(scope='row') 
+												a(onclick='window.open("/invoice?invoice_id=' + invoice.id + '", "_blank");') #{invoice.invoice_number}
+												p.m-0 
+													label.badge.badge-secondary Issued By - #{invoice.generated_by}
+													label.badge.badge-info #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+													label.badge.badge.badge-warning #{sails.config.globals.price_formatter(invoice.amount_billed)}
+											td(scope='row')
+												if invoice.challan_no
+													each challan in invoice.challan_no
+														div.text-white=challan.challan_no
+											td(scope='row') #{invoice.dcm_document ? "DCM RAISED" : "ACTIVE"}
+											
+			.row.text-center
+				.col-lg-1
+					//button#inwardcargo_awb_show_can_btn.btn.btn-info.waves-effect.waves(type='button',style='width: 10rem;', disabled)
+						i
+						|  Generate Can
+				.col-lg-1
+				.col-lg-1
+					//button#inwardcargo_awb_generate_do_btn.btn.btn-info.waves-effect.waves(type='button',style='width: 10rem;', disabled)
+						i
+						|  Generate Do
+				.col-lg-1
+				.col-lg-1
+					//button#inwardcargo_awb_generate_invoice_btn.btn.btn-info.waves-effect.waves(type='button',style='width: 10rem;', disabled)
+						i
+						|  Generate Invoice
+				.col-lg-1
+				.col-lg-1
+					//button#inwardcargo_awb_void_do_btn.btn.btn-info.waves-effect.waves(type='button',style='width: 10rem;', disabled)
+						i
+						|  Void Do
+				.col-lg-1
+				.col-lg-1
+					//button#inwardcargo_awb_void_invoice_btn.btn.btn-info.waves-effect.waves(type='button',style='width: 10rem;', disabled)
+						i
+						|  Void Invoice
+				.col-lg-1
+				.col-lg-1
+					if allow_edit
+						button#inwardcargo_awb_save_awb_btn.btn.btn-danger.waves-effect.waves(type='submit',style='width: 10rem;')
+							i
+							|  Save AWB
+	
+		// Modal Add Category
+		#inwardcargo-awb-add-new-hawb-modal.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+						//form#inwardcargo-airport-list-add-new-city-form(action="/airportlist" method='post', onsubmit="return showFakeLoader('inwardcargo-airport-list-add-new-city-modal')")
+						.modal-header
+							h4.modal-title
+								i#inwardcargo-awb-add-new-hawb-modal-title.mdi.mdi-city
+								|
+								h3.mx-3
+									span House Airway Bill Information
+							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						.modal-body
+							input#inwardcargo_awb_hawb_id(type='text', name='inwardcargo_awb_hawb_id', hidden='')
+							.row.mb-3
+								#inwardcargo_awb_hawb_number_input_block.col-md-12
+									label.control-label HAWB Number
+									if allow_edit
+										input#inwardcargo_awb_hawb_number_input.form-control.form-white(placeholder='Enter hawb Number', type='text', name='inwardcargo_awb_hawb_number_input',value='', autocomplete="off" )
+									else
+										input#inwardcargo_awb_hawb_number_input.form-control.form-white(placeholder='Enter hawb Number', type='text', name='inwardcargo_awb_hawb_number_input',value='', autocomplete="off" , readonly)
+							.row.mb-3
+								#inwardcargo_awb_hawb_number_of_pieces_input_block.col-md-6
+									label.control-label Number Of Pieces Received
+									input#inwardcargo_awb_hawb_number_of_pieces_input.form-control.form-white(placeholder='Enter Number Of Pieces', type='text', name='inwardcargo_awb_hawb_number_of_pieces_input', autocomplete="off" )
+								#inwardcargo_awb_hawb_total_number_of_pieces_input_block.col-md-6
+									label.control-label Total Number Of Pieces
+									if allow_edit
+										input#inwardcargo_awb_hawb_total_number_of_pieces_input.form-control.form-white(placeholder='Enter Total Number Of Pieces', type='text', name='inwardcargo_awb_hawb_total_number_of_pieces_input', autocomplete="off" )
+									else
+										input#inwardcargo_awb_hawb_total_number_of_pieces_input.form-control.form-white(placeholder='Enter Total Number Of Pieces', type='text', name='inwardcargo_awb_hawb_total_number_of_pieces_input' , autocomplete="off", readonly)
+							.row.mb-3
+								#inwardcargo_awb_hawb_weight_input_block.col-md-6
+									label.control-label Weight Received
+									input#inwardcargo_awb_hawb_weight_input.form-control.form-white(placeholder='Enter Weight', type='text', name='inwardcargo_awb_hawb_weight_input', autocomplete="off" )
+								#inwardcargo_awb_hawb_total_weight_input_block.col-md-6
+									label.control-label Total Gross Weight
+									if allow_edit
+										input#inwardcargo_awb_hawb_total_weight_input.form-control.form-white(placeholder='Enter Total Weight', type='text', name='inwardcargo_awb_hawb_total_weight_input', autocomplete="off" )
+									else
+										input#inwardcargo_awb_hawb_total_weight_input.form-control.form-white(placeholder='Enter Total Weight', type='text', name='inwardcargo_awb_hawb_total_weight_input', autocomplete="off" , readonly)
+							.row.mb-3
+								#inwardcargo_awb_hawb_origin_select_block.col-md-6
+									label.control-label From
+									select#inwardcargo_awb_hawb_origin_select.select2.form-control.form-white.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_hawb_origin_select', autocomplete="off")
+										each airport in airportlistdetails
+											option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+								#inwardcargo_awb_hawb_destination_select_block.col-md-6
+									label.control-label To
+									select#inwardcargo_awb_hawb_destination_select.select2.form-control.form-white.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_awb_hawb_destination_select', autocomplete="off")
+										each airport in airportlistdetails
+											option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+						.modal-footer
+							button#inwardcargo_awb_hawb_save_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick='addhawb()') Save
+							button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+				// END MODAL
+		include ../includes/reasonmodal.pug
+		include ../includes/add_consignee.pug
+		//	Modal for BRO Received
+		#inwardcargo-awb-consignee-info-gstin-modal-saved-awb.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+					.modal-header
+						h4#inwardcargo-awb-consignee-info-gstin-modal-title-saved-awb.modal-title Edit Consignee GSTIN
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						label.control-label GSTIN
+						input#inwardcargo_awb_consignee_info_gstin_saved_awb_input.form-control.form-white.mb-2(type='text', name='inwardcargo_awb_consignee_info_gstin_saved_awb_input', autocomplete="off")
+						b#inwardcargo-awb-consignee-info-gstin-number-hint-modal-title-saved-awb.btn-danger
+					.modal-footer
+						button#inwardcargo_awb_consignee_info_gstin_saved_awb_input_save_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick="saveConsigneeGSTINSavedAwb()") Save
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+				// END MODAL
+		//	Modal for BRO Received
+		//	Modal for BRO Received
+		#inwardcargo-awb-consignee-info-gstin-modal.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+					.modal-header
+						h4#inwardcargo-awb-consignee-info-gstin-modal-title.modal-title Edit Consignee GSTIN
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						label.control-label GSTIN
+						input#inwardcargo_awb_consignee_info_gstin_input.form-control.form-white.mb-2(type='text', name='inwardcargo_awb_consignee_info_gstin_input', autocomplete="off")
+						b#inwardcargo-awb-consignee-info-gstin-number-hint-modal-title.btn-danger
+					.modal-footer
+						button#inwardcargo_awb_consignee_info_gstin_input_save_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick="saveConsigneeGSTIN()") Save
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+				// END MODAL
+		//	Modal for BRO Received
+		#inwardcargo_awb_bro_required_modal.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+					form#inwardcargo-airport-list-add-new-city-form(action="/awbbroreceived" method='post', onsubmit="return checkBROReceived()")
+						input(type='hidden', name='_csrf', value=_csrf)
+						.modal-header
+							h4.modal-title The AWB (#{awb.awb_number}) requires BRO
+							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						.modal-body
+							label.control-label
+								ul.list-style-none
+									li(style='padding-top:1rem;padding-right:1rem;padding-left:1rem;')
+										label.customcheckbox(style='font-size: 16px;font-weight: 600') BRO Obtained
+											input#inwardcargo_awb_bro_obtained.listCheckbox(type='checkbox', name='inwardcargo_awb_bro_obtained', autocomplete="off")
+											span.checkmark
+								ul.list-style-none
+									li
+										input#inwardcargo_awb_number(type='text', name='inwardcargo_awb_number', hidden)
+						.modal-footer
+							button#inwardcargo_awb_hawb_save_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='submit') Save
+							button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+		// Modal Add Category
+		#inwardcargo-deletehawb-and-reason-modal.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+						.modal-header
+							h4.modal-title
+								i#inwardcargo-deletehawb-and-reason-modal-title
+							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						.modal-body
+							.row
+								.col-lg-12
+									label.control-label Select Reason
+									select#inwardcargo_deletehawb_and_reason_reason_select.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_deletehawb_and_reason_reason_select', autocomplete="off")
+								.col-lg-12
+									label.control-label Reason Explanation
+									input#inwardcargo_deletehawb_and_reason_explanation_reason_input.form-control.form-white(placeholder='Enter Reason Explanation', type='text', name='inwardcargo_deletehawb_and_reason_explanation_reason_input', autocomplete="off")
+						.modal-footer
+							button#inwardcargo_deletehawb_and_reason_id.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick='deleteHawb()') Save
+							button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal', aria-hidden='true') Close
+				// END MODAL
+		// Modal edit part AwB
+		#inwardcargo-awb-edit-part-awb-modal.modal.fade.none-border
+			.modal-dialog
+				.modal-content
+						.modal-header
+							h4.modal-title
+								i#inwardcargo-awb-edit-part-awb-modal-title.mdi.mdi-city
+								|
+							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						.modal-body
+							//-.row#inwardcargo_awb_edit_disclaimer
+								.col-md-12.badge.badge-danger NOTE: The AWB's User data is already entered and saved. Perform action at your own risk.
+							.row
+								#inwardcargo_awb_edit_partawb_flight_number_input_block.col-md-6
+									label.control-label Part AWB Flight Number
+									input#inwardcargo_awb_edit_partawb_flight_number_input.form-control.form-white(type='text', name='inwardcargo_awb_edit_partawb_flight_number_input', autocomplete="off")
+								#inwardcargo_awb_edit_partawb_pieces_received_input_block.col-md-6
+									label.control-label Pieces Reiceived
+									input#inwardcargo_awb_edit_partawb_pieces_received_input.form-control.form-white(type='text', name='inwardcargo_awb_edit_partawb_pieces_received_input', autocomplete="off")
+							.row
+								#inwardcargo_awb_edit_partawb_weight_received_input_block.col-md-6
+									label.control-label Weight Reiceived (kg)
+									input#inwardcargo_awb_edit_partawb_weight_received_input.form-control.form-white(type='text', name='inwardcargo_awb_edit_partawb_weight_received_input', autocomplete="off")
+								#inwardcargo_awb_edit_partawb_commodity_input_block.col-md-6
+									label.control-label Commodity
+									input#inwardcargo_awb_edit_partawb_commodity_input.form-control.form-white(type='text', name='inwardcargo_awb_edit_partawb_commodity_input', autocomplete="off")
+							.row
+								#inwardcargo_awb_edit_partawb_reason_type_select_block.col-md-6
+									label.control-label Reason Type
+									select#inwardcargo_awb_edit_partawb_reason_type_select.select2.form-control.custom-select(type='text', name='inwardcargo_awb_edit_partawb_reason_type_select', autocomplete="off")
+										if(reasonsdetail)
+											each reasons in reasonsdetail
+												option(value=reasons.reason) #{reasons.reason}
+								#inwardcargo_awb_edit_partawb_reason_input_block.col-md-6
+									label.control-label Reason
+									input#inwardcargo_awb_edit_partawb_reason_input.form-control.form-white(type='text', name='inwardcargo_awb_edit_partawb_reason_input', autocomplete="off")
+						.row.mx-1.modal-footer
+							button.col-3#inwardcargo_awb_edit_partawb_delete_btn.btn.btn-danger.waves-effect.waves-light.save-category.mr-auto(type='button', onclick='deletePartAwb()') 
+								i.fa.fa-trash(aria-hidden='true')
+								| &nbsp&nbspDelete
+							.col
+							button.col-3#inwardcargo_awb_edit_partawb_edit_btn.btn.btn-warning.waves-effect.waves-light.save-category(type='button', onclick='editPartAwb()') 
+								i.fa.fa-edit(aria-hidden='true')
+								| &nbsp&nbspEdit
+							button.col-3.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') 
+								i.fa.fa-times-circle(aria-hidden='true')
+								| &nbsp&nbspClose
+		// END MODAL
+
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/extra-libs/DataTables/datatables.min.js')
+	// Include the Quill library
+	//script(src='https://cdn.quilljs.com/1.3.6/quill.js')-cdn
+	script(src='/dist/js/quill.js')
+	script(src='/js/swal_helper.js')
+	include ../includes/add_consignee_js.pug
+	include ../includes/csrf.pug
+	script.
+		$(document).ready(function () {
+			//	Disable all the fields so that the user should not be able to edit anything since the AWB is saved
+			if(#{allow_edit} == false){
+				$('#inwardcargo_awb_flight_from_select').attr('disabled', '');
+				$('#inwardcargo_awb_flight_to_select').attr('disabled', '');
+				$('#inwardcargo_awb_consignee').attr('disabled', '');
+				$('#inwardcargo_awb_notify_select').attr('disabled', '');
+				$('#inwardcargo_awb_notify_address').attr('disabled', '');
+				$('#inwardcargo_awb_expected_no_of_pieces').attr('readonly', '');
+				$('#inwardcargo_awb_expected_weight').attr('readonly', '');
+				$('#inwardcargo_awb_collect_charges_type').attr('disabled', '');
+				$('#inwardcargo_awb_chargable_weight_input').attr('readonly', '');
+				$('#inwardcargo_awb_total_number_of_houses').attr('readonly', '');
+				$('#inwardcargo_awb_delivery_option').attr('disabled', '');
+				$('#inwardcargo_awb_collect_currency_name_input').attr('disabled', '');
+				$('#inwardcargo_awb_collect_weight_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_valuation_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_tax_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_due_agent_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_due_carrier_charge_input').attr('readonly', '');
+			}
+		});
+		$('#menu_constants').addClass("selected");
+		
+		if(#{allow_edit}) {
+			awbgetconsigneedetails($("#inwardcargo_awb_consignee option:selected").val());
+		} else {
+			var consigneeId = '#{consigneeidforgstin}';
+			awbgetconsigneedetails(consigneeId);
+		}
+		manageAWBNotifySelection($("#inwardcargo_awb_notify_select"));
+		manageCollectChargesTypeSelection($("#inwardcargo_awb_collect_charges_type"));
+		
+		$("#inwardcargo_awb_consignee").change(function () {
+			var consineeid = $("#inwardcargo_awb_consignee option:selected").val();
+			awbgetconsigneedetails(consineeid);
+		});
+		
+		$("#inwardcargo_awb_notify_select").change(function () {
+			manageAWBNotifySelection($(this));
+		});
+		
+		$("#inwardcargo_awb_collect_charges_type").change(function () {
+			manageCollectChargesTypeSelection($(this));
+		});
+		
+		function awbgetconsigneedetails(consigneeid) {
+			if(consigneeid === '') {
+				$("#inwardcargo_awb_consignee_type").empty();
+				$("#inwardcargo_awb_consignee_type").append( "<option value=''></option>" );
+				$("#inwardcargo_awb_address").text('');
+				$('#inwardcargo_awb_consignee_email').html('');
+				$('#inwardcargo_awb_consignee_phone').html('');
+				$('#inwardcargo_awb_consignee_gst').html('');
+				$('#inwardcargo_awb_consignee_credit_period').html('');
+				$('#inwardcargo_awb_add_hawb_btn').attr('disabled','');
+				$('#issez').html('');
+			} else {
+				getCSRFToken(function(_csrf) {
+					$.post( "/awbgetconsigneedetails",{
+						_csrf: _csrf, 
+						inwardcargo_awb_consignee: consigneeid
+					},function( data ) {
+						if(data.value) {
+							$("#inwardcargo_awb_consignee_type").empty();
+							$( "#inwardcargo_awb_consignee_type").append( "<option value="+data.value.type_of_customer+">"+data.value.type_of_customer+"</option>" );
+							$("#inwardcargo_awb_address").text(data.value.address + data.value.address2);
+							$('#inwardcargo_awb_consignee_email').html(data.value.email);
+							$('#inwardcargo_awb_consignee_phone').html(data.value.phone);
+							$('#inwardcargo_awb_consignee_state').html(data.value.state);
+							if(data.value.gstin) {
+								$('#inwardcargo_awb_consignee_gst').html(data.value.gstin);
+							} else {
+								$(".consignee_info_gstin").empty();
+								$(".consignee_info_gstin").append('<button type="button" id ="consignee_info_gstin" class="btn btn-warning btn-sm" onclick="consignee_info_add_gstin(\''+data.value.id+'\')">Add GSTIN</button>');
+								var check_edit = #{allow_edit};
+								var do_is_live = #{do_is_issued};
+								console.log(check_edit);
+								console.log(do_is_live);
+								console.log(check_edit);
+								if(!check_edit) {
+									if(!do_is_live) {
+										$("#consignee_info_gstin").css("display", "none");
+										$(".consignee_info_gstin").append('<button type="button" id ="consignee_info_gstin_saved_awb" class="btn btn-warning btn-sm" onclick="consignee_info_add_gstin_saved_awb(\''+data.value.id+'\')">Add GSTIN</button>');
+									} else {
+										$("#consignee_info_gstin").css("display", "none");
+									}
+								}
+							}
+							$('#inwardcargo_awb_consignee_credit_period').html(data.value.credit_period);
+							if(data.value.is_sez)
+								$('#issez').html('SEZ');
+							else
+								$('#issez').html('');
+
+							//	Manage the visibility of the hawb management area
+							if(data.value.type_of_customer === 'Direct')
+								disableFieldsForNonAgency();
+							else if (data.value.type_of_customer === 'Agent')
+								enableFieldsForAgency();
+							else if (data.value.type_of_customer === 'Bank')
+								disableFieldsForNonAgency();
+							else if (data.value.type_of_customer === 'Direct Agent')
+								disableFieldsForNonAgency();
+						}
+					});
+				});
+			}
+		}
+		
+		function consignee_info_add_gstin(consineeid) {
+			$( ".invalid-gst" ).remove();
+			$("#inwardcargo_awb_consignee_info_gstin_input").removeClass('is-invalid');
+			var state = $('#inwardcargo_awb_consignee_state').text();
+			$.get( "/getgstcode?"+Date.now(),{state:state},function( data ) {
+				if(data.error) {
+					errorSwal('Error',data.error);
+				} else {
+					$('#inwardcargo_awb_consignee_info_gstin_input').val(data.value);
+					$('#inwardcargo-awb-consignee-info-gstin-number-hint-modal-title').text('NOTE : GSTIN for ' + state +' is ' + data.value);
+					$('#inwardcargo_awb_consignee_info_gstin_input_save_btn').val(consineeid);
+					$('#inwardcargo-awb-consignee-info-gstin-modal').modal('show');
+				}
+			});
+		}
+		
+		function consignee_info_add_gstin_saved_awb(consineeid) {
+			$( ".invalid-gst" ).remove();
+			$("#inwardcargo_awb_consignee_info_gstin_saved_awb_input").removeClass('is-invalid');
+			var state = $('#inwardcargo_awb_consignee_state').text();
+			$.get( "/getgstcode?"+Date.now(),{state:state},function( data ) {
+				if(data.error) {
+					errorSwal('Error',data.error);
+				} else {
+					$('#inwardcargo_awb_consignee_info_gstin_saved_awb_input').val(data.value);
+					$('#inwardcargo-awb-consignee-info-gstin-number-hint-modal-title-saved-awb').text('NOTE : GSTIN for ' + state +' is ' + data.value);
+					$('#inwardcargo_awb_consignee_info_gstin_saved_awb_input_save_btn').val(consineeid);
+					$('#inwardcargo-awb-consignee-info-gstin-modal-saved-awb').modal('show');
+				}
+			});
+		}
+		
+		$("#inwardcargo_awb_consignee_info_gstin_input").on('keydown', function(evt) {
+			var charCode = evt.charCode || evt.keyCode || evt.which;
+			if (charCode === 46 || charCode === 37 ||charCode === 17 || charCode === 16 && this.value.length < 3) {
+				return false;
+			}
+		});
+		
+		$("#inwardcargo_awb_consignee_info_gstin_saved_awb_input").on('keydown', function(evt) {
+			var charCode = evt.charCode || evt.keyCode || evt.which;
+			if (charCode === 46 || charCode === 37 ||charCode === 17 || charCode === 16 && this.value.length < 3) {
+				return false;
+			}
+		});
+		
+		function saveConsigneeGSTIN() {
+			$( ".invalid-gst" ).remove();
+			$("#inwardcargo_awb_consignee_info_gstin_input").removeClass('is-invalid');
+			var consigneeId = $('#inwardcargo_awb_consignee_info_gstin_input_save_btn').val();
+			var gstin = $('#inwardcargo_awb_consignee_info_gstin_input').val();
+			console.log(gstin)
+			var isGSTIN = ((!{sails.config.custom.access_allowed(req.user.role, 'AppAdmin')}) ? (/^([0-2][0-9]|[3][0-7]|[9][7])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/.test(gstin)) : (/^([0-2][0-9]|[3][0-7])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/.test(gstin)));
+			if(isGSTIN) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/saveconsigneegstin", {
+						_csrf: _csrf,
+						inwardcargo_awb_consignee_info_consignee_id: consigneeId, 
+						inwardcargo_awb_consignee_info_gstin_input: gstin
+					},function( data ) {
+						if(data.value){
+							location.reload();
+						}
+					});
+				});
+			} else {
+				$("#inwardcargo_awb_consignee_info_gstin_input").addClass('is-invalid');
+				$( "#inwardcargo_awb_consignee_info_gstin_input" ).after( "<div class='invalid-feedback invalid-gst mb-2'>Invalid GSTIN</div>");
+				//alert('Invalid gstin');
+			}
+		}
+		
+		function saveConsigneeGSTINSavedAwb() {
+			$( ".invalid-gst" ).remove();
+			$("#inwardcargo_awb_consignee_info_gstin_saved_awb_input").removeClass('is-invalid');
+			var consigneeId = $('#inwardcargo_awb_consignee_info_gstin_saved_awb_input_save_btn').val();
+			var awbId = '#{awbidforgstin}';
+			var gstin = $('#inwardcargo_awb_consignee_info_gstin_saved_awb_input').val();
+			var isGSTIN = ((!{sails.config.custom.access_allowed(req.user.role, 'AppAdmin')}) ? (/^([0-2][0-9]|[3][0-7]|[9][7])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/.test(gstin)) : (/^([0-2][0-9]|[3][0-7])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/.test(gstin)));
+			
+			if(isGSTIN) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/saveconsigneegstinsavedawb", {
+						_csrf: _csrf,
+						inwardcargo_awb_consignee_info_consignee_id_saved_awb: consigneeId, 
+						inwardcargo_awb_consignee_info_awb_id_saved_awb: awbId, 
+						inwardcargo_awb_consignee_info_gstin_saved_awb_input: gstin
+					},function( data ) {
+						if(data.value){
+							location.reload();
+						}
+					});
+				});
+			} else {
+				$("#inwardcargo_awb_consignee_info_gstin_saved_awb_input").addClass('is-invalid');
+				$( "#inwardcargo_awb_consignee_info_gstin_saved_awb_input" ).after( "<div class='invalid-feedback invalid-gst mb-2'>Invalid GSTIN</div>");
+				//alert('Invalid gstin');
+			}
+		}
+		
+		function manageAWBNotifySelection(jqNotifySelection) {
+			var selected_notify_party = jqNotifySelection.val();
+			if(selected_notify_party === 'Bank') {
+				$('#inwardcargo_awb_notify_address').removeAttr('readonly');
+			} else {
+				$('#inwardcargo_awb_notify_address').attr('readonly', '');
+				$('#inwardcargo_awb_notify_address').val('');
+			}
+		}
+		
+		function manageCollectChargesTypeSelection(jqCCTypeSelection) {
+			var cc_type_selection = jqCCTypeSelection.val();
+			
+			if(cc_type_selection === 'PP') {
+				$('#inwardcargo_awb_collect_currency_name_input').attr('disabled', '');
+				$('#inwardcargo_awb_collect_weight_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_valuation_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_tax_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_due_agent_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_due_carrier_charge_input').attr('readonly', '');
+				
+				$('#inwardcargo_awb_collect_weight_charge_input').val('0');
+				$('#inwardcargo_awb_collect_valuation_charge_input').val('0');
+				$('#inwardcargo_awb_collect_tax_input').val('0');
+				$('#inwardcargo_awb_collect_due_agent_charge_input').val('0');
+				$('#inwardcargo_awb_collect_due_carrier_charge_input').val('0');
+			} else if(cc_type_selection === 'CC') {
+				$('#inwardcargo_awb_collect_currency_name_input').removeAttr('disabled');
+				$('#inwardcargo_awb_collect_weight_charge_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_valuation_charge_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_tax_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_due_agent_charge_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_due_carrier_charge_input').removeAttr('readonly');
+			} else if(cc_type_selection === 'PPCC') {
+				$('#inwardcargo_awb_collect_currency_name_input').removeAttr('disabled');
+				$('#inwardcargo_awb_collect_weight_charge_input').attr('readonly', '');
+				$('#inwardcargo_awb_collect_valuation_charge_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_tax_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_due_agent_charge_input').removeAttr('readonly');
+				$('#inwardcargo_awb_collect_due_carrier_charge_input').removeAttr('readonly');
+				
+				$('#inwardcargo_awb_collect_weight_charge_input').val('0');
+			}
+		}
+		
+		function enableFieldsForAgency() {
+			$('#inwardcargo_awb_add_hawb_btn').removeAttr('disabled');
+			$('#inwardcargo_awb_total_number_of_houses').removeAttr('disabled');
+			//$('#inwardcargo_awb_expected_no_of_pieces').removeAttr('disabled');
+			//$('#inwardcargo_awb_expected_weight').removeAttr('disabled');
+		}
+		
+		function disableFieldsForNonAgency() {
+			$('#inwardcargo_awb_add_hawb_btn').attr('disabled', '');
+			$('#inwardcargo_awb_total_number_of_houses').attr('disabled', '');
+			//$('#inwardcargo_awb_expected_no_of_pieces').attr('disabled', '');
+			//$('#inwardcargo_awb_expected_weight').attr('disabled', '');
+		}
+		
+		$("#inwardcargo_awb_hawb_number_of_pieces_input").change(function () {
+			$('#inwardcargo_awb_hawb_total_number_of_pieces_input').val($(this).val());
+		});
+		
+		$("#inwardcargo_awb_hawb_weight_input").change(function () {
+			$('#inwardcargo_awb_hawb_total_weight_input').val($(this).val());
+		});
+		
+		function addhawb() {
+			var inwardcargo_awb_hawb_id = $('#inwardcargo_awb_hawb_id').val();
+			var inwardcargo_awb_hawb_number_input = $('#inwardcargo_awb_hawb_number_input').val();
+			var inwardcargo_awb_hawb_origin_select = $('#inwardcargo_awb_hawb_origin_select').val();
+			var inwardcargo_awb_hawb_destination_select = $('#inwardcargo_awb_hawb_destination_select').val();
+			var inwardcargo_awb_hawb_number_of_pieces_input = $('#inwardcargo_awb_hawb_number_of_pieces_input').val();
+			var inwardcargo_awb_hawb_total_number_of_pieces_input = $('#inwardcargo_awb_hawb_total_number_of_pieces_input').val();
+			var inwardcargo_awb_hawb_weight_input = $('#inwardcargo_awb_hawb_weight_input').val();
+			var inwardcargo_awb_hawb_total_weight_input = $('#inwardcargo_awb_hawb_total_weight_input').val();
+			var inwardcargo_awb_awb_number_input = $('#inwardcargo_awb_awb_number_input').val();
+			
+			var number_regex = /^[0-9]+$/;
+			var float_regex = /^\d+(\.\d{1,2})?$/;
+			$(".invalid-numberinput" ).remove();
+			$(".invalid-piecesinput" ).remove();
+			$(".invalid-totalpiecesinput" ).remove();
+			$(".invalid-weightinput" ).remove();
+			$(".invalid-totalweightinput" ).remove();
+			$(".invalid-hawbselect" ).remove();
+			
+			$("#inwardcargo_awb_hawb_number_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_hawb_number_of_pieces_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_hawb_total_number_of_pieces_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_hawb_weight_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_hawb_total_weight_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_awb_number_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_hawb_number_of_pieces_input").removeClass('is-invalid');
+			
+			if(!inwardcargo_awb_hawb_number_input.match(number_regex)){
+				$("#inwardcargo_awb_hawb_number_input").addClass('is-invalid');
+				$("#inwardcargo_awb_hawb_number_input").after("<div class='invalid-feedback invalid-numberinput'>Please enter valid HAWB</div>");
+			} else if(!inwardcargo_awb_hawb_number_of_pieces_input.match(number_regex)){
+				$("#inwardcargo_awb_hawb_number_of_pieces_input").addClass('is-invalid');
+				$("#inwardcargo_awb_hawb_number_of_pieces_input").after("<div class='invalid-feedback invalid-piecesinput'>Please enter valid number</div>");
+			} else if(!inwardcargo_awb_hawb_total_number_of_pieces_input.match(number_regex) || Number(inwardcargo_awb_hawb_number_of_pieces_input) > Number(inwardcargo_awb_hawb_total_number_of_pieces_input)){
+				$("#inwardcargo_awb_hawb_total_number_of_pieces_input").addClass('is-invalid');
+				$("#inwardcargo_awb_hawb_total_number_of_pieces_input").after("<div class='invalid-feedback invalid-totalpiecesinput'>Please enter total number of pieces greater or equal to pieces received </div>");
+			} else if(!inwardcargo_awb_hawb_weight_input.match(float_regex)){
+				$("#inwardcargo_awb_hawb_weight_input").addClass('is-invalid');
+				$("#inwardcargo_awb_hawb_weight_input").after("<div class='invalid-feedback invalid-weightinput'>Please enter valid weight</div>");
+			} else if(!inwardcargo_awb_hawb_weight_input.match(float_regex) || Number(inwardcargo_awb_hawb_weight_input) > Number(inwardcargo_awb_hawb_total_weight_input)) {
+				$("#inwardcargo_awb_hawb_total_weight_input").addClass('is-invalid');
+				$("#inwardcargo_awb_hawb_total_weight_input").after("<div class='invalid-feedback invalid-totalweightinput'>Please enter valid weight. total weight cannot less than weight input</div>");
+			} else{
+				getCSRFToken(function(_csrf) {
+					var hawbdetails = {};
+					hawbdetails._csrf = _csrf;
+					hawbdetails.inwardcargo_awb_hawb_id = inwardcargo_awb_hawb_id;
+					hawbdetails.inwardcargo_awb_hawb_number_input = inwardcargo_awb_hawb_number_input;
+					hawbdetails.inwardcargo_awb_hawb_number_of_pieces_input = inwardcargo_awb_hawb_number_of_pieces_input;
+					hawbdetails.inwardcargo_awb_hawb_total_number_of_pieces_input = inwardcargo_awb_hawb_total_number_of_pieces_input;
+					hawbdetails.inwardcargo_awb_hawb_weight_input = inwardcargo_awb_hawb_weight_input;
+					hawbdetails.inwardcargo_awb_hawb_total_weight_input = inwardcargo_awb_hawb_total_weight_input;
+					hawbdetails.inwardcargo_awb_hawb_origin_select = inwardcargo_awb_hawb_origin_select;
+					hawbdetails.inwardcargo_awb_hawb_destination_select = inwardcargo_awb_hawb_destination_select;
+					hawbdetails.inwardcargo_awb_mawb_number_input = inwardcargo_awb_awb_number_input;
+					//	POST the data to the Server
+					$.post( "/hawb", hawbdetails, function( data ) {
+						var server_response_success = true;//	Calculate your value here
+
+						if(server_response_success == true) {
+							$('#inwardcargo_awb_hawb_number_input').val('');
+							$('#inwardcargo_awb_hawb_origin_select').val('');
+							$('#inwardcargo_awb_hawb_destination_select').val('');
+							$('#inwardcargo_awb_hawb_number_of_pieces_input').val('');
+							$('#inwardcargo_awb_hawb_total_number_of_pieces_input').val('');
+							$('#inwardcargo_awb_hawb_weight_input').val('');
+							$('#inwardcargo_awb_hawb_total_weight_input').val('');
+
+							var id =data.value.id;
+							var onclick_item = 'onclick="showModal(\'' + id + '\',' + inwardcargo_awb_hawb_number_input + ',\'' + inwardcargo_awb_hawb_origin_select + '\',\'' + inwardcargo_awb_hawb_destination_select + '\',' + inwardcargo_awb_hawb_number_of_pieces_input + ',' + inwardcargo_awb_hawb_total_number_of_pieces_input + ',' + inwardcargo_awb_hawb_weight_input + ',' + inwardcargo_awb_hawb_total_weight_input + ')"';
+							
+							var current_count_me = $('.count-me').length;
+
+							var html2add = '<tr id="' + id + '" role="row" class="odd ' +(inwardcargo_awb_hawb_total_number_of_pieces_input > inwardcargo_awb_hawb_number_of_pieces_input ? 'badge-warning count-me' : 'badge-success count-me') + '"><th scope="row" ' + onclick_item + '>' + (current_count_me+1) + '</th><th scope="row" ' + onclick_item + '>' + inwardcargo_awb_hawb_number_input + '</th><td ' + onclick_item + '>' + inwardcargo_awb_hawb_origin_select + '</td><td ' + onclick_item + '>' + inwardcargo_awb_hawb_destination_select + '</td><td ' + onclick_item + '>' + inwardcargo_awb_hawb_number_of_pieces_input + '</td><td ' + onclick_item + '>' + inwardcargo_awb_hawb_total_number_of_pieces_input + '</td><td ' + onclick_item + '>' + inwardcargo_awb_hawb_weight_input + '</td><td ' + onclick_item + '>' + inwardcargo_awb_hawb_total_weight_input + '</td><td><button class="btn btn-danger waves-effect waves-light save-category" type="button" name="inwardcargo_airport_list_delete_airport" onclick="showConfirm(\'' + id + '\')"><i class="mdi mdi-close"></i></button></td></tr>';
+							if(inwardcargo_awb_hawb_id === '0') {
+								$('#no-click').before(html2add);
+							} else{
+								var jqhawb = $('#'+inwardcargo_awb_hawb_id);
+								jqhawb.before(html2add);
+								jqhawb.remove();
+							}
+							$('#inwardcargo-awb-add-new-hawb-modal').modal('hide');
+						}
+					});
+				});
+			}
+		}
+		
+		function showPartAwbModal(partawbid, flightnumber, piecesreceived, weightreceived, commodity, can_document) {
+			if (!#{allow_edit}) {
+				if(can_document) {
+					errorSwal('Error', 'CAN is already issued, editing is not possible now')
+					return;
+				}
+				//errorSwal('Error','You need to void the AWB to proceed with editing');
+				//return;
+				//$('#inwardcargo_awb_edit_disclaimer').show();
+			} else {
+				//$('#inwardcargo_awb_edit_disclaimer').hide();
+			}
+				
+			if (partawbid && flightnumber && piecesreceived && weightreceived && commodity) {
+				$('#inwardcargo_awb_edit_partawb_flight_number_input').val(flightnumber);
+				$('#inwardcargo_awb_edit_partawb_pieces_received_input').val(piecesreceived);
+				$('#inwardcargo_awb_edit_partawb_weight_received_input').val(weightreceived);
+				$('#inwardcargo_awb_edit_partawb_commodity_input').val(commodity);
+				$('#inwardcargo_awb_edit_partawb_edit_btn').val(partawbid);
+				$('#inwardcargo_awb_edit_partawb_delete_btn').val(partawbid);
+				$('#inwardcargo-awb-edit-part-awb-modal-title').text('Edit Part Awb');
+			}
+			$('#inwardcargo-awb-edit-part-awb-modal').modal('show');
+		}
+		
+		function deletePartAwb() {
+			var reasonType = $('#inwardcargo_awb_edit_partawb_reason_type_select').val();
+			var reason = $('#inwardcargo_awb_edit_partawb_reason_input').val();
+			var partawbid = $('#inwardcargo_awb_edit_partawb_delete_btn').val();
+			
+			if(!reasonType) {
+				errorSwal('Error','reason cannot be blank');
+			} else if(!reason) {
+				errorSwal('Error','reason explanation cannot be blank');
+			} else {
+				swal({
+					title: 'Are you sure?',
+					text: "You won't be able to revert this!",
+					type: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Yes, delete it!'
+				}).then(function (isConfirm) {
+					if (isConfirm.value == true) {
+						$('#inwardcargo-awb-edit-part-awb-modal').modal('hide');
+						showStaticFakeLoader();
+						getCSRFToken(function(_csrf) {
+							$.post("/requestdeletepartawb", {
+								_csrf: _csrf,
+								inwardcargo_awb_edit_partawb_delete: partawbid,
+								reason_type: reasonType,
+								reason: reason,
+							}, function (data) {
+								if (data.error) {
+									swal({
+										title: 'Error!',
+										text: data.error,
+										imageUrl: '/images/alert_cross.png',
+										background: '#ffffff',
+										imageWidth: 150,
+										imageHeight: 150,
+										confirmButtonText: 'OK'
+									});
+								} else {
+									swal({
+										title: 'Success',
+										text: 'Your request to delete the AWB part is registered successfully. Kindly await your manager\'s approval',
+										background: '#ffffff',
+										confirmButtonText: 'OK'
+									});
+								}
+								hideFakeLoader();
+							});
+						});
+					}
+				});
+			}
+		}
+		
+		function editPartAwb() {
+			var flightnumber = $('#inwardcargo_awb_edit_partawb_flight_number_input').val();
+			var piecesreceived = $('#inwardcargo_awb_edit_partawb_pieces_received_input').val();
+			var weightreceived = $('#inwardcargo_awb_edit_partawb_weight_received_input').val();
+			var commodity = $('#inwardcargo_awb_edit_partawb_commodity_input').val();
+			var reasonType = $('#inwardcargo_awb_edit_partawb_reason_type_select').val();
+			var reason = $('#inwardcargo_awb_edit_partawb_reason_input').val();
+			var partawbid = $('#inwardcargo_awb_edit_partawb_edit_btn').val();
+			
+			if(!reason || !reasonType || !flightnumber || !piecesreceived || !weightreceived || !commodity) {
+				swal({
+					title: 'Error!',
+					text: 'All the fields have to be entered',
+					imageUrl: '/images/alert_cross.png',
+					background: '#fff',
+					imageWidth: 150,
+					imageHeight: 150,
+					confirmButtonText: 'OK'
+				});
+				return;
+			}
+			
+			getCSRFToken(function(_csrf) {
+				$.post("/partawbedit", {
+					_csrf: _csrf,
+					inwardcargo_awb_edit_partawb_id: partawbid,
+					inwardcargo_awb_edit_partawb_flight_number_input: flightnumber, 
+					inwardcargo_awb_edit_partawb_pieces_received_input: piecesreceived,
+					inwardcargo_awb_edit_partawb_weight_received_input: weightreceived,
+					inwardcargo_awb_edit_partawb_commodity_input: commodity,
+					inwardcargo_awb_edit_partawb_reason_type_select: reasonType,
+					inwardcargo_awb_edit_partawb_reason_input: reason
+				}, function (data) {
+					if (data.error) {
+						swal({
+							title: 'Error!',
+							text: data.error,
+							imageUrl: '/images/alert_cross.png',
+							background: '#fff',
+							imageWidth: 150,
+							imageHeight: 150,
+							confirmButtonText: 'OK'
+						});
+					} else {
+						if (data.value)
+							location.reload();
+					}
+				});
+			});
+		}
+		
+		function showModal(hawbid, hawbnumber, hawborigin, hawbdestination, hawbnoofpieces, hawbtotalnoofpieces, hawbweight, hawbtotalweight) {
+				
+			if((hawbnumber)&&(hawbtotalnoofpieces)&&(hawbnoofpieces)&&(hawbtotalweight)&&(hawbweight)&&(hawborigin)) {
+				$('#inwardcargo_awb_hawb_number_input').val(hawbnumber);
+				$('#inwardcargo_awb_hawb_total_number_of_pieces_input').val(hawbtotalnoofpieces);
+				$('#inwardcargo_awb_hawb_number_of_pieces_input').val(hawbnoofpieces);
+				$('#inwardcargo_awb_hawb_total_weight_input').val(hawbtotalweight);
+				$('#inwardcargo_awb_hawb_weight_input').val(hawbweight);
+				$('#inwardcargo_awb_hawb_origin_select').val(hawborigin);
+				$('#inwardcargo_awb_hawb_destination_select').val(hawbdestination);
+				$('#inwardcargo_awb_hawb_id').val(hawbid);
+			} else {
+				$('#inwardcargo_awb_hawb_number_input').val('');
+				$('#inwardcargo_awb_hawb_total_number_of_pieces_input').val('');
+				$('#inwardcargo_awb_hawb_number_of_pieces_input').val('');
+				$('#inwardcargo_awb_hawb_total_weight_input').val('');
+				$('#inwardcargo_awb_hawb_weight_input').val('');
+				$('#inwardcargo_awb_hawb_origin_select').prop('selectedIndex', 0);
+				$('#inwardcargo_awb_hawb_destination_select').prop('selectedIndex', 0);
+				$('#inwardcargo_awb_hawb_id').val('0');
+			}
+			$('#inwardcargo-awb-add-new-hawb-modal').modal('show');
+		}
+
+		function issueCAN(part_awb, awb_number) {
+			if(part_awb && awb_number) {
+				$("#fakeloader").fadeIn();
+				getCSRFToken(function(_csrf) {
+					$.post( "/can", {
+						_csrf: _csrf,
+						part_awb: part_awb, 
+						awb_number: awb_number 
+					}, function( data ) {
+						if(data.error) {
+							$("#fakeloader").fadeOut();
+							errorSwal('Error',data.error);
+						} else {
+							//-window.open("/can?can=" + data.id, "_blank");
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function issueDO(part_awb, awb_number, igm_city) {
+			if(part_awb && awb_number && igm_city) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/createdo", {
+						_csrf: _csrf,
+						part_awb: part_awb,
+						awb_number: awb_number, 
+						igm_city: igm_city 
+					}, function( data ) {
+						if(data.error) {
+							errorSwal('Error',data.error);
+						} else {
+							//-window.open("/do?do=" + data.id, "_blank");
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function issueInvoice(do_id, part_awb, awb_number, igm_city) {
+			if(do_id && part_awb && awb_number && igm_city) {
+				$("#fakeloader").fadeIn();
+				getCSRFToken(function(_csrf) {
+					$.post( "/issueinvoice", {
+						_csrf: _csrf,
+						do_id: do_id, 
+						part_awb: part_awb, 
+						awb_number: awb_number, 
+						igm_city: igm_city
+					}, function( data ) {
+						$("#fakeloader").fadeOut();
+						if(data.error) {
+							errorSwal('Error', data.error, (result) => location.reload());
+						} else {
+							//-window.open("/do?do=" + data.id, "_blank");
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function askForBRO(awb_number) {
+			$('#inwardcargo_awb_number').val(awb_number);
+			$('#inwardcargo_awb_bro_required_modal').modal('show');
+		}
+		
+		function checkBROReceived() {
+			if($('#inwardcargo_awb_number').val()) {
+			} else {
+				errorSwal('Error','There is no AWB linked to this part');
+				return false;
+			}
+			
+			if($('#inwardcargo_awb_bro_obtained').is(':checked'))
+				return true;
+			else {
+				errorSwal('Error','You cannot generate DO without receiving BRO');
+				return false;
+			}
+		}
+			
+		function showConfirm(hawbId) {
+			$.get( "/getreasonsfordeletehawb?"+Date.now(),{selected_reason: 'Reasons for deleting HAWB'},function( reasondata ) {
+				var reason_option = '';
+				 $('#inwardcargo_deletehawb_and_reason_reason_select').empty();
+				 $('#inwardcargo_deletehawb_and_reason_explanation_reason_input').val('');
+				for( i = 0; i < reasondata.value.length; i++) {
+					reason_option = reason_option + '<option value='+'"'+reasondata.value[i].reason+'"'+'>'+reasondata.value[i].reason+'</option>';
+				}
+				$('#inwardcargo_deletehawb_and_reason_id').val(hawbId);
+				$("#inwardcargo_deletehawb_and_reason_reason_select").append(reason_option);
+				$('#inwardcargo-deletehawb-and-reason-modal-title').text('Delete HAWB');
+				$('#inwardcargo-deletehawb-and-reason-modal').modal('show');
+			});
+		}
+			
+		
+		
+		function deleteHawb() {
+			$(".invalid-reasoninputhawb").remove();
+			$("#inwardcargo_deletehawb_and_reason_explanation_reason_input").removeClass('is-invalid');
+			var deleteHawbID = $('#inwardcargo_deletehawb_and_reason_id').val();
+			var selected_reason = $('#inwardcargo_deletehawb_and_reason_reason_select').val();
+			var user_typed_reason = $('#inwardcargo_deletehawb_and_reason_explanation_reason_input').val();
+			if(!user_typed_reason){
+				$("#inwardcargo_deletehawb_and_reason_explanation_reason_input").addClass('is-invalid');
+				$("#inwardcargo_deletehawb_and_reason_explanation_reason_input" ).after( "<div class='invalid-feedback invalid-reasoninputhawb'>Please enter valid reason</div>");
+			} else{
+				getCSRFToken(function(_csrf) {
+					$.post("/deletehawb", {
+						_csrf: _csrf,
+						inwardcargo_hawb_list_delete_hawb: deleteHawbID, 
+						selected_reason: selected_reason, 
+						user_typed_reason: user_typed_reason
+					}, function (data) {
+					if (data.error) {
+						swal({
+							title: 'Error!',
+							text: data.error,
+							imageUrl: '/images/alert_cross.png',
+							background: '#fff',
+							imageWidth: 150,
+							imageHeight: 150,
+							confirmButtonText: 'OK'
+						});
+					} else {
+						if (data.value)
+							location.reload();
+					}
+				});
+			});
+			}
+		}
+
+		function performAWBVoid(awb_number, selected_reason, user_typed_reason) {
+			if(awb_number && selected_reason && user_typed_reason) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/voidawb", { 
+						_csrf: _csrf,
+						awb_number: awb_number,  
+						selected_reason: selected_reason, 
+						user_typed_reason: user_typed_reason
+					}, function( data ) {
+						if(data.error) {
+							console.log(data.error);
+						} else {
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function performDOVoid(do_id, selected_reason, user_typed_reason) {
+			if(do_id && selected_reason && user_typed_reason) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/voiddo", { 
+						_csrf: _csrf,
+						do_id: do_id, 
+						selected_reason: selected_reason,
+						user_typed_reason: user_typed_reason
+					}, function( data ) {
+						if(data.error) {
+							console.log(data.error);
+						} else {
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function performInvoiceVoid(invoice_id, selected_reason, user_typed_reason) {
+			if(invoice_id && selected_reason && user_typed_reason) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/voidinvoice", {
+						_csrf: _csrf,
+						invoice_id: invoice_id,  
+						selected_reason: selected_reason, 
+						user_typed_reason: user_typed_reason
+					}, function( data ) {
+						if(data.error) {
+							errorSwal('Error !', data.error);
+							console.log(data.error);
+						} else {
+							//for refreshing page
+							location.reload();
+						}
+					}, "json");
+				});
+			}
+		}
+		
+		function showVoidReasonModal(id,modal_title) {
+			$.get( "/getreasonsforvoid?"+Date.now(),{modal_title: modal_title},function( data ) {
+				var reason_option = '';
+				 $('#inwardcargo_voidreason_reason_select').empty();
+				 $('#inwardcargo_voidreason_explanation_reason_input').val('');
+				for( i = 0; i < data.value.length; i++) {
+					reason_option = reason_option + '<option value='+'"'+data.value[i].reason+'"'+'>'+data.value[i].reason+'</option>';
+				}
+				$("#inwardcargo_voidreason_reason_select").append(reason_option);
+				$('#inwardcargo_void_id').val(id);
+				$('#inwardcargo-void-reason-title').text(modal_title);
+				$('#inwardcargo-void-reason-modal').modal('show');
+			});
+		}
+
+		function performVoid() {
+			$(".invalid-reasoninput").remove();
+			$("#inwardcargo_deletehawb_and_reason_explanation_reason_input").removeClass('is-invalid');
+			var number = $('#inwardcargo_void_id').val();
+			var selected_reason = $('#inwardcargo_voidreason_reason_select').val();
+			var user_typed_reason = $('#inwardcargo_voidreason_explanation_reason_input').val();
+			if(!user_typed_reason){
+				$("#inwardcargo_voidreason_explanation_reason_input").addClass('is-invalid');
+				$("#inwardcargo_voidreason_explanation_reason_input" ).after( "<div class='invalid-feedback invalid-reasoninput'>Please enter valid reason</div>");
+			} else{
+				var modal_title = $('#inwardcargo-void-reason-title').text();
+				if(modal_title == 'Void AWB') {
+					performAWBVoid(number, selected_reason, user_typed_reason);
+				} else if(modal_title == 'Void DO'){
+					//console.log(modal_title + '-' + number + '-' + selected_reason +'-' + user_typed_reason)
+					performDOVoid(number, selected_reason, user_typed_reason);
+				} else if(modal_title == 'Void Invoice'){
+					//console.log(modal_title + '-' + number + '-' + selected_reason +'-' + user_typed_reason)
+					performInvoiceVoid(number, selected_reason, user_typed_reason);
+				}
+			}
+		}
+		
+		function checkFormData() {
+			//	Check the type of consignee.
+			//	For consignee as Agent, we should check how many houses, expected no of pieces and expected weight is entered or not
+			//	Also validate that the weight and the no of pieces entered are greater than or equal to the value set by the user
+			
+			var inwardcargo_awb_consignee_type_checks = false;
+			var inwardcargo_awb_notify_checks = false;
+			var inwardcargo_awb_chargable_weight_check = false;
+			var inwardcargo_awb_hawb_entry_check = false;
+			var alert_msg = 'something is wrong with your inputs';
+			
+			var inwardcargo_awb_consignee_type = $('#inwardcargo_awb_consignee_type').val();
+			var inwardcargo_awb_notify_select = $('#inwardcargo_awb_notify_select').val();
+			var inwardcargo_awb_notify_address = $('#inwardcargo_awb_notify_address').val();
+			
+			var inwardcargo_awb_total_number_of_houses = Number($('#inwardcargo_awb_total_number_of_houses').val());
+			var inwardcargo_awb_expected_no_of_pieces = Number($('#inwardcargo_awb_expected_no_of_pieces').val());
+			var inwardcargo_awb_expected_weight = Number($('#inwardcargo_awb_expected_weight').val());
+			var inwardcargo_awb_chargable_weight_input = Number($('#inwardcargo_awb_chargable_weight_input').val());
+			
+			//	Checking consignee type
+			if(inwardcargo_awb_consignee_type === 'Agent') {
+				if(inwardcargo_awb_total_number_of_houses <= 0) {
+					alert_msg = 'Please add atleast one hawb';
+				} else {
+					inwardcargo_awb_consignee_type_checks = true;
+				}
+			} else if(inwardcargo_awb_consignee_type === '') {
+				alert_msg = 'Please select a consignee';
+			} else {
+				//	You are concluding that everything is good.
+				inwardcargo_awb_consignee_type_checks = true;
+				inwardcargo_awb_hawb_entry_check = true;	//	There is no need for the hawb entry check if the consignee is not Agent
+			}
+			
+			//	Checking HAWB entry
+			if(inwardcargo_awb_consignee_type_checks === true) {
+				var hawbs_entered = $('.count-me').length;
+				
+				if(inwardcargo_awb_consignee_type === 'Agent') {
+					if(Number(inwardcargo_awb_total_number_of_houses) === hawbs_entered) {
+						inwardcargo_awb_hawb_entry_check = true;
+					} else {
+						alert_msg = 'Please enter total of ' + inwardcargo_awb_total_number_of_houses + ' HAWB(s)';
+						inwardcargo_awb_hawb_entry_check = false;
+					}
+					
+				} else {
+					//	There should be no HAWB entry for other types of consignee
+					if(hawbs_entered > 0) {
+						inwardcargo_awb_hawb_entry_check = false;
+						alert_msg = 'There shall be no HAWB for the consignee type ' + inwardcargo_awb_consignee_type;
+					}
+					else
+						inwardcargo_awb_hawb_entry_check = true;
+				}
+			}
+			
+			//	Check for notify address when earlier checks are done, else the alert msg can get overwritten
+			if(inwardcargo_awb_hawb_entry_check === true) {
+				if(inwardcargo_awb_notify_select === 'Bank' && inwardcargo_awb_notify_address.length === 0) {
+					alert_msg = 'Please enter the Notify Party Address';
+				} else {
+					inwardcargo_awb_notify_checks = true;
+				}
+			}
+			
+			//	Chargable weight check
+			if(inwardcargo_awb_notify_checks === true) {
+				if(inwardcargo_awb_chargable_weight_input >= inwardcargo_awb_expected_weight){
+					inwardcargo_awb_chargable_weight_check = true;
+				}
+				else{
+					alert_msg = 'Chargable weight cannot be less than Gross Weight';
+				}
+			}
+			
+			if(inwardcargo_awb_consignee_type_checks == false 	||
+				inwardcargo_awb_notify_checks == false			||
+				inwardcargo_awb_hawb_entry_check == false)
+				errorSwal('Error !', alert_msg);
+			
+			//alert('' + inwardcargo_awb_consignee_type_checks + '&&' + inwardcargo_awb_notify_checks + '&&' + inwardcargo_awb_chargable_weight_check + '&&' + inwardcargo_awb_hawb_entry_check + '&&' + perform_awb_validation())
+			
+			return inwardcargo_awb_consignee_type_checks && inwardcargo_awb_notify_checks && inwardcargo_awb_chargable_weight_check && inwardcargo_awb_hawb_entry_check && perform_awb_validation();
+		}
+		
+		function perform_awb_validation(){
+			var ret_value = false;
+			var inwardcargo_awb_expected_no_of_pieces= $('#inwardcargo_awb_expected_no_of_pieces').val();
+			var inwardcargo_awb_expected_weight= $('#inwardcargo_awb_expected_weight').val();
+			var inwardcargo_awb_chargable_weight_input= $('#inwardcargo_awb_chargable_weight_input').val();
+			var inwardcargo_awb_collect_valuation_charge_input= $('#inwardcargo_awb_collect_valuation_charge_input').val();
+			var inwardcargo_awb_collect_weight_charge_input= $('#inwardcargo_awb_collect_weight_charge_input').val();
+			var inwardcargo_awb_collect_tax_input= $('#inwardcargo_awb_collect_tax_input').val();
+			var inwardcargo_awb_collect_due_agent_charge_input= $('#inwardcargo_awb_collect_due_agent_charge_input').val();
+			var inwardcargo_awb_collect_due_carrier_charge_input= $('#inwardcargo_awb_collect_due_carrier_charge_input').val();
+			var inwardcargo_awb_total_number_of_houses = $('#inwardcargo_awb_total_number_of_houses').val();
+			var number_regex = /^[0-9]+$/;
+			var floatno_regex =/^[0-9]+(\.[0-9]+)?$/;
+			$( ".invalid-hawbno" ).remove();
+			$( ".invalid-number" ).remove();
+			$( ".invalid-weight" ).remove();
+			$( ".invalid-weightcharge" ).remove();
+			$( ".invalid-chargeweight" ).remove();
+			$( ".invalid-chargeinput" ).remove();
+			$( ".invalid-weightcharge" ).remove();
+			$( ".invalid-taxinput" ).remove();
+			$( ".invalid-collectdue" ).remove();
+			$( ".invalid-collectduecarrier" ).remove();
+			
+			$("#inwardcargo_awb_total_number_of_houses").removeClass('is-invalid');
+			$("#inwardcargo_awb_expected_no_of_pieces").removeClass('is-invalid');
+			$("#inwardcargo_awb_expected_weight").removeClass('is-invalid');
+			$("#inwardcargo_awb_chargable_weight_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_collect_valuation_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_collect_weight_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_collect_tax_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_collect_due_agent_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_awb_collect_due_carrier_charge_input").removeClass('is-invalid');
+
+			
+			if(!inwardcargo_awb_total_number_of_houses.match(number_regex)){
+				$("#inwardcargo_awb_total_number_of_houses").addClass('is-invalid');
+				$("#inwardcargo_awb_total_number_of_houses").after( "<div class='invalid-feedback invalid-hawbno'>Please enter valid number of pieces</div>" );
+			}
+			//	Expected number of pieces
+			if(!inwardcargo_awb_expected_no_of_pieces.match(number_regex)){
+				$("#inwardcargo_awb_expected_no_of_pieces").addClass('is-invalid');
+				$("#inwardcargo_awb_expected_no_of_pieces").after( "<div class='invalid-feedback invalid-number'>Please enter valid number of pieces</div>" );
+			}	
+			//	Expected weight 
+			else if(!inwardcargo_awb_expected_weight.match(floatno_regex)){
+				//-console.log('error for expected weight');
+				$("#inwardcargo_awb_expected_weight").addClass('is-invalid');
+				$("#inwardcargo_awb_expected_weight" ).after( "<div class='invalid-feedback invalid-weight'>Please enter valid weight</div>");
+			}
+			//	Chargable weight
+			else if(!inwardcargo_awb_chargable_weight_input.match(floatno_regex) || Number(inwardcargo_awb_expected_weight) > Number(inwardcargo_awb_chargable_weight_input)){
+				//-console.log('error for chargable weight');
+				$("#inwardcargo_awb_chargable_weight_input").addClass('is-invalid');
+				$("#inwardcargo_awb_chargable_weight_input").after("<div class='invalid-feedback invalid-chargeweight'>Please enter valid chargeable weight greater than total gross weight</div>");
+			} 
+			
+			//	Collect...
+			else if(!inwardcargo_awb_collect_valuation_charge_input.match(floatno_regex)){
+				//-console.log('error for collect valuation charge');
+				$("#inwardcargo_awb_collect_valuation_charge_input").addClass('is-invalid');
+				$("#inwardcargo_awb_collect_valuation_charge_input").after("<div class='invalid-feedback invalid-chargeinput'>Please enter valid valuation charge</div>");
+			} else if(!inwardcargo_awb_collect_weight_charge_input.match(floatno_regex)){
+			//-console.log('error for collect weight charge');
+				$("#inwardcargo_awb_collect_weight_charge_input").addClass('is-invalid');
+				$("#inwardcargo_awb_collect_weight_charge_input").after("<div class='invalid-feedback invalid-weightcharge'>Please enter valid weight charge</div>");
+			} else if(!inwardcargo_awb_collect_tax_input.match(floatno_regex)){
+			//-console.log('error for collect tax');
+				$("#inwardcargo_awb_collect_tax_input").addClass('is-invalid');
+				$("#inwardcargo_awb_collect_tax_input").after("<div class='invalid-feedback invalid-taxinput'>Please enter valid tax</div>");
+			} else if(!inwardcargo_awb_collect_due_agent_charge_input.match(floatno_regex)){
+			//-console.log('error for due agent');
+				$("#inwardcargo_awb_collect_due_agent_charge_input").addClass('is-invalid');
+				$("#inwardcargo_awb_collect_due_agent_charge_input").after("<div class='invalid-feedback invalid-collectdue'>Please enter valid agent charge</div>");
+			} else if(!inwardcargo_awb_collect_due_carrier_charge_input.match(floatno_regex)){
+			//-console.log('error for due carrier');
+				$("#inwardcargo_awb_collect_due_carrier_charge_input").addClass('is-invalid');
+				$("#inwardcargo_awb_collect_due_carrier_charge_input").after("<div class='invalid-feedback invalid-collectduecarrier'>Please enter valid carrier charge input</div>");
+			} else {
+			//-console.log('all neat');
+				ret_value = true;
+			}
+			
+			return ret_value;
+		}
+		
+		function estimateDoCharges(awb_user_data, igm_city) {
+			if(awb_user_data && igm_city) {
+				getCSRFToken(function(_csrf) {
+					$.post( "/estimatedocost", {
+						_csrf: _csrf,
+						igm_city: igm_city,
+						awb_user_data: awb_user_data
+					},function( data ) {
+						if(data.value){
+							let currency_symbol = '#{sails.config.globals.local_currency_symbol}';
+							$('#estimateDoCharges').html(currency_symbol + ' ' + data.value);
+						} else {
+							errorSwal('Error', data.error);
+						}
+					});
+				});
+			} else {
+				errorSwal('Error', "Cannot estimate for this AWB");
+			}
+		}
+		
+		async function changeDestinationOfAWB() {
+			const { value: fruit } = await Swal.fire({
+				title: 'Select field validation',
+				input: 'select',
+				inputOptions: !{JSON.stringify(inward_ports)},
+				//inputPlaceholder: 'Select new Destination',
+				showCancelButton: true,
+				inputValidator: (value) => {
+					return new Promise((resolve) => {
+						getCSRFToken(function(_csrf) {
+							$.post('/changeAWBDestination', {
+								_csrf: _csrf,
+								awb_no: $('#inwardcargo_awb_awb_number_input').val(),
+								new_iata_city: value
+							}, function(data) {
+								resolve();
+								location.href='/igm'
+							});
+						});
+					});
+				}
+			})
+		}

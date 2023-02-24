@@ -1,0 +1,97 @@
+doctype html
+html(lang="en", dir='ltr')
+
+	//- Variables to set active page in sidebar
+	block variables
+		- var activePage = 'dashboard'
+		- var activeGroup = 'none'
+
+	head
+		style.
+			.borderless tr, .borderless td, .borderless th {
+				border: none !important;
+			}
+			.red{
+				color:red;
+			}
+			.bold{
+				font-weight:600;
+			}
+		include ../includes/matrix_head.pug
+	body
+
+		#fakeloader(onclick='hideFakeLoader()', )
+
+		//-.preloader
+			.lds-ripple
+				.lds-pos
+				.lds-pos
+
+		div#main-wrapper
+			// Navbar
+			//include ../includes/matrix_header.pug
+			
+			.page-wrapper(style="margin-left: 0px;")
+				block content
+
+			//- Javascripts
+			include ../includes/matrix_javascript.pug
+			// Page specific javascripts
+			block specific-js
+
+		// Google analytics script
+		// Fake Loader
+		//script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+		script(src='/dist/js/fakeLoader.js')
+		script.
+			const toast = swal.mixin({
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				timer: 3000
+			});
+			
+			function showStaticFakeLoader() {
+				$("#fakeloader").fadeIn();
+			}
+
+			function showFakeLoader(modalname, pagetoredirect) {
+				$('#'+modalname).modal('hide');
+				$("#fakeloader").fadeIn();
+				location.href = pagetoredirect;
+			}
+
+			$("#fakeloader").fakeLoader({
+				timeToHide: 0, //Time in milliseconds for fakeLoader disappear
+				zIndex: "999",//Default zIndex
+				spinner: "spinner6",//Options: 'spinner1', 'spinner2', 'spinner3', 'spinner4', 'spinner5', 'spinner6', 'spinner7'
+				bgColor: "#000000cc", //Hex, RGB or RGBA colors
+			});
+
+			function hideFakeLoader() {
+				$("#fakeloader").fadeOut();
+			}
+			
+			//- var IDLE_TIMEOUT = 60; //seconds
+			//- var _idleSecondsCounter = 0;
+			//- document.onclick = function() {
+			//- 	_idleSecondsCounter = 0;
+			//- };
+			//- document.onmousemove = function() {
+			//- 	_idleSecondsCounter = 0;
+			//- };
+			//- document.onkeypress = function() {
+			//- 	_idleSecondsCounter = 0;
+			//- };
+			//- window.setInterval(CheckIdleTime, 1000);
+			//- 
+			//- function CheckIdleTime() {
+			//- 	_idleSecondsCounter++;
+			//- 	var oPanel = document.getElementById("SecondsUntilExpire");
+			//- 	if (oPanel)
+			//- 		oPanel.innerHTML = (IDLE_TIMEOUT - _idleSecondsCounter) + "";
+			//- 	if (_idleSecondsCounter >= IDLE_TIMEOUT) {
+			//- 		alert("Time expired!");
+			//- 		document.location.href = "/logout";
+			//- 	}
+			//- }

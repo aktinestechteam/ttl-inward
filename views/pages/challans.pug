@@ -1,0 +1,437 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {year:'numeric', month:'short', day:'numeric'};
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	//-link(rel='stylesheet', type='text/css', href='https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/af-2.3.0/b-1.5.2/b-colvis-1.5.2/b-flash-1.5.2/b-html5-1.5.2/b-print-1.5.2/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.4.0/r-2.2.2/rg-1.0.3/rr-1.2.4/sc-1.5.0/sl-1.2.6/datatables.min.css')
+	link(rel='stylesheet', type='text/css', href='/dist/css/datatables.min.css')
+	//-link(rel='stylesheet', href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')-cdn
+	link(rel='stylesheet', href='/dist/css/jquery-ui.css')
+
+
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		//-label.control-label Search Invoice
+		//-.row
+			.col-lg-3
+				input#inwardcargo_invoice_search_invoiceno_input.form-control(type='text', placeholder='Enter Invoice Number' name='inwardcargo_invoice_search_invoiceno_input', autocomplete="off")
+			.col-lg-3
+				button.btn.btn-danger.waves-effect.waves-light.save-category.ml-2.mb-3(type='button' onclick='findInvoice()') Find Invoice
+				
+		h3 Challans
+		.row
+			.col-1.m-auto
+				div.input-group-addon Station
+			.col-2
+				select#challan_station.select2.form-control.custom-select(type='text', name='inwardcargo_igm_upload_select_igm_from_available_igm', autocomplete="off")
+					each inward_port in inward_ports
+						option(value=inward_port.iata_code)=inward_port.iata_code + ' (' + inward_port.city_name + ')'
+			.col-4.mx-auto
+				div.input-group.input-daterange
+					input#challan_start_date.form-control(type="text",placeholder="Select Start Date",data-date-end-date="0d")
+					div.input-group-addon.my-auto TO
+					input#challan_end_date.form-control(type="text",placeholder="Select End Date",data-date-end-date="0d")
+			.col-2.m-auto
+				div.input-group
+					span.my-auto.p-2 OR
+					input#challan_search_by_challan_number.form-control(type="text", placeholder="Search Challan", name="challan_search_by_challan_number")
+			.col-3
+				button.btn.btn-danger(onclick='getchallans()')
+					i.fa.fa-file
+					| &nbsp;&nbsp;Submit
+
+		.card.mt-2
+			.row.card-body
+				.col-md-12
+					.tile
+						.tile-body
+							table.table.table-bordered(style='background-color:white')#challan_table
+								thead
+									tr
+										th Challan Date
+										th Challan Number
+										th Cash / Cheque
+										th Bank Name
+										th Created By
+										th AWBs
+										th Void / Void Reason
+	
+	#challan_awbs_modal.modal.fade.none-border
+		.modal-dialog
+			.modal-content
+					.modal-header
+						h4.modal-title
+							i#challan_awbs_modal_title.mdi.mdi-city
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						.row#challan_awbs_modal_awbs
+					.modal-footer
+						//-button#iscannedffm_add_comments_save.btn.btn-danger.waves-effect.waves-light.save-category(type='button', name='iscannedffm_add_comments_save', onclick='saveComments()') Save
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+						
+	#challan_void_modal.modal.fade.none-border
+		.modal-dialog
+			.modal-content
+					.modal-header
+						h4.modal-title
+							i#challan_void_modal_title.mdi.mdi-city
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						.row
+							.col-md-12
+								label.control-label Reason for VOID Challan
+								input#challan_void_modal_reason.form-control.form-white(placeholder='Enter Comments', type='text', name='challan_void_modal_reason', autocomplete="off")
+							input#challan_void_modal_challan_id(type='hidden', value='challan_void_modal_challan_id')
+					.modal-footer
+						button#challan_void_modal_challan_void_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='button', name='challan_void_modal_challan_void_btn', onclick='voidchallan()') Void
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+
+		// END MODAL
+		// ==============================================================
+		// End Container fluid
+		// ==============================================================
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	//script(src='/libs/jquery/dist/jquery.min.js')
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/js/swal_helper.js')
+	script(src='/js/helper.js')
+	script(src='/js/validation.js')
+	include ../includes/csrf.pug
+	script.
+		let challan_table = $('#challan_table').DataTable({
+			//dom: 'lfrtBip',
+			sScrollX: '100%',
+			autoWidth: false,
+			dom: 'lfrtip',
+			buttons: [
+				'copy', 'csv', 'excel', 'pdf', 'print'
+			],
+			"aoColumns": [
+				{
+					mData: 0,
+					bSortable: false,
+					/*mRender: function(data, type, full) {
+						return '<div>'+data[0]+'</div><div><strong>'+data[1]+'</strong></div>';
+					}*/
+				},
+				{
+					mData: 1,
+					bSortable: false,
+					/*mRender: function(data, type, full) {
+						return '<div>'+data[0]+'</div><div><strong>'+data[1]+'</strong></div>';
+					}*/
+				},
+				{
+					mData: 2,
+					bSortable: false
+				},
+				{
+					mData: 3,
+					bSortable: false,
+					bSearchable: true,
+					/*mRender: function(data, type, full) {
+						let return_html = '';
+						console.log(data[0]);
+						if(data[0]) {
+							return_html = '<div><a href=' + !{'"' + sails.config.custom.base_url + '"'} + data[0] + '>View Copy</a></div><div><strong>' + data[1] + '</strong></div>';
+						} else {
+							if(!{user.role === 'user'}) {
+								return_html = '<button class="btn btn-primary" onclick=\'showModalToUploadScannedFFM('+ JSON.stringify(full) +')\'>UPLOAD</button>';
+							}
+						}
+						
+						return return_html;
+					}*/
+				},
+				{
+					mData: 4,
+					bSortable: false,
+					/*mRender: function(data, type, full) {
+						let html = '';
+						
+						switch(data[0]) {
+							case 'upload_pending': 
+								html = '<div class="text-center">UPLOAD PENDING</div>';
+								break;
+							case 'approval_pending': 
+								if(!{user.role === 'admin'}) {
+									html = '<div><button class="btn btn-success" onclick=\'showApprovalCommentsModal(' + JSON.stringify(full) +', "ok")\'>APPROVE</button></div>';
+									html += '<div><button class="btn btn-danger" onclick=\'showApprovalCommentsModal(' + JSON.stringify(full) +', "rejected")\'>DECLINE</button></div>';
+								} else {
+									html = '<div class="text-center">APPROVAL PENDING</div>';
+								}
+								break;
+							case 'ok': 
+								html = '<h3 class="text-success text-center"><i class="fas fa-check-circle"></i></h3>'
+								if((Date.now() - data[1]) < 3*(24*60*60*1000)) {	//	3 days 
+									if(!{user.role === 'admin'}) {
+										html += '<div class="text-center"><button class="btn btn-warning" onclick=\'showApprovalCommentsModal(' + JSON.stringify(full) +', "revoked")\'>REVOKE</button></div>';
+									}
+								}
+								break;
+							case 'revoked':							
+								html = '<div class="text-center">REVOKED</div>';
+							case 'rejected':
+								html += '<h3 class="text-danger text-center"><i class="fas fa-times-circle"/></h3>'
+								break;
+								
+						}
+						
+						return html;
+					}*/
+				},
+				{
+					mData: 5,
+					bSortable: false,
+					mRender: function(data, type, full) {
+						return '<button class="btn btn-warning" onclick=\'showAwbs(' + JSON.stringify(full) + ',' + JSON.stringify(data) + ')\'>Show AWBs</button>';
+					}
+				},
+				{
+					mData: 6,
+					bSortable: false,
+					mRender: function(data, type, full) {
+						if(data[1]) {
+							return '<div>' + data[1] + '</div>';
+						} else {
+							return '<button class="btn btn-info" onclick=\'showChallanVoidModal(' + JSON.stringify(full) + ')\'>Void</button>';
+						}
+					}
+				}
+			]
+		});
+		
+		$('#challan_start_date').datepicker({
+			format: "dd-M-yyyy",
+			autoclose: true,
+			todayHighlight: true,
+		}).on('changeDate', function(selected_start_time){
+			//console.log(selected_start_time.date);
+			$('#challan_end_date').datepicker('show');
+		});
+		
+		$('#challan_start_date').datepicker('show');
+		
+		$('#challan_end_date').datepicker({
+			format: "dd-M-yyyy",
+			autoclose: true,
+			todayHighlight: true
+		}).on('changeDate', function(selected_end_time){
+			console.log(selected_end_time)
+			let start_time = $('#challan_start_date').datepicker('getDate').getTime();
+			let end_time = selected_end_time.date.getTime();
+			
+			if(end_time < start_time) {
+				swal('Oops', 'Please select END-DATE larger or equal to START-DATE', 'error');
+				$('#challan_end_date').datepicker('update', '');
+			}
+		});
+		
+		function getchallans() {
+			
+			let challan_number_to_search = $('#challan_search_by_challan_number').val();
+			let query = {};
+			query.station = $('#challan_station').val();
+			
+			if(challan_number_to_search) {
+				query.challan_no = challan_number_to_search;
+			} else {
+				let start_time_picker = $('#challan_start_date').datepicker('getDate');
+				if(!start_time_picker) {
+					swal('Oops', 'Please select START-DATE', 'error');
+					return;
+				}
+
+				let end_time_picker = $('#challan_end_date').datepicker('getDate');
+				if(!end_time_picker) {
+					swal('Oops', 'Please select END-DATE', 'error');
+					return;
+				}
+				
+				query.start_date = $('#challan_start_date').datepicker('getDate').getTime();
+				query.end_date = $('#challan_end_date').datepicker('getDate').getTime() + 24*60*60*1000;
+			}
+			
+			getCSRFToken(function(_csrf) {
+				showStaticFakeLoader();
+				query._csrf = _csrf;
+				$.post('/getchallans', 
+				query, 
+				function(data) {
+					console.log(data);
+					if(!data.error) {
+						challan_table.clear();
+						if(data.data.length) {
+							data.data.forEach(function(challan, index) {
+								let challan_date = new Date(challan.createdAt);
+								let challan_date_to_show = normalizeDigitsToTwo(challan_date.getDate()) + '-' + normalizeDigitsToTwo(challan_date.getMonth() + 1) + '-' + challan_date.getFullYear();// + ', ' + normalizeDigitsToTwo(challan_date.getHours()) + ':' + normalizeDigitsToTwo(challan_date.getMinutes());
+								let challan_transfer_date = challan.transfer_date > 0 ? new Date(challan.transfer_date) : 0;
+								let challan_transfer_date_to_show = challan_transfer_date > 0 ? (normalizeDigitsToTwo(challan_transfer_date.getDate()) + '-' + normalizeDigitsToTwo(challan_transfer_date.getMonth() + 1) + '-' + challan_transfer_date.getFullYear()) : '';
+		
+								challan_table.row.add([
+									getReadableDate(challan.createdAt),
+									challan.challan_no,
+									challan.challan_for,
+									challan.bank_ifsc ? challan.bank_ifsc : '',
+									challan.created_by ? challan.created_by : '',
+									challan.invoices,
+									[challan.id, challan.void_on ? challan.void_reason : null],
+								]).draw(true);
+							});
+						} else {
+							swal('Oops', 'There exists No data to show', 'info');
+						}
+						hideFakeLoader();
+					}
+				});
+			});
+		}
+		
+		let comment_validation_inputs = [
+			
+			{tagid: 'scannedffm_upload_modal_transfer_date_input', regex_name: 'free_text', allow_numbers: true, min: 0, required: true, errmsg: 'Please select a Date of Transfer'},
+			{tagid: 'scannedffm_upload_modal_transfer_igm_input', regex_name: 'text', allow_numbers: true, min: 4, max: 10, required: true, errmsg: 'IGM must be between 4-10 characters'},
+			{tagid: 'scannedffm_upload_modal_transfer_comments_input', regex_name: 'free_text', allow_numbers: true, min: 10, required: true, errmsg: 'Please enter a valid Comment of minimum 10 characters'},
+			
+			/*{tagid: 'quantity', text: '0', regex_name: 'any_number', errmsg: 'Only Digits are allowed for Quantity.'},
+			{tagid: 'phone', text: '9876543210', regex_name: 'any_number', errmsg: 'the number should be decimal number', allow_negative: false, allow_decimal: true},
+			{tagid: 'address', text: 'Brindavan', regex_name: 'text', errmsg: 'Address Error', allow_numbers: true, min: 3, other_chars: ' ', max: 5},*/
+		];
+		
+		async function showChallanVoidModal(row) {
+			$('#challan_void_modal').modal('show');
+			setTimeout(() => {
+				$('#challan_void_modal_title').html('VOID for Challan No - ' + row[1] + ', Date - ' + row[0] + ', ' + row[2]);
+				console.log(row[6][0]);
+				$('#challan_void_modal_challan_id').val(row[6][0]);
+			}, 300);
+		}
+		
+		/*challan_table.on('click', 'tr', function () {
+			var data = challan_table.row( this ).data();
+			alert( 'You clicked on '+data[0]+'\'s row' );
+			//showModalToUploadScannedFFM(data);
+		});*/
+		
+		function setScannedFFMFilename(fileName) {
+			$('#scannedffm_upload_label').text(fileName ? fileName : 'Choose Scanned FFM');
+		}
+		
+		$('#scannedffm_upload').change(function (e) {
+			var fileName = e.target.files[0].name;
+			setScannedFFMFilename(fileName);
+		});
+		
+		
+		//$('#scannedffm_upload_modal').modal('show');
+		function uploadScannedFFM() {
+			getCSRFToken(function(_csrf) {
+				var myFormData = new FormData();
+				scannedffm_upload = $('#scannedffm_upload')
+				myFormData.append('scannedffm_upload', scannedffm_upload.prop('files')[0]);
+				myFormData.append('_csrf', _csrf);
+				myFormData.append('scannedffm_id', $('#scannedffm_id').val());
+				//myFormData.append('stationSourceInput', $('#stationSourceSelect').val());
+				//myFormData.append('stationDestinationInput', $('#stationDestinationSelect').val());
+
+				$.ajax({
+					url: '/uploadscannedffm',
+					type: 'POST',
+					processData: false, // important
+					contentType: false, // important
+					//dataType : 'json',
+					data: myFormData
+				}).done(function(data) {
+					$('#scannedffm_upload_modal').modal('hide');
+					console.log('uploading done');
+					setScannedFFMFilename();
+					getscannedffms();
+				}).fail(function(jqXHR, status) {
+					console.log(status)
+					console.log('uploading failed');
+				});
+			});
+		}
+		
+		function saveApprovalComments() {
+			getCSRFToken(function(_csrf) {
+				$.post('/scannedffmapproval', {
+					_csrf: _csrf,
+					scannedffm_id: $('#scannedffm_approval_reason_modal_scannedffm_id').val(),
+					scannedffm_approval_reason: $('#scannedffm_approval_reason').val(),
+					scannedffm_approval_status: $('#scannedffm_approval_status').val(),
+				}, function(data) {
+					$('#scannedffm_approval_reason_modal').modal('hide');
+					getscannedffms();
+				});
+			});
+		}
+		
+		function showAwbs(row, invoices) {
+			showStaticFakeLoader();
+			getCSRFToken(function(_csrf) {
+				$.post('/getawbsforinvoices', {
+					_csrf: _csrf,
+					invoices: invoices
+				}, function(data) {
+					if(data.data) {
+						$('#challan_awbs_modal').modal('show');
+						setTimeout(() => {
+							$('#challan_awbs_modal_title').html('Challan No - ' + row[1] + ', Date - ' + row[0] + ', ' + row[2]);
+							$('#challan_awbs_modal_awbs').empty();
+							data.data.forEach(awbs => {
+								awbs.forEach(awb => {
+									let awb_url = '/awb?inwardcargo_igm_awb_number=' + awb.awb_number;
+									$('#challan_awbs_modal_awbs').append('<a href="' + awb_url + '" target="_blank"><div class="showawb badge badge-info m-1">' + awb.awb_number + '</div></a>')
+								});
+							});
+						}, 300);
+					} else {
+						swal('Oops', data.errormsg, 'error');
+					}
+					hideFakeLoader();
+					//getscannedffms();
+				});
+			});
+		}
+		
+		function voidchallan() {
+			let void_reason = $('#challan_void_modal_reason').val();
+			let challan_id = $('#challan_void_modal_challan_id').val();
+			
+			showStaticFakeLoader();
+			
+			getCSRFToken(function(_csrf) {
+				$.post('/voidchallan', {
+					_csrf: _csrf,
+					challan_id: challan_id,
+					void_reason: void_reason
+				}, function(data) {
+					console.log(data);
+					if(data.data) {
+						$('#challan_void_modal').modal('hide');
+						getchallans();
+					} else {
+						swal('Oops', data.errormsg, 'error');
+					}
+					hideFakeLoader();
+				});
+			});
+		}
+		
+		$('.showawb').click(function(item) {console.log(item);});
+		
+		//$('#challan_awbs_modal').modal('show');

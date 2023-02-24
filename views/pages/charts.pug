@@ -1,0 +1,165 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	link(href='/libs/flot/css/float-chart.css', rel='stylesheet')
+
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Charts
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		// Chart-1
+		.row
+			.col-md-12
+				.card
+					.card-body
+						h5.card-title Real Time Chart
+						#real-time(style='height:400px;')
+						p
+							| Time between updates:
+							input#updateInterval(type='text', value='', style='text-align: right; width:5em')
+							|  milliseconds
+		// ENd chart-1
+		// Chart-2
+		.row
+			.col-md-12
+				.card
+					.card-body
+						h5.card-title Turning-series chart
+						#placeholder(style='height: 400px;')
+						p#choices.m-t-20
+		// End Chart-2
+		// Cards
+		.row
+			.col-md-3
+				.card.m-t-0
+					.row
+						.col-md-6
+							.peity_line_neutral.left.text-center.m-t-10
+								span
+									span(style='display: none;') 10,15,8,14,13,10,10
+									canvas(width='50', height='24')
+								h6 10%
+						.col-md-6.border-left.text-center.p-t-10
+							h3.mb-0.font-weight-bold 150
+							span.text-muted New Users
+			.col-md-3
+				.card.m-t-0
+					.row
+						.col-md-6
+							.peity_bar_bad.left.text-center.m-t-10
+								span
+									span(style='display: none;') 3,5,6,16,8,10,6
+									canvas(width='50', height='24')
+								h6 -40%
+						.col-md-6.border-left.text-center.p-t-10
+							h3.mb-0.font-weight-bold 4560
+							span.text-muted Orders
+			.col-md-3
+				.card.m-t-0
+					.row
+						.col-md-6
+							.peity_line_good.left.text-center.m-t-10
+								span
+									span(style='display: none;') 12,6,9,23,14,10,17
+									canvas(width='50', height='24')
+								h6 +60%
+						.col-md-6.border-left.text-center.p-t-10
+							h3.mb-0 5672
+							span.text-muted Active Users
+			.col-md-3
+				.card.m-t-0
+					.row
+						.col-md-6
+							.peity_bar_good.left.text-center.m-t-10
+								span 12,6,9,23,14,10,13
+								h6 +30%
+						.col-md-6.border-left.text-center.p-t-10
+							h3.mb-0.font-weight-bold 2560
+							span.text-muted Register
+		// End cards
+		// Chart-3
+		.row
+			.col-md-12
+				.card
+					.card-body
+						h5.card-title Bar Chart
+						.flot-chart
+							#flot-line-chart.flot-chart-content
+		// End chart-3
+		// Charts
+		.row
+			.col-md-6
+				.card
+					.card-body
+						h5.card-title Pie Chart
+						.pie(style='height: 400px;')
+			.col-md-6
+				.card
+					.card-body
+						h5.card-title Line Chart
+						.bars(style='height: 400px;')
+		// End Charts
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+
+
+block specific-js
+	script(type='text/javascript').
+	script(src = '/libs/chart/matrix.interface.js')
+	script(src = '/libs/chart/excanvas.min.js')
+	script(src = '/libs/flot/jquery.flot.js')
+	script(src = '/libs/flot/jquery.flot.pie.js')
+	script(src = '/libs/flot/jquery.flot.time.js')
+	script(src = '/libs/flot/jquery.flot.stack.js')
+	script(src = '/libs/flot/jquery.flot.crosshair.js')
+	script(src = '/libs/chart/jquery.peity.min.js')
+	script(src = '/libs/chart/matrix.charts.js')
+	script(src = '/libs/chart/jquery.flot.pie.min.js')
+	script(src = '/libs/flot.tooltip/js/jquery.flot.tooltip.min.js')
+	script(src = '/libs/chart/turning-series.js')
+	script(src = '/dist/js/pages/chart/chart-page-init.js')
+		

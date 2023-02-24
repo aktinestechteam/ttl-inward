@@ -1,0 +1,504 @@
+.col-sm.text-center
+	img(src='/images/airways_logo.png', alt='')
+	p#cantoaddress(style='font-size: 22px;font-weight: 600;') #{constants.registered_address}
+.container-fluid(style="padding-right: 20px;padding-left: 20px;")
+	.row.py-1
+		.col-sm-12.text-center
+			b
+				u#cancargoarivalnoticelabel(style='font-size: 25px;font-weight: 1000;') TAX INVOICE
+	.row
+		.col-sm-12
+			table.table.w-100.borderless
+				tbody.customtable
+					tr
+						td.p-0(width='10%', style='font-size: 16px;font-weight: 600;') Consignee : 
+						td.p-0(width='60%', style='font-size: 16px;font-weight: 600;white-space: pre-wrap')
+							|#{awb_user_data_objs[0].consignee_name}
+							|#{awb_user_data_objs[0].consignee_address} #{awb_user_data_objs[0].consignee_address2}
+						td.p-0.text-right(width='10%', style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+							| Invoice No. : 
+							| Date : 
+						td.p-0.text-right(width='20%', style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+							| #{invoice.invoice_number}
+							| #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+			table.table.w-100.borderless
+				tbody.customtable1
+					tr
+						td.p-0(width='10%', style='font-size: 16px;font-weight: 600;') GSTIN:
+						td.p-0(width='30%', style='font-size: 16px;font-weight: 600;white-space: pre-wrap')
+							|#{awb_user_data_objs[0].consignee_gstn}
+						td(width='10%')
+						td(width='10%')
+						td(width='10%')
+						td.p-0(width='10%', style='font-size: 16px;font-weight: 600;') Place of supply :
+						td.p-0(width='20%', style='font-size: 16px;font-weight: 600;white-space: pre-wrap')
+							|#{awb_user_data_objs[0].consignee_state}
+						
+	//- .row
+	//- 	.col-sm-6
+	//- 		.row
+	//- 			.col-sm-3
+	//- 				b#cantolabel(style='font-size: 16px;font-weight: 600;') Consignee :
+	//- 			.col-sm-9
+	//- 					p#cantoaddress(style='font-size: 16px;font-weight: 600;white-space: pre-wrap;') 
+	//- 						| #{awb_user_data_objs[0].consignee_name}
+	//- 						| #{awb_user_data_objs[0].consignee_address}
+	//- 						//-| #{awb_user_data_objs[0].consignee_email}
+	//- 						//-| #{awb_user_data_objs[0].consignee_phone}
+	//- 						| #{awb_user_data_objs[0].consignee_pincode}
+	//- 	.col-sm-6
+	//- 		.row.text-right
+	//- 			.col-sm-12
+	//- 				b#canfromdate(style='font-size: 16px;font-weight: 600;') No : 
+	//- 					| #{invoice.invoice_number}
+	//- 		.row.text-right
+	//- 			.col-sm-12
+	//- 				b#canfromdate(style='font-size: 16px;font-weight: 600;') Date :  
+	//- 					| #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+	//- .row
+	//- 	.col-sm-6
+	//- 		.row
+	//- 			.col-sm-3(style='font-size: 18px;') 
+	//- 				strong GSTIN:
+	//- 			.col-sm-3(style='font-size: 18px;') 
+	//- 				strong #{awb_user_data_objs[0].consignee_gstn}
+	//- 	.col-sm-6
+	//- 		.row
+	//- 			.col-sm-3(style='font-size: 18px;') 
+	//- 				strong Place of supply :
+	//- 			.col-sm-3(style='font-size: 18px;') 
+	//- 				strong #{awb_user_data_objs[0].consignee_state}
+	.row
+		.col-sm-12
+			table.table.table-bordered.w-100(style="border: 2px solid black !important;")
+				colgroup
+					col(style='width: 50%')
+					col(style='width: 50%')
+				thead.thead-light
+					tr
+						th(scope='col', style='font-size: 18px;font-weight: 600;border: 2px solid black !important;') HSN / SAC : #{constants.hsn}
+						th(scope='col', style='font-size: 18px;font-weight: 600;border: 2px solid black !important;')     
+				tbody
+					tr
+						td(style='font-size: 18px; border: 2px solid black !important;')
+							.row
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') #{awb_user_data_objs[0].awbs}
+												td.p-0(style='font-size: 16px;font-weight: 600;')
+							//- .row.pb-1
+							//- 	.col-sm-8(style='font-size: 18px;font-weight: 600;width: 50%') #{awb_user_data_objs[0].awbs}
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;width: 50%')   
+							if isCreditCustomer
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') Invoice payments for the period #{new Date(invoice.credit_period_from).toLocaleString('en-US', date_format_options)} to #{new Date(invoice.credit_period_to).toLocaleString('en-US', date_format_options)}
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_do + total_bb + total_baggage + total_directdelivery + total_cartage + total_freightcharge + total_collectfee + total_misc)}
+									//- .col-sm-8
+									//- 	strong Invoice payments for the period #{new Date(invoice.credit_period_from).toLocaleString('en-US', date_format_options)} to #{new Date(invoice.credit_period_to).toLocaleString('en-US', date_format_options)}
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_do + total_bb + total_baggage + total_directdelivery + total_cartage + total_freightcharge + total_collectfee + total_misc)}
+							else
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') AWB Number
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{awb_user_data_objs[0].awb_number}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Delivery Order Fees Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_do)}
+									//- .col-sm-8(style='font-size: 18px;') Delivery Order Fees Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_do)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Break Bulk charges Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_bb)}
+									//- .col-sm-8(style='font-size: 18px;') Break Bulk charges Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_bb)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Baggage Charges Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_baggage)}
+									//- .col-sm-8(style='font-size: 18px;') Baggage Charges Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_baggage)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Direct Delivery Charges Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_directdelivery)}
+									//- .col-sm-8(style='font-size: 18px;') Direct Delivery Charges Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_directdelivery)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Cartage Charges Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_cartage)}
+									//- .col-sm-8(style='font-size: 18px;') Cartage Charges Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_cartage)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Freight Charges Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_freightcharge)}
+									//- .col-sm-8(style='font-size: 18px;') Freight Charges Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_freightcharge)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Collect Fees Rs.
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_collectfee)}
+									//- .col-sm-8(style='font-size: 18px;') Collect Fees Rs.
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_collectfee)}
+								.row.pb-1
+									.col-sm-12
+										table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+											tbody.customtable
+												tr
+													td.p-0(style='font-size: 16px;font-weight: 600;') Miscellaneous Charges
+													td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_misc)}
+									//- .col-sm-8(style='font-size: 18px;') Miscellaneous Charges
+									//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_misc)}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') IGST 18.00% Rs.
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_igst)}
+								//- .col-sm-8(style='font-size: 18px;') IGST 18.00% Rs.
+								//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_igst)}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') SGST 9.00% Rs.
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_sgst)}
+								//- .col-sm-8(style='font-size: 18px;') SGST 9.00% Rs.
+								//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_sgst)}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') CGST 9.00% Rs. 
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(total_cgst)}
+								//- .col-sm-8(style='font-size: 18px;') CGST 9.00% Rs. 
+								//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(total_cgst)}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') Total Rs.
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') #{sails.config.globals.price_formatter(Math.ceil(total))}
+								//- .col-sm-8(style='font-size: 18px;') Total Rs.
+								//- .col-sm-4(align='right', style='font-size: 18px;') #{sails.config.globals.price_formatter(Math.ceil(total))}
+						td(style='font-size: 18px;border: 2px solid black !important;', width="50%")
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0
+													img(src=qrcode, style="width: 250px")
+												td.p-0(style='font-size: 12px;font-weight: 600;')
+													if irn
+														div IRN:
+														div #{irn.substr(0,16)}
+														div #{irn.substr(16,16)}
+														div #{irn.substr(32,16)}
+														div #{irn.substr(48)}
+													if ack_no
+														div.mt-2 Ack No: #{ack_no}
+													if ack_date
+														div.mt-2 Ack Date: #{ack_date}
+												
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;' colspan="2")
+													include ../includes/number2string.pug
+													+number2string(Math.ceil(invoice.amount_billed))
+								//- include ../includes/number2string.pug
+								//- +number2string(Math.round(invoice.amount_billed))
+							//.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												//td.p-0(style='font-size: 16px;font-weight: 600;')
+													| In accordance with notification Stamps No. 3 dated 21st Dec 1946,
+													| issued by the Finance Department, Government of India,Corporation 
+													| is exempted from affixing stamps on receipts of passengers fares 
+													| and freight charges.
+								//- .col-sm-12(style='font-size: 18px;') 
+								//- 	p.m-0 In accordance with notification Stamps No. 3 dated 21st Dec 1946, 
+								//- 	p.m-0 issued by the Finance Department, Government of India,Corporation 
+								//- 	p.m-0 is exempted from affixing stamps on receipts of passengers fares 
+								//- 	p.m-0 and freight charges.
+							.row
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;')
+													| #{sails.config.globals.local_currency_symbol} #{sails.config.globals.price_formatter(Math.ceil(total))}
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;')
+													| For #{sails.config.globals.airlines_name}
+								//- .col-sm-8(style='font-size: 18px;') #{sails.config.globals.local_currency_symbol} #{sails.config.globals.price_formatter(Math.ceil(total))}
+								//- .col-sm-4.text-right(style='font-size: 18px;') For British Airways
+							.row
+								.col-sm-12
+									table.table.w-100.borderless.mb-0(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 12px;font-weight: 600;')
+													div Note 1. For all Charges Collect shipments, GST is not applicable on Freight Charges.
+													div Note 2. Invoice total is rounded to next rupee as per Govt tax compliance
+
+					tr
+						td(style='font-size: 18px;border: 2px solid black !important;')
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') 
+													| Nationality
+												td.p-0(style='font-size: 16px;font-weight: 600;') 
+													hr.mx-2(style="border-color: black")
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Passport No.
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Date of issue
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Place of issue 
+													hr.mx-2(style="border-color: black")
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') Ticket No.
+												td.p-0(style='font-size: 16px;font-weight: 600;') 
+													hr.mx-2(style="border-color: black")
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Original Ticket No.
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Date of issue
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') 
+													| Place of issue 
+													hr.mx-2(style="border-color: black")
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;') Enc. No.
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;') Date
+													hr.mx-2(style="border-color: black")
+												td.p-0(style='font-size: 16px;font-weight: 600;') Date of Arrival
+													hr.mx-2(style="border-color: black")
+											//tr
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') Date of Arrival
+												td.p-0.text-right(style='font-size: 16px;font-weight: 600;') 
+													hr.mx-2(style="border-color: black")
+								//- .col-sm-4(style='font-size: 18px;') Nationality
+								//- .col-sm-4(style='font-size: 18px;') ----------
+								//- .col-sm-4
+							//- .row.pb-1
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Passport No.
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Date of issue
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Place of issue 
+							//- .row.pb-1
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- .row.pb-1
+							//- 	.col-sm-4(style='font-size: 18px;') Ticket No.
+							//- 	.col-sm-4(style='font-size: 18px;') ----------
+							//- 	.col-sm-4
+							//- .row.pb-1
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Original Ticket No.
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Date of issue
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') Place of issue 
+							//- .row.pb-1
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- .row.pb-1
+							//- 	.col-sm-2(style='font-size: 18px;font-weight: 600;') Enc. No.
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- 	.col-sm-2(style='font-size: 18px;font-weight: 600;') Date
+							//- 	.col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+							//- .row.pb-1
+							//- 	.col-sm-2(style='font-size: 18px;') 
+							//- 	.col-sm-4(style='font-size: 18px;') Date of Arrival
+							//- 	.col-sm-4(style='font-size: 18px;') ----------
+							//- 	.col-sm-2(style='font-size: 18px;') 
+						
+						td(style='font-size: 18px;border: 2px solid black !important;')
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												//td.p-0.text-center(style='font-size: 16px;font-weight: 600;') MODE OF PAYMENT
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| MODE OF PAYMENT
+												td.p-0
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| UPI
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													if(invoice.payment_mode === 'UPI')
+														.border-bottom.border-dark
+															| #{sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount)}
+													else
+														hr.mx-2(style="border-color: black")
+							//- .row.pb-1
+							//- 	.col-sm-4
+							//- 	.col-sm-4(style='font-size: 18px;') 
+							//- 	.col-sm-4
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| CASH
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													if(invoice.payment_mode === 'CASH')
+														.border-bottom.border-dark
+															| #{sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount)}
+													else
+														hr.mx-2(style="border-color: black")
+													//| #{invoice.payment_mode === 'CASH' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| RTGS
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													if(invoice.payment_mode === 'RTGS')
+														.border-bottom.border-dark
+															| #{sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount)}
+													else
+														hr.mx-2(style="border-color: black")
+													//| #{invoice.payment_mode === 'RTGS' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+								//- .col-sm-2(style='font-size: 18px;font-weight: 600;') CASH
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') #{invoice.payment_mode === 'CASH' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+								//- .col-sm-2(style='font-size: 18px;font-weight: 600;') RTGS
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') #{invoice.payment_mode === 'RTGS' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| Cheque
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													if(invoice.payment_mode === 'CHQ')
+														.border-bottom.border-dark
+															| #{sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount)}
+													else
+														hr.mx-2(style="border-color: black")
+													//| #{invoice.payment_mode === 'CHQ' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													| DD
+												td.p-0.w-25(style='font-size: 16px;font-weight: 600;')
+													if(invoice.payment_mode === 'DD')
+														.border-bottom.border-dark
+															| #{sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount)}
+													else
+														hr.mx-2(style="border-color: black")
+													//| #{invoice.payment_mode === 'DD' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+								//- .col-sm-2(style='font-size: 18px;font-weight: 600;') Cheque
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') #{invoice.payment_mode === 'CHQ' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+								//- .col-sm-2(style='font-size: 18px;font-weight: 600;') DD
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') #{invoice.payment_mode === 'DD' ? sails.config.globals.local_currency_symbol + ' ' + sails.config.globals.price_formatter(invoice.payment_amount) : '----------'}
+							.row.text-center
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0(style='font-size: 16px;font-weight: 600;')
+												| #{invoice.payment_mode === 'CASH' ? 'In CASH on ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) : ''}
+												| #{invoice.payment_mode === 'RTGS' ? 'RTGS Traansaction No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', By: ' + invoice.payment_drawn_on : ''}
+												| #{invoice.payment_mode === 'CHQ' ? 'Cheque No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', ' + invoice.payment_drawn_on : ''}
+												| #{invoice.payment_mode === 'DD' ? 'DD No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', ' + invoice.payment_drawn_on : ''}
+												| #{invoice.payment_mode === 'UPI' ? 'UPI Transaction No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) : ''}
+									//- p(style='font-size: 16px;')
+									//- | #{invoice.payment_mode === 'CASH' ? 'In CASH on ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) : ''}
+									//- | #{invoice.payment_mode === 'RTGS' ? 'RTGS Traansaction No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', By: ' + invoice.payment_drawn_on : ''}
+									//- | #{invoice.payment_mode === 'CHQ' ? 'Cheque No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', ' + invoice.payment_drawn_on : ''}
+									//- | #{invoice.payment_mode === 'DD' ? 'DD No: ' + invoice.payment_reference_number + ', Dated ' + new Date(invoice.payment_instrument_date).toLocaleString('en-US', date_format_options) + ', ' + invoice.payment_drawn_on : ''}
+							.row.pb-1
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0.w-50(style='font-size: 16px;font-weight: 600;')
+													| FOREIGN
+												td.p-0(style='font-size: 16px;font-weight: 600;')
+													hr.mx-2(style="border-color: black")
+								//- .col-sm-4(style='font-size: 18px;') FOREIGN
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+								//- .col-sm-4
+							.row
+								.col-sm-12
+									table.table.w-100.borderless(style='background-color: transparent;')
+										tbody.customtable
+											tr
+												td.p-0.w-50(style='font-size: 16px;font-weight: 600;')
+													| EXCHANGE
+												td.p-0(style='font-size: 16px;font-weight: 600;')
+													hr.mx-2(style="border-color: black")
+								//- .col-sm-4(style='font-size: 18px;') EXCHANGE
+								//- .col-sm-4(style='font-size: 18px;font-weight: 600;') ----------
+								//- .col-sm-4
+								
+							
+			.row
+				.col-sm-12
+					table.table.w-100.mb-0.borderless(style='background-color: transparent;')
+						tbody.customtable
+							tr
+								td.p-0(style='font-size: 20px;font-weight: 600;')
+									| GSTIN : #{constants.gstin_number}
+								td.p-0.text-right(style='font-size: 20px;font-weight: 600;')
+									| #{constants.signatory}
+			.row
+				.col-sm-12
+					table.table.w-100.borderless
+						tbody.customtable
+							tr
+								td.p-0.text-right.align-bottom(style='font-size: 20px;font-weight: 600;')
+									| #{constants.designation}
+				//- .col-sm-6
+				//- 	p(style='font-size: 20px;')
+				//- 		| GSTIN : #{constants.gstin_number}
+				//- .col-sm-6
+				//- 	p.text-right(style='font-size: 20px;')
+				//- 		| #{constants.signatory}
+				//- .col-sm-12.pt-5
+				//- 	p.text-right(style='font-size: 20px;')
+				//- 		| #{constants.designation}

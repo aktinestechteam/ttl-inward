@@ -1,0 +1,717 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	//- var toolbarOptions = [['bold', 'italic', 'underline', 'strike'],['blockquote', 'code-block'],[{'list': 'ordered'}, {'list': 'bullet'}],[{'script': 'sub'}, {'script': 'super'}],[{'indent': '-1'}, {'indent': '+1'}],[{'direction': 'rtl'}],[{'header': [1, 2, 3, 4, 5, 6, false]}],[{'color': []}, {'background': []}],[{'font': []}],[{'align': []}],['clean']];
+	//- var quill1 = new Quill('#inwardcargo_constants_list_canfront_textarea',{modules: {toolbar:toolbarOptions},readonly: false,theme: 'snow'});
+
+	//- var quill2 = new Quill('#inwardcargo_constants_list_canback_textarea', {modules: {toolbar:toolbarOptions},readonly: false,theme: 'snow'});
+
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	link(href='/libs/datatables.net-bs4/css/dataTables.bootstrap4.css', rel='stylesheet')
+	// Include quill stylesheet
+	//link(href='https://cdn.quilljs.com/1.3.6/quill.snow.css', rel='stylesheet')-cdn
+	link(href='/dist/css/quill.snow.css', rel='stylesheet')
+
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			//form.container(action="/" method='get')
+				label.control-label.col-lg-3 Select City
+				select.select2.form-control.custom-select.col-lg-5(style='width: 100%; height:36px;', placeholder='Enter', type='text', name='inwardcargo-constants-list-city', autocomplete="off")
+					option(disabled='') Select
+				button.btn.btn-danger.waves-effect.waves-light.save-category.col-lg-3.ml-2(type='submit') Save
+
+			.col-12.mt-3
+				.card
+					.table-responsive
+						table.table
+							thead.thead-light
+								tr
+									th(scope='col')
+										b IATA
+									th(scope='col')
+										b DO
+									th(scope='col')
+										b HAWB (BB)
+									th(scope='col')
+										b Baggage
+									th(scope='col')
+										b DD
+									th(scope='col')
+										b Misc
+									th(scope='col')
+										b Effective From
+									th(scope='col')
+										b Expires on
+									th(scope='col')
+										b Edit
+									
+							tbody.customtable
+								each cityconstant in cityconstantdetails
+									tr
+										td #{cityconstant.iata_code}
+										td #{cityconstant.delivery_order_charge}
+										td #{cityconstant.break_bulk_charges}
+										td #{cityconstant.delivery_order_charge_baggage}
+										td #{cityconstant.direct_delivery_charges}
+										td #{cityconstant.miscellaneous_charges}
+										td #{new Date(cityconstant.effective_from).toLocaleString('en-US', date_format_options)}
+										if (cityconstant.expires_on < sails.config.globals.expires_at_infinity)
+											td #{new Date(cityconstant.expires_on).toLocaleString('en-US', date_format_options)}
+										else
+											td Active
+										td
+											if ((cityconstant.effective_from < Date.now()) && (cityconstant.expires_on == sails.config.globals.expires_at_infinity))
+												button.btn.btn-danger.waves-effect.waves-light(onclick="showModal('" + cityconstant.id + "','" + escape(cityconstant.bank_ifsc) + "','" + escape(cityconstant.registered_address) + "','" + escape(cityconstant.bank_address) + "','" + escape(cityconstant.delivery_address) + "','" + escape(cityconstant.customs_address) + "','" + cityconstant.gstin_number + "','" + cityconstant.hsn + "'," + cityconstant.igst_percentage + "," + cityconstant.cgst_percentage + "," + cityconstant.sgst_percentage + "," + cityconstant.collect_fees_percentage + "," + cityconstant.collect_fees_min_usd + "," + cityconstant.delivery_order_charge + "," + cityconstant.delivery_order_charge_baggage + "," + cityconstant.direct_delivery_charges + "," + cityconstant.break_bulk_charges + "," + cityconstant.miscellaneous_charges + "," + cityconstant.cartage_charge_min_weight + "," + cityconstant.cartage_charge_min + "," + cityconstant.cartage_charge_per_kg + ",'" + cityconstant.signatory + "','" + cityconstant.designation + "','" + cityconstant.iata_code + "'," + JSON.stringify(cityconstant.can_front) + "," + JSON.stringify(cityconstant.can_back) + ", " + cityconstant.effective_from + ", '" + cityconstant.gst_budget_code + "','" + cityconstant.gst_budget_account + "','" + cityconstant.approved_by + "','" + cityconstant.approver_title + "','" + cityconstant.approver_email + "','" + cityconstant.intimation_email + "','" + cityconstant.line_manager_email + "','" + cityconstant.approval_manager_email + "')", ) 
+													i.fa.fa-edit(aria-hidden='true')
+													| &nbsp&nbspExpire for #{cityconstant.iata_code}
+											else if(cityconstant.effective_from > Date.now())
+												button.btn.btn-info.waves-effect.waves-light(onclick="showModal('" + cityconstant.id + "','" + escape(cityconstant.bank_ifsc) + "','" + escape(cityconstant.registered_address) + "','" + escape(cityconstant.bank_address) + "','" + escape(cityconstant.delivery_address) + "','" + escape(cityconstant.customs_address) + "','" + cityconstant.gstin_number + "','" + cityconstant.hsn + "'," + cityconstant.igst_percentage + "," + cityconstant.cgst_percentage + "," + cityconstant.sgst_percentage + "," + cityconstant.collect_fees_percentage + "," + cityconstant.collect_fees_min_usd + "," + cityconstant.delivery_order_charge + "," + cityconstant.delivery_order_charge_baggage + "," + cityconstant.direct_delivery_charges + "," + cityconstant.break_bulk_charges + "," + cityconstant.miscellaneous_charges + "," + cityconstant.cartage_charge_min_weight + "," + cityconstant.cartage_charge_min + "," + cityconstant.cartage_charge_per_kg + ",'" + cityconstant.signatory + "','" + cityconstant.designation + "','" + cityconstant.iata_code + "'," + JSON.stringify(cityconstant.can_front) + "," + JSON.stringify(cityconstant.can_back) + ",undefined" + ", '" + cityconstant.gst_budget_code + "','" + cityconstant.gst_budget_account + "','" + cityconstant.approved_by + "','" + cityconstant.approver_title + "','" + cityconstant.approver_email + "','" + cityconstant.intimation_email + "','" + cityconstant.line_manager_email + "','" + cityconstant.approval_manager_email + "')", ) 
+													i.fa.fa-edit(aria-hidden='true')
+													| &nbsp&nbspEdit for #{cityconstant.iata_code}
+											//else
+												button.btn.btn-warning.waves-effect.waves-light(onclick="showModal('" + cityconstant.id + "','" + escape(cityconstant.registered_address) + "','" + escape(cityconstant.bank_address) + "','" + escape(cityconstant.delivery_address) + "','" + escape(cityconstant.customs_address) + "','" + cityconstant.gstin_number + "','" + cityconstant.hsn + "'," + cityconstant.igst_percentage + "," + cityconstant.cgst_percentage + "," + cityconstant.sgst_percentage + "," + cityconstant.collect_fees_percentage + "," + cityconstant.collect_fees_min_usd + "," + cityconstant.delivery_order_charge + "," + cityconstant.delivery_order_charge_baggage + "," + cityconstant.direct_delivery_charges + "," + cityconstant.break_bulk_charges + "," + cityconstant.miscellaneous_charges + "," + cityconstant.cartage_charge_min_weight + "," + cityconstant.cartage_charge_min + "," + cityconstant.cartage_charge_per_kg + ",'" + cityconstant.signatory + "','" + cityconstant.designation + "','" + cityconstant.iata_code + "'," + JSON.stringify(cityconstant.can_front) + "," + JSON.stringify(cityconstant.can_back) + ", " + cityconstant.effective_from + ", '" + cityconstant.gst_budget_code + "','" + cityconstant.gst_budget_account + "','" + cityconstant.approved_by + "','" + cityconstant.approver_title + "','" + cityconstant.approver_email + "','" + cityconstant.intimation_email + "','" + cityconstant.line_manager_email + "')", ) 
+													i.fa.fa-edit(aria-hidden='true')
+													| &nbsp&nbspSplit
+									//(id, companyregisteredaddress, companybankaddress, cargodeliveryaddress, customaddress, companygstin, hsncode, igst, cgst, sgst, collectfeesinperc, minimumcollectfeesusd, deliveryordercharge, deliveryorderbaggagecharge, directdelivercharge, breakbulkcharge, miscellaneouscharge, minimumcartageweightinkg, minimumcartagecharge, cartagechargeperkg, signatory, designation, cityiata, canfront, canback , effectivedate)
+
+								tr
+									td
+										button#inwardcargo-constants-list-add-new-constants-modal-btn.btn.m-t-5.btn-info.waves-effect.waves-light(onclick="showModal(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)")
+											i.fa.fa-plus-circle(aria-hidden='true')
+											| &nbsp&nbspAdd New Constants
+									td
+									td
+									td
+									td
+									td
+									td
+
+		// Modal Add Category
+		#inwardcargo-constants-list-add-new-constants-modal.modal.fade.none-border
+			.modal-dialog(style="margin-left: 270px;")
+				.modal-content(style="width: 802px;")
+						//form#inwardcargo-constants-list-add-new-constants-form(action="/constants" method='post', onsubmit="return showFakeLoader('inwardcargo-constants-list-add-new-constants-modal')")
+						.modal-header
+							h4.modal-title
+								i#inwardcargo-constants-add-new-constants-modal-title.mdi.mdi-settings
+								|
+							button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+						.modal-body
+							.row
+								.col-lg-12
+									label#inwardcargo_constants_list_effectivedate_type_select_label.control-label Effective Date
+									select#inwardcargo_constants_list_effectivedate_type_select.select2.form-control.custom-select.mb-3(style='width: 100%; height:36px;', type='text', name='inwardcargo_constants_list_effectivedate_type_select', autocomplete="off")
+										option(disabled='') Select
+								.col-lg-12.pb-3
+									label.control-label City (IATA Code)
+									select#inwardcargo_constants_list_city_input.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_constants_list_city_input', autocomplete="off")
+										each airport in airportlistdetails
+											option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+								.col-lg-12
+									.card.m-b-0
+										#headingFour.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Delivery Charges
+										#collapseFour.collapse.show(aria-labelledby='headingFour', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col
+														label.control-label Delivery Order Charge
+														input#inwardcargo_constants_list_delivery_order_charge_input.form-control.form-white(placeholder='Delivery Order Charge', type='text', name='inwardcargo_constants_list_delivery_order_charge_input', autocomplete="off" required='')
+													.col
+														label.control-label Break Bulk(BB) Charge
+														input#inwardcargo_constants_list_break_bulk_charge_input.form-control.form-white(placeholder='Break Bulk Charge', type='text', name='inwardcargo_constants_list_break_bulk_charge_input', autocomplete="off" required='')
+													.col
+														label.control-label Delivery Order (Baggage) Charge
+														input#inwardcargo_constants_list_delivery_order_baggage_charge_input.form-control.form-white(placeholder='Delivery Order (Baggage) Charge', type='text', name='inwardcargo_constants_list_delivery_order_baggage_charge_input', autocomplete="off" required='')
+													.col
+														label.control-label Direct Delivery Charge
+														input#inwardcargo_constants_list_direct_delivery_charge_input.form-control.form-white(placeholder='Direct Delivery Charge', type='text', name='inwardcargo_constants_list_direct_delivery_charge_input', autocomplete="off" required='')
+													.col
+														label.control-label Miscellaneous Charge
+														input#inwardcargo_constants_list_miscellaneous_charge_input.form-control.form-white(placeholder='Miscellaneous Charge', type='text', name='inwardcargo_constants_list_miscellaneous_charge_input', autocomplete="off" required='')
+									.card.m-b-0
+										#headingThree.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Collect Charges
+										#collapseThree.collapse.show(aria-labelledby='headingThree', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-6
+														label.control-label Collect Fees (in %)
+														input#inwardcargo_constants_list_collect_fees_in_perc_input.form-control.form-white(placeholder='Enter Collect Fees (in %)', type='text', name='inwardcargo_constants_list_collect_fees_in_perc_input', autocomplete="off" required='')
+													.col-lg-6
+														label.control-label Minimum Collect Fees ( USD )
+														input#inwardcargo_constants_list_minimum_collect_fees_usd_input.form-control.form-white(placeholder='Enter Minimum Collect Fees ( USD )', type='text', name='inwardcargo_constants_list_minimum_collect_fees_usd_input', autocomplete="off" required='')
+									.card.m-b-0
+										#headingFive.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Cartage Charges
+										#collapseFive.collapse.show(aria-labelledby='headingFive', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-4
+														label.control-label Minimum Cartage Weight(kg)
+														input#inwardcargo_constants_list_minimum_cartage_weight_input.form-control.form-white(placeholder='Minimum Cartage Weight(kg)', type='text', name='inwardcargo_constants_list_minimum_cartage_weight_input', autocomplete="off" required='')
+													.col-lg-4
+														label.control-label Minimum Cartage Charge
+														input#inwardcargo_constants_list_minimum_cartage_charge_input.form-control.form-white(placeholder='Minimum Cartage Charge', type='text', name='inwardcargo_constants_list_minimum_cartage_charge_input', autocomplete="off" required='')
+													.col-lg-4
+														label.control-label Cartage Charge Per Kg
+														input#inwardcargo_constants_list_cartage_charge_per_kg_input.form-control.form-white(placeholder='Cartage Charge Per Kg', type='text', name='inwardcargo_constants_list_cartage_charge_per_kg_input', autocomplete="off" required='')
+
+									.card.m-b-0
+										#headingTwo.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span GST Details
+										#collapseTwo.collapse.show(aria-labelledby='headingTwo', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-4
+														label.control-label Company GSTIN
+														input#inwardcargo_constants_list_gstin_input.form-control.form-white(placeholder='Enter Company GSTIN', type='text', name='inwardcargo_constants_list_gstin_input', autocomplete="off" required='')
+													.col
+														label.control-label HSN Code
+														input#inwardcargo_constants_list_hsncode_input.form-control.form-white(placeholder='Enter HSN Code', type='text', name='inwardcargo_constants_list_hsncode_input', autocomplete="off" required='')
+													.col
+														label.control-label IGST (in %)
+														input#inwardcargo_constants_list_igst_input.form-control.form-white(placeholder='Enter IGST (in %)', type='text', name='inwardcargo_constants_list_igst_input', autocomplete="off" required='')
+													.col
+														label.control-label CGST (in %)
+														input#inwardcargo_constants_list_cgst_input.form-control.form-white(placeholder='Enter CGST (in %)', type='text', name='inwardcargo_constants_list_cgst_input', autocomplete="off" required='')
+													.col
+														label.control-label SGST (in %)
+														input#inwardcargo_constants_list_sgst_input.form-control.form-white(placeholder='Enter SGST (in %)', type='text', name='inwardcargo_constants_list_sgst_input', autocomplete="off" required='')
+									.card.m-b-0
+										#headingOne.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Address
+										#collapseOne.collapse.show(aria-labelledby='headingOne', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-6
+														label.control-label Company Registered Address
+														textarea#inwardcargo_constants_list_company_registered_address_textarea.form-control.form-white(placeholder='Enter Company Registered Address', type='text', name='inwardcargo_constants_list_company_registered_address_textarea', autocomplete="off" required='')
+
+														label.control-label Company Bank Address And Account Details
+														textarea#inwardcargo_constants_list_company_bank_address_textarea.form-control.form-white(placeholder='Enter Bank Address And Account Details', type='text', name='inwardcargo_constants_list_company_bank_address_textarea', autocomplete="off" required='')
+
+													.col-lg-6
+														label.control-label Cargo Delivery Address
+														textarea#inwardcargo_constants_list_cargo_delivery_address_textarea.form-control.form-white(placeholder='Enter Cargo Delivery Address', type='text', name='inwardcargo_constants_list_cargo_delivery_address_textarea', autocomplete="off" required='')
+
+														label.control-label Customs Address
+														textarea#inwardcargo_constants_list_company_customs_address_textarea.form-control.form-white(placeholder='Enter Customs Address', type='text', name='inwardcargo_constants_list_company_customs_address_textarea', autocomplete="off" required='')
+													.col-lg-6
+														label.control-label Bank IFSC
+															span.badge.badge-info.mx-2 for managing challans
+														input#inwardcargo_constants_list_company_bank_ifsc_input.form-control.form-white(placeholder='Enter Bank IFSC', type='text', name='inwardcargo_constants_list_company_bank_ifsc_input', autocomplete="off" required='')
+									.card.m-b-0
+										#headingSix.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Signatory And Designation
+										#collapseSix.collapse.show(aria-labelledby='headingSix', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-4
+														label.control-label Signatory
+														input#inwardcargo_constants_list_signatory_input.form-control.form-white(placeholder='Enter Signatory', type='text', name='inwardcargo_constants_list_signatory_input', autocomplete="off" required='')
+													.col-lg-4
+														label.control-label Designation
+														input#inwardcargo_constants_list_designation_input.form-control.form-white(placeholder='Enter Designation', type='text', name='inwardcargo_constants_list_designation_input', autocomplete="off" required='')
+									.card.m-b-0
+										#headingEight.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Cheque Request Constants
+										#collapseEight.collapse.show(aria-labelledby='headingEight', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col
+														label.control-label Budget Code
+														input#inwardcargo_constants_list_budget_code_input.form-control.form-white(placeholder='Budget Code', type='text', name='inwardcargo_constants_list_budget_code_input', autocomplete="off", required='')
+													.col
+														label.control-label Budget Account
+														input#inwardcargo_constants_list_gst_budget_account_input.form-control.form-white(placeholder='Budget Account', type='text', name='inwardcargo_constants_list_gst_budget_account_input', autocomplete="off", required='')
+													.col
+														label.control-label Approved By
+														input#inwardcargo_constants_list_chqreq_approved_by_input.form-control.form-white(placeholder='Approved By', type='text', name='inwardcargo_constants_list_chqreq_approved_by_input', autocomplete="off", required='')
+													.col
+														label.control-label Title
+														input#inwardcargo_constants_list_chqreq_approved_by_title_input.form-control.form-white(placeholder='Title', type='text', name='inwardcargo_constants_list_chqreq_approved_by_title_input', autocomplete="off", required='')
+													.col
+														label.control-label Email Id
+														input#inwardcargo_constants_list_chqreq_approved_by_email_input.form-control.form-white(placeholder='Email Id', type='email', name='inwardcargo_constants_list_chqreq_approved_by_email_input', autocomplete="off", required='')
+									.card.m-b-0
+										#headingNine.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span Email IDs
+										#collapseNine.collapse.show(aria-labelledby='headingNine', data-parent='#accordionExample')
+											.card-body
+												.row
+													.col-lg-4
+														label.control-label DCM Intimation Email
+														input#inwardcargo_constants_dcm_email_input.form-control.form-white(placeholder='Email Id', type='email', name='inwardcargo_constants_dcm_email_input', autocomplete="off", required='')
+													.col-lg-4
+														label.control-label Line Manager Email
+														input#inwardcargo_constants_linemanager_email_input.form-control.form-white(placeholder='Email Id', type='email', name='inwardcargo_constants_linemanager_email_input', autocomplete="off", required='')
+													.col-lg-4
+														label.control-label Approval Manager Email
+														input#inwardcargo_constants_approvalmanager_email_input.form-control.form-white(placeholder='Email Id', type='email', name='inwardcargo_constants_approvalmanager_email_input', autocomplete="off", required='')
+									.card.m-b-0
+										#headingSeven.card-header
+											h5.mb-0
+												i.m-r-5(aria-hidden='true')
+												span CAN
+										#collapseSeven.collapse.show(aria-labelledby='headingSeven', data-parent='#accordionExample')
+											.card-body
+												label.control-label Can Front
+												div#inwardcargo_constants_list_canfront_textarea.form-control.form-white(placeholder='Enter Can Front', type='text', name='inwardcargo_constants_list_canfront_textarea' , style='height: 375px;', required='')
+
+												label.control-label Can Back
+												div#inwardcargo_constants_list_canback_textarea.form-control.form-white(placeholder='Enter Can Back', type='text', name='inwardcargo_constants_list_canback_textarea', style='height: 375px;', required='')
+													//#editor.col-lg-12(style='height: 375px;')
+
+
+						.modal-footer
+							button#inwardcargo_constants_id.btn.btn-danger.waves-effect.waves-light.save-category(type='button', name='inwardcargo_constants_id', onclick='saveConstants()') 
+								i.fa.fa-edit(aria-hidden='true')
+								| &nbsp&nbspSave
+							button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') 
+								i.fa.fa-times-circle(aria-hidden='true')
+								| &nbsp&nbspClose
+				// END MODAL
+				// ==============================================================
+				// End PAge Content
+				// ==============================================================
+				// ==============================================================
+				// Right sidebar
+				// ==============================================================
+				// .right-sidebar
+				// ==============================================================
+				// End Right sidebar
+				// ==============================================================
+		// ==============================================================
+		// End Container fluid
+		// ==============================================================
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/extra-libs/DataTables/datatables.min.js')
+	// Include the Quill library
+	//script(src='https://cdn.quilljs.com/1.3.6/quill.js')-cdn
+	script(src='/dist/js/quill.js')
+	include ../includes/csrf.pug
+	script.
+		$('#zero_config').DataTable();
+		$('#menu_constants').addClass("selected");
+		var toolbarOptions = [
+			['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+			['blockquote', 'code-block'],
+			[{'list': 'ordered'}, {'list': 'bullet'}],
+			[{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+			[{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+			[{'direction': 'rtl'}],                         // text direction
+			[{'header': [1, 2, 3, 4, 5, 6, false]}],
+			[{'color': []}, {'background': []}],          // dropdown with defaults from theme
+			[{'font': []}],
+			[{'align': []}],
+			['clean']                                         // remove formatting button
+		];
+
+		var quill1 = new Quill('#inwardcargo_constants_list_canfront_textarea',{
+			modules: {
+				toolbar: toolbarOptions
+			},
+			readonly: false,
+			theme: 'snow'
+		});
+
+		var quill2 = new Quill('#inwardcargo_constants_list_canback_textarea', {
+			modules: {
+				toolbar: toolbarOptions
+			},
+			readonly: false,
+			theme: 'snow'
+		});
+
+		var date_format_options = {year: 'numeric', month: 'short', day: 'numeric'};
+		var server_timestamp = #{currentDate}
+		var noDates = #{noDatesToDisplay}
+		function showModal(id, companybankifsc, companyregisteredaddress, companybankaddress, cargodeliveryaddress, customaddress, companygstin, hsncode, igst, cgst, sgst, collectfeesinperc, minimumcollectfeesusd, deliveryordercharge, deliveryorderbaggagecharge, directdelivercharge, breakbulkcharge, miscellaneouscharge, minimumcartageweightinkg, minimumcartagecharge, cartagechargeperkg, signatory, designation, cityiata, canfront, canback , effectivedate, gstbudgetcode, gstbudgetaccount, approvedby, approvertitle, approveremail, intimationemail, linemangeremail, approvalmanageremail) {
+			if (id) {
+				if(effectivedate) {
+					//	ToDo : Calculate effective dates for display
+					calculateFeatureDates(effectivedate, false);
+					$('#inwardcargo_constants_list_effectivedate_type_select').prop('selectedIndex', 0);
+					$("#inwardcargo_constants_list_effectivedate_type_select").css("display", "block");
+					$("#inwardcargo_constants_list_effectivedate_type_select_label").css("display", "block");
+				} else {
+					//- $( "#inwardcargo_exchangerates_effectivedate_type_select" ).remove();
+					//- $( "#inwardcargo_exchangerates_effectivedate_type_select_label" ).remove();
+					$("#inwardcargo_constants_list_effectivedate_type_select").css("display", "none");
+					$("#inwardcargo_constants_list_effectivedate_type_select_label").css("display", "none");
+				}
+				
+				$('#inwardcargo-constants-add-new-constants-modal-title').text(" Edit Constants");
+				$('#inwardcargo_constants_id').val(id);
+				$('#inwardcargo_constants_list_company_registered_address_textarea').val(unescape(companyregisteredaddress));
+				$('#inwardcargo_constants_list_company_bank_ifsc_input').val(unescape(companybankifsc));
+				$('#inwardcargo_constants_list_company_bank_address_textarea').val(unescape(companybankaddress));
+				$('#inwardcargo_constants_list_cargo_delivery_address_textarea').val(unescape(cargodeliveryaddress));
+				$('#inwardcargo_constants_list_company_customs_address_textarea').val(unescape(customaddress));
+				$('#inwardcargo_constants_list_gstin_input').val(companygstin);
+				$('#inwardcargo_constants_list_hsncode_input').val(hsncode);
+				$('#inwardcargo_constants_list_igst_input').val(igst);
+				$('#inwardcargo_constants_list_cgst_input').val(cgst);
+				$('#inwardcargo_constants_list_sgst_input').val(sgst);
+				$('#inwardcargo_constants_list_collect_fees_in_perc_input').val(collectfeesinperc);
+				$('#inwardcargo_constants_list_minimum_collect_fees_usd_input').val(minimumcollectfeesusd);
+				$('#inwardcargo_constants_list_delivery_order_charge_input').val(deliveryordercharge);
+				$('#inwardcargo_constants_list_delivery_order_baggage_charge_input').val(deliveryorderbaggagecharge);
+				$('#inwardcargo_constants_list_direct_delivery_charge_input').val(directdelivercharge);
+				$('#inwardcargo_constants_list_break_bulk_charge_input').val(breakbulkcharge);
+				$('#inwardcargo_constants_list_miscellaneous_charge_input').val(miscellaneouscharge);
+				$('#inwardcargo_constants_list_minimum_cartage_weight_input').val(minimumcartageweightinkg);
+				$('#inwardcargo_constants_list_minimum_cartage_charge_input').val(minimumcartagecharge);
+				$('#inwardcargo_constants_list_cartage_charge_per_kg_input').val(cartagechargeperkg);
+				$('#inwardcargo_constants_list_signatory_input').val(signatory);
+				$('#inwardcargo_constants_list_designation_input').val(designation);
+				$('#inwardcargo_constants_list_city_input').val(cityiata);
+				$('#inwardcargo_constants_list_budget_code_input').val(gstbudgetcode);
+				$('#inwardcargo_constants_list_gst_budget_account_input').val(gstbudgetaccount);
+				$('#inwardcargo_constants_list_chqreq_approved_by_input').val(approvedby);
+				$('#inwardcargo_constants_list_chqreq_approved_by_title_input').val(approvertitle);
+				$('#inwardcargo_constants_list_chqreq_approved_by_email_input').val(approveremail);
+				$('#inwardcargo_constants_dcm_email_input').val(intimationemail);
+				$('#inwardcargo_constants_linemanager_email_input').val(linemangeremail);
+				$('#inwardcargo_constants_approvalmanager_email_input').val(approvalmanageremail);
+				quill1.setContents(canfront);
+				quill2.setContents(canback);
+			} else {
+				calculateFeatureDates(server_timestamp, true);
+				$('#inwardcargo-constants-add-new-constants-modal-title').text(' Add New Constants');
+				$('#inwardcargo_constants_id').val('');
+				$('#inwardcargo_constants_list_company_registered_address_textarea').val('');
+				$('#inwardcargo_constants_list_company_bank_ifsc_input').val('');
+				$('#inwardcargo_constants_list_company_bank_address_textarea').val('');
+				$('#inwardcargo_constants_list_cargo_delivery_address_textarea').val('');
+				$('#inwardcargo_constants_list_company_customs_address_textarea').val('');
+				$('#inwardcargo_constants_list_gstin_input').val('');
+				$('#inwardcargo_constants_list_hsncode_input').val('');
+				$('#inwardcargo_constants_list_igst_input').val('');
+				$('#inwardcargo_constants_list_cgst_input').val('');
+				$('#inwardcargo_constants_list_sgst_input').val('');
+				$('#inwardcargo_constants_list_collect_fees_in_perc_input').val('');
+				$('#inwardcargo_constants_list_minimum_collect_fees_usd_input').val('');
+				$('#inwardcargo_constants_list_delivery_order_charge_input').val('');
+				$('#inwardcargo_constants_list_delivery_order_baggage_charge_input').val('');
+				$('#inwardcargo_constants_list_direct_delivery_charge_input').val('');
+				$('#inwardcargo_constants_list_break_bulk_charge_input').val('');
+				$('#inwardcargo_constants_list_miscellaneous_charge_input').val('');
+				$('#inwardcargo_constants_list_minimum_cartage_weight_input').val('');
+				$('#inwardcargo_constants_list_minimum_cartage_charge_input').val('');
+				$('#inwardcargo_constants_list_cartage_charge_per_kg_input').val('');
+				$('#inwardcargo_constants_list_signatory_input').val('');
+				$('#inwardcargo_constants_list_designation_input').val('');
+				$('#inwardcargo_constants_list_city_input').prop('selectedIndex', 0);
+				quill1.setContents([{insert: '\n'}]);
+				quill2.setContents([{insert: '\n'}]);
+				//$('#inwardcargo_constants_list_effectivedate_type_select').val('');
+				$("#inwardcargo_constants_list_effectivedate_type_select").css("display", "block");
+				$("#inwardcargo_constants_list_effectivedate_type_select_label").css("display", "block");
+				
+				$('#inwardcargo_constants_list_budget_code_input').val('');
+				$('#inwardcargo_constants_list_gst_budget_account_input').val('');
+				$('#inwardcargo_constants_list_chqreq_approved_by_input').val('');
+				$('#inwardcargo_constants_list_chqreq_approved_by_title_input').val('');
+				$('#inwardcargo_constants_list_chqreq_approved_by_email_input').val('');
+				$('#inwardcargo_constants_dcm_email_input').val('');
+				$('#inwardcargo_constants_linemanager_email_input').val('');
+				$('#inwardcargo_constants_approvalmanager_email_input').val('');
+			}
+			$('#inwardcargo-constants-list-add-new-constants-modal').modal('show');
+		}
+
+		function calculateFeatureDates(startDateTime, include_today) {
+			$('#inwardcargo_constants_list_effectivedate_type_select').empty();
+			if (startDateTime < server_timestamp) {
+				startDateTime = server_timestamp;
+			}
+			var maxDate = new Date(server_timestamp + noDates * 24 * 60 * 60 * 1000).getTime();
+			var option = '';
+			var i = include_today ? 0 : 1;
+			for (; i <= noDates; i++) {
+				var next_day = new Date(startDateTime + i * 24 * 60 * 60 * 1000).getTime();
+				if (next_day > maxDate)
+					break;
+				option += '<option value="' + next_day + '">' + new Date(next_day).toLocaleString('en-US', date_format_options) + '</option>';
+			}
+			$('#inwardcargo_constants_list_effectivedate_type_select').append(option);
+		}
+
+		function saveConstants() {
+			var id = $("#inwardcargo_constants_id").val();
+			var companyregisteredaddress = $('#inwardcargo_constants_list_company_registered_address_textarea').val();
+			var companybankifsc = $('#inwardcargo_constants_list_company_bank_ifsc_input').val();
+			var companybankaddress = $('#inwardcargo_constants_list_company_bank_address_textarea').val();
+			var cargodeliveryaddress = $("#inwardcargo_constants_list_cargo_delivery_address_textarea").val();
+			var customaddress = $('#inwardcargo_constants_list_company_customs_address_textarea').val();
+			var companygstin = $('#inwardcargo_constants_list_gstin_input').val();
+			var hsncode = $("#inwardcargo_constants_list_hsncode_input").val();
+			var igst = $("#inwardcargo_constants_list_igst_input").val();
+			var cgst = $("#inwardcargo_constants_list_cgst_input").val();
+			var sgst = $("#inwardcargo_constants_list_sgst_input").val();
+			var collectfeesinperc = $("#inwardcargo_constants_list_collect_fees_in_perc_input").val();
+			var minimumcollectfeesusd = $("#inwardcargo_constants_list_minimum_collect_fees_usd_input").val();
+			var deliveryordercharge = $("#inwardcargo_constants_list_delivery_order_charge_input").val();
+			var deliveryorderbaggagecharge = $("#inwardcargo_constants_list_delivery_order_baggage_charge_input").val();
+			var directdelivercharge = $("#inwardcargo_constants_list_direct_delivery_charge_input").val();
+			var breakbulkcharge = $("#inwardcargo_constants_list_break_bulk_charge_input").val();
+			var miscellaneouscharge = $("#inwardcargo_constants_list_miscellaneous_charge_input").val();
+			var minimumcartageweightinkg = $("#inwardcargo_constants_list_minimum_cartage_weight_input").val();
+			var minimumcartagecharge = $("#inwardcargo_constants_list_minimum_cartage_charge_input").val();
+			var cartagechargeperkg = $("#inwardcargo_constants_list_cartage_charge_per_kg_input").val();
+			var signatory = $("#inwardcargo_constants_list_signatory_input").val();
+			var designation = $("#inwardcargo_constants_list_designation_input").val();
+			var canback = JSON.stringify(quill2.getContents());
+			var canfront = JSON.stringify(quill1.getContents());
+			var cityiata = $("#inwardcargo_constants_list_city_input").val();
+			var effectivedate = $("#inwardcargo_constants_list_effectivedate_type_select").val();
+			
+			var gstbudgetcode = $('#inwardcargo_constants_list_budget_code_input').val();
+			var gstbudgetaccount = $('#inwardcargo_constants_list_gst_budget_account_input').val();
+			var approvedby = $('#inwardcargo_constants_list_chqreq_approved_by_input').val();
+			var approvertitle = $('#inwardcargo_constants_list_chqreq_approved_by_title_input').val();
+			var approveremail = $('#inwardcargo_constants_list_chqreq_approved_by_email_input').val();
+			var intimationemail = $('#inwardcargo_constants_dcm_email_input').val();
+			var linemangeremail = $('#inwardcargo_constants_linemanager_email_input').val();
+			var approvalmanageremail = $('#inwardcargo_constants_approvalmanager_email_input').val();
+				
+			$( ".invalid-city" ).remove();
+			$( ".invalid-min-collect-fee-usd" ).remove();
+			$( ".invalid-collect-fee-in-perc" ).remove();
+			$( ".invalid-delivery-order-charge" ).remove();
+			$( ".invalid-delivery-order-baggage-charge" ).remove();
+			$( ".invalid-direct-delivery-charge" ).remove();
+			$( ".invalid-min-cartage-charge" ).remove();
+			$( ".invalid-min-cartage-weight" ).remove();
+			$( ".invalid-cartage-charge-per-kg" ).remove();
+			$( ".invalid-micellaneous-charge" ).remove();
+			$( ".invalid-break-bulk-charge" ).remove();
+			$( ".invalid-igst" ).remove();
+			$( ".invalid-cgst" ).remove();
+			$( ".invalid-sgst" ).remove();
+			$("#inwardcargo_constants_list_city_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_minimum_collect_fees_usd_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_collect_fees_in_perc_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_delivery_order_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_delivery_order_baggage_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_direct_delivery_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_minimum_cartage_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_minimum_cartage_weight_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_cartage_charge_per_kg_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_miscellaneous_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_break_bulk_charge_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_igst_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_cgst_input").removeClass('is-invalid');
+			$("#inwardcargo_constants_list_cgst_input").removeClass('is-invalid');
+			
+			if(cityiata == '' || cityiata == null || cityiata == undefined) {
+				$("#inwardcargo_constants_list_city_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_city_input" ).after( "<div class='invalid-feedback invalid-city'>City Cannot be blank</div>");
+				//$("#inwardcargo-constants-list-add-new-constants-modal").animate({scrollTop: $('#inwardcargo_constants_list_city_input').offset().top}, 500);
+			} else if(minimumcollectfeesusd == '' || minimumcollectfeesusd == null || minimumcollectfeesusd == undefined) {
+				$("#inwardcargo_constants_list_minimum_collect_fees_usd_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_minimum_collect_fees_usd_input" ).after( "<div class='invalid-feedback invalid-min-collect-fee-usd'>Minimum Collect Fees Cannot be blank</div>" );
+				//$("#inwardcargo-constants-list-add-new-constants-modal").animate({scrollTop: $('#inwardcargo_constants_list_minimum_collect_fees_usd_input').offset().top}, 500);
+			} else if(collectfeesinperc == '' || collectfeesinperc == null || collectfeesinperc == undefined) {
+				$("#inwardcargo_constants_list_collect_fees_in_perc_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_collect_fees_in_perc_input" ).after( "<div class='invalid-feedback invalid-collect-fee-in-perc'>Collect Fees in Percentage Cannot be blank</div>" );
+				//$("#inwardcargo-constants-list-add-new-constants-modal").animate({scrollTop: $('#inwardcargo_constants_list_collect_fees_in_perc_input').offset().top}, 500);
+			} else if(deliveryordercharge == '' || deliveryordercharge == null || deliveryordercharge == undefined) {
+				$("#inwardcargo_constants_list_delivery_order_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_delivery_order_charge_input" ).after( "<div class='invalid-feedback invalid-delivery-order-charge'>Delivery Order Charge Cannot be blank</div>" );
+			} else if(deliveryorderbaggagecharge == '' || deliveryorderbaggagecharge == null || deliveryorderbaggagecharge == undefined) {
+				$("#inwardcargo_constants_list_delivery_order_baggage_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_delivery_order_baggage_charge_input" ).after( "<div class='invalid-feedback invalid-delivery-order-baggage-charge'>Delivery Order Baggage Charge Cannot be blank</div>" );
+			} else if(directdelivercharge == '' || directdelivercharge == null || directdelivercharge == undefined) {
+				$("#inwardcargo_constants_list_direct_delivery_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_direct_delivery_charge_input" ).after( "<div class='invalid-feedback invalid-direct-delivery-charge'>Direct Delivery Charge Cannot be blank</div>" );
+			} else if(minimumcartagecharge == '' || minimumcartagecharge == null || minimumcartagecharge == undefined) {
+				$("#inwardcargo_constants_list_minimum_cartage_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_minimum_cartage_charge_input" ).after( "<div class='invalid-feedback invalid-min-cartage-charge'>Minimum Cartage Charge Cannot be blank</div>" );
+			} else if(minimumcartageweightinkg == '' || minimumcartageweightinkg == null || minimumcartageweightinkg == undefined) {
+				$("#inwardcargo_constants_list_minimum_cartage_weight_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_minimum_cartage_weight_input" ).after( "<div class='invalid-feedback invalid-min-cartage-weight'>Minimum Cartage Weight Cannot be blank</div>" );
+			} else if(cartagechargeperkg == '' || cartagechargeperkg == null || cartagechargeperkg == undefined) {
+				$("#inwardcargo_constants_list_cartage_charge_per_kg_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_cartage_charge_per_kg_input" ).after( "<div class='invalid-feedback invalid-cartage-charge-per-kg'>Cartage Charge Per KG Cannot be blank</div>" );
+			} else if(miscellaneouscharge == '' || miscellaneouscharge == null || miscellaneouscharge == undefined) {
+				$("#inwardcargo_constants_list_miscellaneous_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_miscellaneous_charge_input" ).after( "<div class='invalid-feedback invalid-micellaneous-charge'>Miscellaneous Charge Cannot be blank</div>" );
+			} else if(breakbulkcharge == '' || breakbulkcharge == null || breakbulkcharge == undefined) {
+				$("#inwardcargo_constants_list_break_bulk_charge_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_break_bulk_charge_input" ).after( "<div class='invalid-feedback invalid-break-bulk-charge'>Break Bulk Charge Cannot be blank</div>" );
+			} else if(igst == '' || igst == null || igst == undefined) {
+				$("#inwardcargo_constants_list_igst_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_igst_input" ).after( "<div class='invalid-feedback invalid-igst'>Igst Cannot be blank</div>" );
+			} else if(cgst == '' || cgst == null || cgst == undefined) {
+				$("#inwardcargo_constants_list_cgst_input").addClass('is-invalid');
+				$( "#inwardcargo_constants_list_cgst_input" ).after( "<div class='invalid-feedback  invalid-cgst'>Cgst Cannot be blank</div>" );
+			} else if(sgst == '' || sgst == null || sgst == undefined) {
+				$("#inwardcargo_constants_list_sgst_input").addClass('is-invalid invalid-sgst');
+				$( "#inwardcargo_constants_list_sgst_input" ).after( "<div class='invalid-feedback invalid-sgst'>Sgst Cannot be blank</div>" );
+			} else {
+				$('#inwardcargo_constants_id').attr('disabled','disabled');
+				getCSRFToken(function(_csrf) {
+					$.post("constants", {
+						_csrf: _csrf,
+						inwardcargo_constants_id: id,
+						inwardcargo_constants_list_company_registered_address_textarea: companyregisteredaddress,
+						inwardcargo_constants_list_company_bank_ifsc_input: companybankifsc,
+						inwardcargo_constants_list_company_bank_address_textarea: companybankaddress,
+						inwardcargo_constants_list_cargo_delivery_address_textarea: cargodeliveryaddress,
+						inwardcargo_constants_list_company_customs_address_textarea: customaddress,
+						inwardcargo_constants_list_gstin_input: companygstin,
+						inwardcargo_constants_list_hsncode_input: hsncode,
+						inwardcargo_constants_list_igst_input: igst,
+						inwardcargo_constants_list_cgst_input: cgst,
+						inwardcargo_constants_list_sgst_input: sgst,
+						inwardcargo_constants_list_collect_fees_in_perc_input: collectfeesinperc,
+						inwardcargo_constants_list_minimum_collect_fees_usd_input: minimumcollectfeesusd,
+						inwardcargo_constants_list_delivery_order_charge_input: deliveryordercharge,
+						inwardcargo_constants_list_delivery_order_baggage_charge_input: deliveryorderbaggagecharge,
+						inwardcargo_constants_list_direct_delivery_charge_input: directdelivercharge,
+						inwardcargo_constants_list_break_bulk_charge_input: breakbulkcharge,
+						inwardcargo_constants_list_miscellaneous_charge_input: miscellaneouscharge,
+						inwardcargo_constants_list_minimum_cartage_weight_input: minimumcartageweightinkg,
+						inwardcargo_constants_list_minimum_cartage_charge_input: minimumcartagecharge,
+						inwardcargo_constants_list_cartage_charge_per_kg_input: cartagechargeperkg,
+						inwardcargo_constants_list_signatory_input: signatory,
+						inwardcargo_constants_list_designation_input: designation,
+						inwardcargo_constants_list_city_input: cityiata,
+						inwardcargo_constants_list_canfront_textarea: canfront,
+						inwardcargo_constants_list_canback_textarea: canback,
+						inwardcargo_constants_list_effectivedate_type_select: effectivedate,
+						
+						inwardcargo_constants_list_budget_code_input: gstbudgetcode,
+						inwardcargo_constants_list_gst_budget_account_input: gstbudgetaccount,
+						inwardcargo_constants_list_chqreq_approved_by_input: approvedby,
+						inwardcargo_constants_list_chqreq_approved_by_title_input: approvertitle,
+						inwardcargo_constants_list_chqreq_approved_by_email_input: approveremail,
+						inwardcargo_constants_dcm_email_input: intimationemail,
+						inwardcargo_constants_linemanager_email_input: linemangeremail,
+						inwardcargo_constants_approvalmanager_email_input: approvalmanageremail
+
+					}, function (data) {
+						$( ".invalid-city" ).remove();
+						$( ".invalid-min-collect-fee-usd" ).remove();
+						$( ".invalid-collect-fee-in-perc" ).remove();
+						$( ".invalid-delivery-order-charge" ).remove();
+						$( ".invalid-delivery-order-baggage-charge" ).remove();
+						$( ".invalid-direct-delivery-charge" ).remove();
+						$( ".invalid-min-cartage-charge" ).remove();
+						$( ".invalid-min-cartage-weight" ).remove();
+						$( ".invalid-cartage-charge-per-kg" ).remove();
+						$( ".invalid-micellaneous-charge" ).remove();
+						$( ".invalid-break-bulk-charge" ).remove();
+						$( ".invalid-igst" ).remove();
+						$( ".invalid-cgst" ).remove();
+						$( ".invalid-sgst" ).remove();
+						$("#inwardcargo_constants_list_city_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_minimum_collect_fees_usd_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_collect_fees_in_perc_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_delivery_order_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_delivery_order_baggage_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_direct_delivery_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_minimum_cartage_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_minimum_cartage_weight_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_cartage_charge_per_kg_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_miscellaneous_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_break_bulk_charge_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_igst_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_cgst_input").removeClass('is-invalid');
+						$("#inwardcargo_constants_list_cgst_input").removeClass('is-invalid');
+						if(data.error_code) {
+							$('#inwardcargo_constants_id').removeAttr("disabled");
+						}
+						if (data.error_code == 'ERR_CON_CITY_BLANK') {
+							$("#inwardcargo_constants_list_city_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_city_input" ).after( "<div class='invalid-feedback invalid-city'>"+data.error+"</div>");
+						} else if (data.error_code == 'ERR_CON_MIN_COLCT_FEE_BLANK') {
+							$("#inwardcargo_constants_list_minimum_collect_fees_usd_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_minimum_collect_fees_usd_input" ).after( "<div class='invalid-feedback invalid-min-collect-fee-usd'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_COLCT_FEE_IN_PERC_BLANK') {
+							$("#inwardcargo_constants_list_collect_fees_in_perc_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_collect_fees_in_perc_input" ).after( "<div class='invalid-feedback invalid-collect-fee-in-perc'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_DELVR_ORDER_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_delivery_order_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_delivery_order_charge_input" ).after( "<div class='invalid-feedback invalid-delivery-order-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_DELVR_ORDER_BAGG_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_delivery_order_baggage_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_delivery_order_baggage_charge_input" ).after( "<div class='invalid-feedback invalid-delivery-order-baggage-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_DIRECT_DELVR_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_direct_delivery_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_direct_delivery_charge_input" ).after( "<div class='invalid-feedback invalid-direct-delivery-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_MIN_CARTGE_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_minimum_cartage_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_minimum_cartage_charge_input" ).after( "<div class='invalid-feedback invalid-min-cartage-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_MIN_CARTGE_WEIGHT_BLANK') {
+							$("#inwardcargo_constants_list_minimum_cartage_weight_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_minimum_cartage_weight_input" ).after( "<div class='invalid-feedback invalid-min-cartage-weight'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_CARTGE_CHARGE_PER_KG_BLANK') {
+							$("#inwardcargo_constants_list_cartage_charge_per_kg_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_cartage_charge_per_kg_input" ).after( "<div class='invalid-feedback invalid-cartage-charge-per-kg'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_MISCE_CARTGE_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_miscellaneous_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_miscellaneous_charge_input" ).after( "<div class='invalid-feedback invalid-micellaneous-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_BREAK_BULK_CHARGE_BLANK') {
+							$("#inwardcargo_constants_list_break_bulk_charge_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_break_bulk_charge_input" ).after( "<div class='invalid-feedback invalid-break-bulk-charge'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_IGST_BLANK') {
+							$("#inwardcargo_constants_list_igst_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_igst_input" ).after( "<div class='invalid-feedback invalid-igst'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_CGST_BLANK') {
+							$("#inwardcargo_constants_list_cgst_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_cgst_input" ).after( "<div class='invalid-feedback  invalid-cgst'>"+data.error+"</div>" );
+						} else if (data.error_code == 'ERR_CON_SGST_BLANK') {
+							$("#inwardcargo_constants_list_sgst_input").addClass('is-invalid');
+							$( "#inwardcargo_constants_list_sgst_input" ).after( "<div class='invalid-feedback invalid-sgst'>"+data.error+"</div>" );
+						} else if (data.value) {
+							toast({
+								type: 'success',
+								title: 'Constants added successfully'
+							})
+							showFakeLoader('inwardcargo-constants-list-add-new-constants-modal', '/constants')
+						} else if (data.error_code == 'ERR_CON_E_UNIQUE') {
+							toast({
+								type: 'error',
+								title: data.error
+							})
+						}
+					});
+				});
+			}
+		}

@@ -1,0 +1,404 @@
+extends ../layouts/matrix_layout_nosidebar.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	- var total_igst = 0;
+	- var total_cgst = 0;
+	- var total_sgst = 0;
+	- var total_other_charges = 0;
+	- var total_incorrect_amount = 0;
+	- var dcm_name_identifier = 'Debit/Credit';
+	- var dcm_edit_mode = dcm ? false : true;
+	
+	- var revised_total = 0;
+	- var balance_total = 0;
+	
+	- var cred_deb = 'X';
+	
+	if !dcm_edit_mode
+		- cred_deb = dcm.dcm_number.substr(0,1)
+	
+		if cred_deb === 'C'
+			- dcm_name_identifier = 'Credit';
+		else
+			- dcm_name_identifier = 'Debit';
+	
+	each awb_user_data in awbuserdatas	
+		- total_igst += awb_user_data.igst;
+		- total_cgst += awb_user_data.cgst;
+		- total_sgst += awb_user_data.sgst;
+		- total_other_charges += awb_user_data.collect_charge + awb_user_data.collect_fee;
+
+block content
+	.container-fluid(style='background-color: white')
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-12
+				//.card
+				.text-center
+					img(src='/images/airways_logo.png', alt='')
+					h5.pt-3#inward_cargo_dcm_header.card-title #{dcm_name_identifier} Note
+				table.table.w-100.borderless
+					tbody.customtable
+						tr
+							td.pb-0.pt-0(style='font-size: 15px;') GSTIN of Supplier :
+							td.pb-0.pt-0(style='font-size: 15px;') #{awbuserdatas[0].gstin}
+							td(rowspan=3)
+								if qrcode
+									img(src=qrcode, style="width: 250px")
+							td(rowspan=3)
+								if irn && irn.irn
+									div IRN:
+									div #{irn.irn.substr(0,16)}
+									div #{irn.irn.substr(16,16)}
+									div #{irn.irn.substr(32,16)}
+									div #{irn.irn.substr(48)}
+								if irn && irn.ack_no
+									div.mt-2 Ack No: #{irn.ack_no}
+								if irn && irn.ack_date
+									div.mt-2 Ack Date: #{irn.ack_date}
+						tr
+							td.pb-0.pt-0(style='font-size: 15px;') Name of Supplier :
+							td.pb-0.pt-0(style='font-size: 15px;') #{sails.config.globals.airlines_name}
+						tr
+							td.pb-0.pt-0(style='font-size: 15px;') Address of Supplier :
+							td.pb-0.pt-0(style='font-size: 15px;') #{constants.delivery_address}
+				table.table.w-100.borderless
+					tbody.customtable
+						tr
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') Corresponding Invoice Number :
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{invoicedetails.invoice_number}
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{dcm_name_identifier} Note  No:
+							if(dcm_edit_mode)
+								td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{cred_deb + '/' +  invoicedetails.invoice_number}
+							else
+								td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{dcm.dcm_number}
+						tr
+						td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') Corresponding Invoice Date :
+						td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{new Date(invoicedetails.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{dcm_name_identifier} Note Date:
+							if(dcm_edit_mode)
+								td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{new Date().toLocaleString('en-US', date_format_options)}
+							else
+								td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{new Date(dcm.dcm_issue_date).toLocaleString('en-US', date_format_options)}
+						tr
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') SAC/HSN Code:
+							td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') #{awbuserdatas[0].hsn_code}
+				.row
+					.col-sm-6
+						table.table.w-100.borderless
+							tbody.customtable
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') Name :
+									td.pb-0.pt-0(style='font-size: 15px;') #{awbuserdatas[0].consignee_name}
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') Address :
+									td.pb-0.pt-0(style='font-size: 15px;') #{awbuserdatas[0].consignee_address} #{awbuserdatas[0].consignee_address2}
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') State :
+									td.pb-0.pt-0(style='font-size: 15px;') #{awbuserdatas[0].consignee_state}
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') State Code :
+									td.pb-0.pt-0(style='font-size: 15px;')
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') GSTIN/Unique ID :
+									td.pb-0.pt-0(style='font-size: 15px;') #{awbuserdatas[0].consignee_gstn}
+					.col-sm-6
+						table.table.w-100.borderless
+							tbody.customtable
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;font-weight: 600;') Address of delivery (if different from recipient address)
+									td.pb-0.pt-0(style='font-size: 15px;') 
+								tr
+									td.pb-4.pt-0(style='font-size: 15px;')
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') Address :
+									td.pb-0.pt-0(style='font-size: 15px;') 
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') State :
+									td.pb-0.pt-0(style='font-size: 15px;')
+								tr
+									td.pb-0.pt-0(style='font-size: 15px;') State Code :
+									td.pb-0.pt-0(style='font-size: 15px;')
+				.table-responsive
+					table.table.w-100.borderless
+						tbody.customtable
+							tr
+								td.pb-0.pt-0(style='font-size: 15px;')
+									h5 Place of Supply Details
+							tr
+								td.pb-0.pt-0(style='font-size: 15px;') State Name: #{awbuserdatas[0].consignee_state}
+								//td.pb-0.pt-0(style='font-size: 15px;') 
+							tr
+								td.pb-0.pt-0(style='font-size: 15px;') State Code:
+								td.pb-0.pt-0(style='font-size: 15px;')
+								table.table.table-bordered
+									form(action="/dcm" method='post' onsubmit="return checkDetails()")
+										input(type='hidden', name='_csrf', value=_csrf)
+										thead
+											tr
+												th(scope='col',style='font-weight:600;') Sr. No.
+												th(scope='col',style='font-weight:600;') Particulars
+												th(scope='col', colspan='3')
+										tbody
+											tr
+												th(scope='row')
+												td(style='font-weight:600;') #{dcm_name_identifier} Note
+												td.red Original / Incorrect Details
+												td.red Revised/Correct details
+												td.red Balance Net amount
+											if dcm_edit_mode
+												each awb_user_data, i in awbuserdatas
+													- var awb_user_data_total = awb_user_data.do_charge + awb_user_data.break_bulk_charge + awb_user_data.baggage_charge + awb_user_data.direct_delivery_charge + awb_user_data.cartage_charge + /*awb_user_data.collect_charge + awb_user_data.collect_fee +*/ awb_user_data.misc_charges;
+													- total_incorrect_amount += awb_user_data_total;
+													tr
+														th(scope='row',style='font-weight:600;') #{i+1}
+														td.bold #{awb_user_data.awb_number}
+														td.red
+															input#dcm_awb_user_data_id(type='hidden', name='dcm_awb_user_data_id[]', value=awb_user_data.id, autocomplete="off")
+															input#dcm_each_awb_total(type='hidden', name='dcm_each_awb_total[]', value=awb_user_data_total, autocomplete="off")
+															| #{sails.config.globals.price_formatter(awb_user_data_total)}
+														td.red
+															input.form-control(type='text', name='dcm_revised_or_correct_details[]', autocomplete="off", id='dcm_revised_or_correct_details'+i, value='0')
+														td.red
+											else
+												//-console.log(dcm.awb_user_datas);
+												each awb_user_data in awbuserdatas
+													//- console.log(awb_user_data.id);
+													- indexOfAwbUserData = dcm.awb_user_datas.indexOf(awb_user_data.id);
+													if indexOfAwbUserData >= 0
+														//- var awb_user_data_total = awb_user_data.do_charge + awb_user_data.break_bulk_charge + awb_user_data.baggage_charge + awb_user_data.direct_delivery_charge + awb_user_data.cartage_charge + awb_user_data.collect_charge + awb_user_data.collect_fee + awb_user_data.misc_charges;
+														//- total_incorrect_amount += awb_user_data_total;
+														- total_incorrect_amount += dcm.incorrect_amount[indexOfAwbUserData];
+														tr
+															th(scope='row',style='font-weight:600;') #{indexOfAwbUserData+1}
+															td.bold #{awb_user_data.awb_number}
+															td.red
+																input#dcm_awb_user_data_id(type='hidden', name='dcm_awb_user_data_id[]', value=awb_user_data.id, autocomplete="off")
+																input#dcm_each_awb_total(type='hidden', name='dcm_each_awb_total[]', value=dcm.incorrect_amount[indexOfAwbUserData], autocomplete="off")
+																| #{sails.config.globals.price_formatter(dcm.incorrect_amount[indexOfAwbUserData])}
+															td.red
+																- revised_total += Number(dcm.correct_amount[indexOfAwbUserData]);
+																| #{sails.config.globals.price_formatter(Number(dcm.correct_amount[indexOfAwbUserData]))}
+															td.red
+																- balance_total += (dcm.correct_amount[indexOfAwbUserData] - dcm.incorrect_amount[indexOfAwbUserData])
+																| #{sails.config.globals.price_formatter(Math.abs(dcm.correct_amount[indexOfAwbUserData] - dcm.incorrect_amount[indexOfAwbUserData]))}
+											tr
+												th.bold(scope='row',style='font-weight:600;') GST :
+												td 
+												td 
+												td 
+												td 
+											tr
+												th.bold(scope='row',style='font-weight:600;') IGST (#{constants.igst_percentage} %) :
+												td 
+												td
+													| #{sails.config.globals.price_formatter(total_igst)}
+													input.form-control(type='hidden', name='dcm_incorrect_igst', value=total_igst, readonly)
+												td 
+													if dcm_edit_mode
+														input#dcm_igst_details.form-control(type='text', name='dcm_correct_igst', autocomplete="off", value='0')
+														input#dcm_invoice_id.form-control(type='hidden', name='dcm_invoice_id', value=invoicedetails.id, autocomplete="off")
+													else
+														- revised_total += Number(dcm.igst);
+														| #{sails.config.globals.price_formatter(Number(dcm.igst))}
+												td 
+													if !dcm_edit_mode
+														- balance_total += dcm.igst - total_igst ;
+														| #{sails.config.globals.price_formatter(Math.abs(dcm.igst - dcm.incorrect_igst))}
+											tr
+												th.bold(scope='row',style='font-weight:600;') CGST (#{constants.cgst_percentage} %) :
+												td 
+												td
+													| #{sails.config.globals.price_formatter(total_cgst)}
+													input.form-control(type='hidden', name='dcm_incorrect_cgst', value=total_cgst, readonly)
+												td 
+													if dcm_edit_mode
+														input#dcm_cgst_details.form-control(type='text', name='dcm_correct_cgst', autocomplete="off", value='0')
+														input#dcm_invoice_number.form-control(type='hidden', name='dcm_invoice_number', value=invoicedetails.invoice_number, autocomplete="off")
+													else
+														- revised_total += Number(dcm.cgst);
+														| #{sails.config.globals.price_formatter(Number(dcm.cgst))}
+												td 
+													if !dcm_edit_mode
+														- balance_total += dcm.cgst - total_cgst;
+														| #{sails.config.globals.price_formatter(Math.abs(dcm.cgst - dcm.incorrect_cgst))}
+											tr
+												th.bold(scope='row',style='font-weight:600;') SGST (#{constants.sgst_percentage} %) :
+												td 
+												td
+													| #{sails.config.globals.price_formatter(total_sgst)}
+													input.form-control(type='hidden', name='dcm_incorrect_sgst', value=total_sgst, readonly)
+												td 
+													if dcm_edit_mode
+														input#dcm_sgst_details.form-control(type='text', name='dcm_correct_sgst', autocomplete="off", value='0')
+														input#dcm_current_city.form-control(type='hidden', name='dcm_current_city', value=current_city, autocomplete="off")
+														input#dcm_current_city.form-control(type='hidden', name='dcm_consignee', value=awbuserdatas[0].consignee, autocomplete="off")
+													else
+														- revised_total += Number(dcm.sgst);
+														| #{sails.config.globals.price_formatter(Number(dcm.sgst))}
+												td
+													if !dcm_edit_mode
+														- balance_total += dcm.sgst - total_sgst;
+														| #{sails.config.globals.price_formatter(Math.abs(dcm.sgst - dcm.incorrect_sgst))}
+											tr
+												th.bold(scope='row',style='font-weight:600;') OTHER :
+												td 
+												td
+													| #{sails.config.globals.price_formatter(total_other_charges)}
+													input.form-control(type='hidden', name='dcm_incorrect_other_charges', value=total_other_charges, readonly)
+												td 
+													if dcm_edit_mode
+														input#dcm_other_charges_details.form-control(type='text', name='dcm_correct_other_charges', autocomplete="off", value='0')
+													else
+														- revised_total += Number(dcm.other_charges);
+														| #{sails.config.globals.price_formatter(Number(dcm.other_charges))}
+												td
+													if !dcm_edit_mode
+														- balance_total += dcm.other_charges - total_other_charges;
+														| #{sails.config.globals.price_formatter(Math.abs(dcm.other_charges - dcm.incorrect_other_charges))}
+											tr
+												th(scope='row') 
+												td 
+												td 
+												td 
+												td 
+											tr
+											- var value_to_show = total_incorrect_amount + total_igst + total_cgst + total_sgst + total_other_charges;
+												th(scope='row',style='font-weight:600;') Total :
+												td 
+												td 
+													| #{sails.config.globals.price_formatter(value_to_show)}
+													input#dcm_incorrect_total.form-control(type='hidden', name='dcm_incorrect_total', readonly='', value=value_to_show, autocomplete="off")
+												td #{sails.config.globals.price_formatter(revised_total)}
+												td #{sails.config.globals.price_formatter(Math.abs(balance_total))}
+
+											tr
+												th(scope='row',colspan='2',style='font-weight:600;') Total Value (In figures)
+												td.text-center(colspan='3') #{sails.config.globals.price_formatter(Math.ceil(Math.abs(balance_total)))}
+											tr
+												th(scope='row',colspan='2',style='font-weight:600;') Total Value (In words)
+												td(colspan='3') 
+													include ../includes/number2string.pug
+													+number2string(Math.ceil(Math.abs(balance_total)))
+											tr
+												td Reason
+												td(scope='row', colspan='3')
+													if dcm_edit_mode
+														textarea.form-control.w-100#dcm_reason(name='dcm_reason') Incorrect Supplier Name
+													else
+														textarea.form-control.w-100#dcm_reason(name='dcm_reason', disabled) #{dcm.dcm_reason}
+												th.text-right(style='font-weight:600;')
+													if dcm_edit_mode
+														button.btn.btn-danger.waves-effect.waves-light.save-category.ml-2(type='submit') Submit
+													else if cred_deb === 'C' 
+														button.print.btn.btn-info.waves-effect.waves-light.save-category.ml-2(type='button', onclick='window.open("/chqreq?invoice_id=' + invoicedetails.id + '&current_city=' + current_city + '", "_blank");') #{invoicedetails.chqreq_document === '' ? 'Request Cheque' : 'Show Cheque Request'}
+				table.table.w-100.borderless
+					tbody.customtable
+						tr.text-right
+							td.pb-0.pt-0(style='font-size: 15px') Signature
+						tr
+							td
+						tr.text-right
+							td.pb-0.pt-0(style='font-size: 15px') Name of the Signatory
+						tr.text-right
+							td.pb-0.pt-0(style='font-size: 15px') Designation/Status
+				//-p.col-lg-12.mx-5 Note: Details highlighed in Red are changed to accommodate business Requirement
+				//-.pagebreak(style='page-break-after: always')
+				//-p.m-5
+					h5.card-title Notes :
+					p
+					| The content present in the invoice formats is based on the CGST Act 2017 and the Rules on Tax Invoice, Credit and Debit Notes released by the Government on 18 May 2017 and the information available in public domain as on 12 June 2017. The Government has not provided any invoice format; the same has been created by VoxLaw from the parameters provided in the Rules. The Company is at liberty to add further parameters/change the format as it deems fit for its business purposes.
+					p
+					| The excel file is not aimed or designed to provide an accurate format of invoice under GST, it covers directional inputs with regards to the data fields required in the Invoice under GST.
+					p.pl-2
+					| 1 . The debit note shall be prepared in duplicate in the following manner:
+					.row.pl-5
+						p.col-lg-12
+						|	a) the original copy being marked as ORIGINAL FOR RECIPIENT and 
+						p.col-lg-12
+						|	b) the duplicate copy being marked as DUPLICATE FOR SUPPLIER 
+					p.pl-2
+					| 2 . Serial Number of Credit Note
+					.row.pl-5
+						p.col-lg-12
+						|	1.1 It shall be consecutive and can be in one or multiple series
+						p.col-lg-12
+						|	1.2 It shall not exceed sixteen characters
+						p.col-lg-12
+						|	1.3 It can contain alphabets or numerals or special characters hyphen/dash (“-“) and slash (“/”) or any combination thereof
+						p.col-lg-12
+						|	1.4 The serial number should be unique for a financial year
+							
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	//include ../includes/footer.pug
+
+	block specific-js
+		script(src='/js/swal_helper.js')
+	script(type='text/javascript').
+		
+		function checkDetails(){
+			var dcm_revised_or_correct_length = $("input[name^='dcm_revised_or_correct_details']").length;
+			var dcm_revised_or_correct_array = $("input[name^='dcm_revised_or_correct_details']");
+			var dcm_igst_details = $('#dcm_igst_details').val();
+			var dcm_cgst_details = $('#dcm_cgst_details').val();
+			var dcm_sgst_details = $('#dcm_sgst_details').val();
+			var dcm_other_charges_details = $('#dcm_other_charges_details').val();
+			var regex_number =/^\d*(\.\d{1,2})?$/;
+			var atleast_one_input_is_filled = false;
+			
+			for(i = 0; i < dcm_revised_or_correct_length ; i++){
+				var dcm_revised_or_correct_details = $('#dcm_revised_or_correct_details'+i).val();
+				
+				if(dcm_revised_or_correct_details)
+					atleast_one_input_is_filled = true;
+					
+				if(!(dcm_revised_or_correct_details.match(regex_number))){
+					errorSwal('Error','Enter valid number');
+					return false;
+				}
+			}
+			
+			if(!(dcm_igst_details.match(regex_number))){
+				errorSwal('Error','please enter correct IGST number');
+				return false;
+			} else if(!dcm_cgst_details.match(regex_number)){
+				errorSwal('Error','please enter correct CGST number');
+				return false;
+			} else if(!dcm_sgst_details.match(regex_number)){
+				errorSwal('Error','please enter correct SGST number');
+				return false;
+			} else if(!dcm_other_charges_details.match(regex_number)){
+				errorSwal('Error','please enter correct Other Charges number');
+				return false;
+			}
+			
+			if(	dcm_igst_details == '' && 
+				dcm_cgst_details == '' && 
+				dcm_sgst_details == '' && 
+				dcm_other_charges_details == '' && 
+				atleast_one_input_is_filled == false){
+				errorSwal('error','all fields cannot blank');
+				return false;
+			} 
+			
+			return true;
+		}
+
+

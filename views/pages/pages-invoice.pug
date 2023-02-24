@@ -1,0 +1,144 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Invoice
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-md-12
+				.card.card-body.printableArea
+					h3
+						b INVOICE
+						span.pull-right #5669626
+					hr
+					.row
+						.col-md-12
+							.pull-left
+								address
+									h3
+										b.text-danger Material Pro Admin
+									p.text-muted.m-l-5
+										| E 104, Dharti-2,
+										br
+										|  Nr' Viswakarma Temple,
+										br
+										|  Talaja Road,
+										br
+										|  Bhavnagar - 364002
+							.pull-right.text-right
+								address
+									h3 To,
+									h4.font-bold Gaala & Sons,
+									p.text-muted.m-l-30
+										| E 104, Dharti-2,
+										br
+										|  Nr' Viswakarma Temple,
+										br
+										|  Talaja Road,
+										br
+										|  Bhavnagar - 364002
+									p.m-t-30
+										b Invoice Date :
+										i.fa.fa-calendar
+										|  23rd Jan 2018
+									p
+										b Due Date :
+										i.fa.fa-calendar
+										|  25th Jan 2018
+						.col-md-12
+							.table-responsive.m-t-40(style='clear: both;')
+								table.table.table-hover
+									thead
+										tr
+											th.text-center #
+											th Description
+											th.text-right Quantity
+											th.text-right Unit Cost
+											th.text-right Total
+									tbody
+										tr
+											td.text-center 1
+											td Milk Powder
+											td.text-right 2
+											td.text-right  $24
+											td.text-right  $48
+										tr
+											td.text-center 2
+											td Air Conditioner
+											td.text-right  3
+											td.text-right  $500
+											td.text-right  $1500
+										tr
+											td.text-center 3
+											td RC Cars
+											td.text-right  20
+											td.text-right  %600
+											td.text-right  $12000
+										tr
+											td.text-center 4
+											td Down Coat
+											td.text-right  60
+											td.text-right $5
+											td.text-right  $300
+						.col-md-12
+							.pull-right.m-t-30.text-right
+								p Sub - Total amount: $13,848
+								p vat (10%) : $138
+								hr
+								h3
+									b Total :
+									|  $13,986
+							.clearfix
+							hr
+							.text-right
+								button.btn.btn-danger(type='submit')  Proceed to payment
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+
+block specific-js
+	script(type='text/javascript').

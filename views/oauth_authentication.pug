@@ -1,0 +1,12 @@
+html
+    head 
+    body 
+        h3 ALWAYS USE INCOGNITO MODE WHEN DOING THIS OPERATION. ONCE A SINGLE AUTHENTICATION IS DONE, CLOSE THE WINDOW AND COME BACK AGAIN.
+        div
+            button
+                a(href=`/azure/tokens?for=${sails.config.custom.email_credentials_for.read_email.name}` target='_blank') Click to Authenticate [ #{sails.config.custom.email_credentials_for.read_email.email_id} ]
+        br
+        div
+            button
+                a(href=`/azure/tokens?for=${sails.config.custom.email_credentials_for.write_email.name}` target='_blank') Click to Authenticate [ #{sails.config.custom.email_credentials_for.write_email.email_id} ]
+                

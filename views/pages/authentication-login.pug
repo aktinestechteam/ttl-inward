@@ -1,0 +1,135 @@
+doctype html
+html(dir='ltr')
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.css', rel='stylesheet')
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			//- script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js') -cdn
+			//- script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')-cdn
+			script(src='/dist/js/html5shiv.js')
+			script(src='/dist/js/respond.min.js')
+	body.bg-dark
+		.main-wrapper
+			// ==============================================================
+			// Preloader - style you can find in spinners.css
+			// ==============================================================
+			//.preloader
+				.lds-ripple
+					.lds-pos
+					.lds-pos
+			// ==============================================================
+			// Preloader - style you can find in spinners.css
+			// ==============================================================
+			// ==============================================================
+			// Login box.scss
+			// ==============================================================
+			.row.bg-white
+				img.p-4(src='/images/client_logistics_logo.jpg', alt='logo')
+			.auth-wrapper.d-flex.no-block.justify-content-center.align-items-center.bg-dark
+				.auth-box.border-top.border-secondary
+					#loginform
+						.row.p-t-3
+							span.db.col-4
+								img(src='/images/client_logo.png', alt='logo')
+							.col-8
+								h4 Import Delivery Order System
+								p IDOS (version 2.0)
+								p Launch Pad
+								i
+									b Enter your user information and click 'Login'. 
+									| In case you are unsure of your account information, contact your system administrator.
+
+						// Form
+						form.form-horizontal.m-t-20(action="/login" method='post')
+							input(type='hidden', name='_csrf', value=_csrf)
+							.row.p-b-30
+								if info
+									.col-12
+										p.pl-2.badge-warning.badge-pill incorrect username/password
+								.col-12
+									.input-group.mb-3
+										.input-group-prepend
+											span#basic-addon1.input-group-text.bg-success.text-white
+												i.ti-user
+										input.form-control.form-control-lg(type='text', placeholder='Username', aria-label='Username', aria-describedby='basic-addon1', name="username", autocomplete="off" required='', style='background-color: palegoldenrod', value='')
+									.input-group.mb-3
+										.input-group-prepend
+											span#basic-addon2.input-group-text.bg-warning.text-white
+												i.ti-pencil
+										input.form-control.form-control-lg(type='password', placeholder='Password', aria-label='Password', aria-describedby='basic-addon1', name="password", autocomplete="off" required='', style='background-color: palegoldenrod', value='')
+							.row.border-top.border-secondary
+								.col-12
+									.form-group
+										.p-t-20
+											//button#to-recover.btn.btn-info(type='button')
+												i.fa.fa-lock.m-r-5
+												|  Lost password?
+											button.btn.btn-success.float-right(type='submit') Login
+					//-#recoverform
+						.text-center
+							span.text-white
+								| Enter your e-mail address below and we will send you instructions how to recover a password.
+						.row.m-t-20
+							// Form
+							form.col-12(action='index')
+								// email
+								.input-group.mb-3
+									.input-group-prepend
+										span#basic-addon.input-group-text.bg-danger.text-white
+											i.ti-email
+									input.form-control.form-control-lg(type='text', placeholder='Email Address', aria-label='Username', aria-describedby='basic-addon1', autocomplete="off")
+								// pwd
+								.row.m-t-20.p-t-20.border-top.border-secondary
+									.col-12
+										a#to-login.btn.btn-success(href='#', name='action') Back To Login
+										button.btn.btn-info.float-right(type='button', name='action') Recover
+			// ==============================================================
+			// Login box.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+		// ==============================================================
+		// All Required js
+		// ==============================================================
+		script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$('[data-toggle="tooltip"]').tooltip();
+			$(".preloader").fadeOut();
+			// ==============================================================
+			// Login and Recover Password
+			// ==============================================================
+			$('#to-recover').on("click", function () {
+				$("#loginform").slideUp();
+				$("#recoverform").fadeIn();
+			});
+			$('#to-login').click(function () {
+				$("#recoverform").hide();
+				$("#loginform").fadeIn();
+			});

@@ -1,0 +1,82 @@
+header.topbar(data-navbarbg='skin5')
+  nav.navbar.top-navbar.navbar-expand-md.navbar-dark
+    .navbar-header(data-logobg='skin5')
+      // This is for the sidebar toggle which is visible on mobile only
+      a.nav-toggler.waves-effect.waves-light.d-block.d-md-none(href='javascript:void(0)')
+        i.ti-menu.ti-close
+      // ==============================================================
+      // Logo
+      // ==============================================================
+      a.navbar-brand(href='index', style='background-color:white;')
+        // Logo icon
+        //b.logo-icon.p-l-10
+          // You can put here icon as well // <i class="wi wi-sunset"></i> //
+          // Dark Logo icon
+          img.light-logo(src='/images/logo-icon.png', alt='homepage')
+        // End Logo icon
+        // Logo text
+        span.logo-text
+          // dark Logo text
+          img.light-logo.w-100(src='/images/client_logistics_logo.jpg', alt='homepage')
+        // Logo icon
+        // <b class="logo-icon">
+        // You can put here icon as well // <i class="wi wi-sunset"></i> //
+        // Dark Logo icon
+        // <img src="/images/logo-text.png" alt="homepage" class="light-logo" />
+        // </b>
+        // End Logo icon
+      // ==============================================================
+      // End Logo
+      // ==============================================================
+      // ==============================================================
+      // Toggle which is visible on mobile only
+      // ==============================================================
+      a.topbartoggler.d-block.d-md-none.waves-effect.waves-light(href='javascript:void(0)', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        i.ti-more
+    // ==============================================================
+    // End Logo
+    // ==============================================================
+    #navbarSupportedContent.navbar-collapse.collapse(data-navbarbg='skin5')
+      // ==============================================================
+      // toggle and nav items
+      // ==============================================================
+      ul.navbar-nav.float-left.mr-auto
+        li.nav-item.d-none.d-md-block
+          a.nav-link.sidebartoggler.waves-effect.waves-light(href='javascript:void(0)', data-sidebartype='mini-sidebar')
+            i.mdi.mdi-menu.font-24
+        // ==============================================================
+        // create new
+        // ==============================================================
+      // ==============================================================
+      // Right side toggle and nav items
+      // ==============================================================
+      ul.navbar-nav.float-right
+        // ==============================================================
+        // Comment
+        // ==============================================================
+        // ==============================================================
+        // End Comment
+        // ==============================================================
+        // ==============================================================
+        // Messages
+        // ==============================================================
+        //-li.nav-item.dropdown
+          a.nav-link.dropdown-toggle.waves-effect.waves-dark(href='', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+            i.fa.fa-bell.mt-3(style='font-size: 30px')
+          .dropdown-menu.dropdown-menu-right.user-dd.animated
+            a.dropdown-item(href='/logout')
+              i.fa.fa-bell.m-r-5.m-l-5
+              |  Logout
+            a.dropdown-item(href='/logout')
+              i.fa.fa-bell.m-r-5.m-l-5
+              |  Logout
+        li.nav-item.dropdown
+          a.nav-link.dropdown-toggle.text-muted.waves-effect.waves-dark.pro-pic(href='', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+            img.rounded-circle(src='/images/users/1.jpg', alt='user', width='31')
+          .dropdown-menu.dropdown-menu-right.user-dd.animated
+            a.dropdown-item(href='/logout')
+              i.fa.fa-power-off.m-r-5.m-l-5
+              |  Logout
+        // ==============================================================
+        // User profile and search
+        // ==============================================================

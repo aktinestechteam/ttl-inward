@@ -1,0 +1,180 @@
+doctype html
+- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};	
+html(dir='ltr')
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.min.css', rel='stylesheet')
+		style.
+			.borderless tr, .borderless td, .borderless th {
+				border: none !important;
+			}
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+			script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+	-var void_watermark = invoice.void_on ? 'background-image: url(/images/void_watermark.png)' : '';
+	body(style=void_watermark)
+		.main-wrapper
+			.text-center
+				img(src='/images/airways_logo.png', alt='', style='width:350px;height:300px;margin-top:-60px')
+				p#cantoaddress(style='font-size: 22px;font-weight: 600;margin-top:-100px; white-space: pre-wrap') #{constants.registered_address}
+			.container-fluid(style="padding-right: 20px;padding-left: 20px;")
+				.row.py-5
+					.col-sm-12.text-center
+						b
+							u#cancargoarivalnoticelabel(style='font-size: 25px;font-weight: 1000;') TAX INVOICE
+				.row
+					.col-sm-6
+						.row
+							.col-sm-3
+								b#cantolabel(style='font-size: 22px;font-weight: 600;') Consignee :
+							.col-sm-9
+									p#cantoaddress(style='font-size: 22px;font-weight: 600;white-space: pre-wrap') #{awb_user_data_objs[0].consignee_address} #{awb_user_data_objs[0].consignee_address2}
+					.col-sm-6
+						.row.text-right
+							.col-sm-12
+								b#canfromdate(style='font-size: 22px;font-weight: 600;') Consignee GSTIN : #{awb_user_data_objs[0].consignee_gstn}
+				.row.pb-5
+					.col-sm-12
+						table.table.w-100.borderless
+							tbody.customtable
+								tr
+									td(style='font-size: 18px;') Statement ref :
+									td(style='font-size: 18px;') #{invoice.invoice_number}
+									td(style='font-size: 18px;') Period :
+									td(style='font-size: 18px;') 01-04-2018 to 30-04-2018
+									td(style='font-size: 18px;') HSN / SAC :
+									td(style='font-size: 18px;') #{constants.hsn}
+								tr
+									td(style='font-size: 18px;') Date :
+									td(style='font-size: 18px;') #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_full_options)}
+				.row.pb-5
+					.col-sm-12
+						table.table.table-bordered
+							thead
+								tr
+									th(scope='col') #
+									th(scope='col') Flt No.
+									th(scope='col') Flight Dt.
+									th(scope='col') AWB No.
+									th(scope='col') DO Charges
+									th(scope='col') BB Charges
+									th(scope='col') Baggage Charges
+									th(scope='col') DD Charges
+									th(scope='col') Cartage
+									th(scope='col') Freight Charge
+									th(scope='col') Collect Fee
+									th(scope='col') Misc. Charge
+									th(scope='col') IGST (#{constants.igst_percentage}%)
+									th(scope='col') CGST (#{constants.cgst_percentage}%)
+									th(scope='col') SGST (#{constants.sgst_percentage}%)
+									th(scope='col') Total
+							tbody
+								- var index = 1;
+								- var total = 0;
+								- var total_do = 0;
+								- var total_bb = 0;
+								- var total_baggage = 0;
+								- var total_directdelivery = 0;
+								- var total_cartage = 0;
+								- var total_freightcharge = 0;
+								- var total_collectfee = 0;
+								- var total_misc = 0;
+								- var total_igst = 0;
+								- var total_cgst = 0;
+								- var total_sgst = 0;
+								each awb_user_data in awb_user_data_objs
+									tr
+										- var subtotal = 0;
+										- var subtotal_do = awb_user_data.do_charge;
+										- var subtotal_bb = awb_user_data.break_bulk_charge;
+										- var subtotal_baggage = awb_user_data.baggage_charge;
+										- var subtotal_directdelivery = awb_user_data.direct_delivery_charge;
+										- var subtotal_cartage = awb_user_data.cartage_charge;
+										- var subtotal_freightcharge = awb_user_data.collect_charge;
+										- var subtotal_collectfee = awb_user_data.collect_fee;
+										- var subtotal_misc = awb_user_data.misc_charges;
+										- var subtotal_igst = awb_user_data.igst;
+										- var subtotal_cgst = awb_user_data.cgst;
+										- var subtotal_sgst = awb_user_data.sgst;
+										- var subtotal = subtotal_do + subtotal_bb + subtotal_baggage + subtotal_directdelivery + subtotal_cartage + subtotal_freightcharge + subtotal_collectfee + subtotal_misc + subtotal_igst + subtotal_cgst + subtotal_sgst;
+									
+										- total_bb += subtotal_bb;
+										- total_baggage += subtotal_baggage;
+										- total_directdelivery += subtotal_directdelivery;
+										- total_cartage += subtotal_cartage;
+										- total_freightcharge += subtotal_freightcharge;
+										- total_collectfee += subtotal_collectfee;
+										- total_misc += subtotal_misc;
+										- total_igst += subtotal_igst;
+										- total_cgst += subtotal_cgst;
+										- total_sgst += subtotal_sgst;
+										- total_do += subtotal_do;
+										- total += subtotal;
+										th #{index++}
+										td BA277
+										td 31/03/2018
+										td #{awb_user_data.awb_number}
+										td #{subtotal_do}
+										td #{subtotal_bb}
+										td #{subtotal_baggage}
+										td #{subtotal_directdelivery}
+										td #{subtotal_cartage}
+										td #{subtotal_freightcharge}
+										td #{subtotal_collectfee}
+										td #{subtotal_misc}
+										td #{subtotal_igst}
+										td #{subtotal_cgst}
+										td #{subtotal_sgst}
+										td #{sails.config.globals.price_formatter(subtotal)}
+								tr
+									th(colspan="4")
+									td #{total_do}
+									td #{total_bb}
+									td #{total_baggage}
+									td #{total_directdelivery}
+									td #{total_cartage}
+									td #{total_freightcharge}
+									td #{total_collectfee}
+									td #{total_misc}
+									td #{total_igst}
+									td #{total_cgst}
+									td #{total_sgst}
+									td #{sails.config.globals.price_formatter(total)}
+				.row
+					.col-sm-6
+						include ../includes/number2string.pug
+						+number2string(invoice.amount_billed)
+					.col-sm-6
+						p.text-right(style='font-size: 20px;') GSTIN : #{constants.gstin_number}
+				.row.pb-3
+					.col-sm-6
+						p(style='font-size: 20px;')
+							| Yours faithfully,
+				.row.pt-3
+					.col-sm-6
+						p(style='font-size: 20px;') #{constants.designation}
+							
+		script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$('[data-toggle="tooltip"]').tooltip();
+			function pdf() {
+				location.href = '/invoice2pdf';
+			}

@@ -1,0 +1,235 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Widgets
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title Small Buttons
+						button.btn.btn-primary.btn-sm(type='button') Primary
+						button.btn.btn-secondary.btn-sm(type='button') Secondary
+						button.btn.btn-success.btn-sm(type='button') Success
+						button.btn.btn-danger.btn-sm(type='button') Danger
+						button.btn.btn-warning.btn-sm(type='button') Warning
+						button.btn.btn-info.btn-sm(type='button') Info
+						button.btn.btn-light.btn-sm(type='button') Light
+						button.btn.btn-dark.btn-sm(type='button') Dark
+						button.btn.btn-link.btn-sm(type='button') Link
+					.border-top
+						.card-body
+							h5.card-title Medium Buttons
+							button.btn.btn-primary(type='button') Primary
+							button.btn.btn-secondary(type='button') Secondary
+							button.btn.btn-success(type='button') Success
+							button.btn.btn-danger(type='button') Danger
+							button.btn.btn-warning(type='button') Warning
+							button.btn.btn-info(type='button') Info
+							button.btn.btn-light(type='button') Light
+							button.btn.btn-dark(type='button') Dark
+							button.btn.btn-link(type='button') Link
+					.border-top
+						.card-body
+							h5.card-title Large Buttons
+							button.btn.btn-primary.btn-lg(type='button') Primary
+							button.btn.btn-secondary.btn-lg(type='button') Secondary
+							button.btn.btn-success.btn-lg(type='button') Success
+							button.btn.btn-danger.btn-lg(type='button') Danger
+							button.btn.btn-warning.btn-lg(type='button') Warning
+							button.btn.btn-info.btn-lg(type='button') Info
+							button.btn.btn-light.btn-lg(type='button') Light
+							button.btn.btn-dark.btn-lg(type='button') Dark
+							button.btn.btn-link.btn-lg(type='button') Link
+					.border-top
+						.card-body
+							h5.card-title Outline Buttons
+							button.btn.btn-outline-primary(type='button') Primary
+							button.btn.btn-outline-secondary(type='button') Secondary
+							button.btn.btn-outline-success(type='button') Success
+							button.btn.btn-outline-danger(type='button') Danger
+							button.btn.btn-outline-warning(type='button') Warning
+							button.btn.btn-outline-info(type='button') Info
+							button.btn.btn-outline-light(type='button') Light
+							button.btn.btn-outline-dark(type='button') Dark
+		// drop down
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title Dropdown Buttons
+						.bd-example
+							.btn-group
+								button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Primary
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-secondary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Secondary
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-success.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Success
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-info.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Info
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-warning.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Warning
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-danger.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Danger
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+					.card-body.border-top
+						h5.card-title Split Buttons
+						.bd-example
+							.btn-group
+								button.btn.btn-primary(type='button') Primary
+								button.btn.btn-primary.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-secondary(type='button') Secondary
+								button.btn.btn-secondary.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-success(type='button') Success
+								button.btn.btn-success.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-info(type='button') Info
+								button.btn.btn-info.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-warning(type='button') Warning
+								button.btn.btn-warning.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+							.btn-group
+								button.btn.btn-danger(type='button') Danger
+								button.btn.btn-danger.dropdown-toggle.dropdown-toggle-split(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+									span.sr-only Toggle Dropdown
+								.dropdown-menu
+									a.dropdown-item(href='#') Action
+									a.dropdown-item(href='#') Another action
+									a.dropdown-item(href='#') Something else here
+									.dropdown-divider
+									a.dropdown-item(href='#') Separated link
+							// /btn-group
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+
+block specific-js
+	script(type='text/javascript').

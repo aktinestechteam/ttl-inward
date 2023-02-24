@@ -1,0 +1,124 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	link(href='/libs/jquery-steps/jquery.steps.css', rel='stylesheet')
+	link(href='/libs/jquery-steps/steps.css', rel='stylesheet')
+
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Form Wizard
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.card
+			.card-body.wizard-content
+				h4.card-title Basic Form Example
+				h6.card-subtitle
+				form#example-form.m-t-40(action='#')
+					div
+						h3 Account
+						section
+							label(for='userName') User name *
+							input#userName.required.form-control(name='userName', type='text')
+							label(for='password') Password *
+							input#password.required.form-control(name='password', type='text')
+							label(for='confirm') Confirm Password *
+							input#confirm.required.form-control(name='confirm', type='text')
+							p (*) Mandatory
+						h3 Profile
+						section
+							label(for='name') First name *
+							input#name.required.form-control(name='name', type='text')
+							label(for='surname') Last name *
+							input#surname.required.form-control(name='surname', type='text')
+							label(for='email') Email *
+							input#email.required.email.form-control(name='email', type='text')
+							label(for='address') Address
+							input#address.form-control(name='address', type='text')
+							p (*) Mandatory
+						h3 Hints
+						section
+							ul
+								li Foo
+								li Bar
+								li Foobar
+						h3 Finish
+						section
+							input#acceptTerms.required(name='acceptTerms', type='checkbox')
+							label(for='acceptTerms') I agree with the Terms and Conditions.
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+	block specific-js
+		script(src='/libs/jquery-steps/build/jquery.steps.min.js')
+		script(src='/libs/jquery-validation/dist/jquery.validate.min.js')
+		script(type='text/javascript').
+			// Basic Example with form
+			var form = $("#example-form");
+			form.validate({
+				errorPlacement: function errorPlacement(error, element) {
+					element.before(error);
+				},
+				rules: {
+					confirm: {
+						equalTo: "#password"
+					}
+				}
+			});
+			form.children("div").steps({
+				headerTag: "h3",
+				bodyTag: "section",
+				transitionEffect: "slideLeft",
+				onStepChanging: function (event, currentIndex, newIndex) {
+					form.validate().settings.ignore = ":disabled,:hidden";
+					return form.valid();
+				},
+				onFinishing: function (event, currentIndex) {
+					form.validate().settings.ignore = ":disabled";
+					return form.valid();
+				},
+				onFinished: function (event, currentIndex) {
+					alert("Submitted!");
+				}
+			});

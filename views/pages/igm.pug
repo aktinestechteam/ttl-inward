@@ -1,0 +1,799 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	//link(rel='stylesheet', type='text/css', href='https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/af-2.3.0/b-1.5.2/b-colvis-1.5.2/b-flash-1.5.2/b-html5-1.5.2/b-print-1.5.2/cr-1.5.0/fc-3.2.5/fh-3.1.4/kt-2.4.0/r-2.2.2/rg-1.0.3/rr-1.2.4/sc-1.5.0/sl-1.2.6/datatables.min.css')
+	link(rel='stylesheet', type='text/css', href='/dist/css/datatables.min.css')
+	link(rel='stylesheet', href='//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')
+
+
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row.mb-4
+			.col-lg-4
+				input#inwardcargo_igm_search_igmnumber_input.form-control(type='text', placeholder='Search IGM Number', name='inwardcargo_igm_search_igmnumber_input', autocomplete="off")
+			.col-lg-2
+				button.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick='findIgm()') Find IGM
+			.col-lg-4
+				input#inwardcargo_igm_search_awb_input.form-control(type='search', placeholder='Search AWB Number', name='inwardcargo_igm_search_awb_input', autocomplete="off")
+			.col-lg-2
+				button.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick='getAwb()') Find AWB
+		.row.mb-3
+			.col-lg-2
+				label Station
+				select#inwardcargo_igm_city.select2.form-control.custom-select(type='text', name='inwardcargo_igm_city', autocomplete="off")
+					each airport in airportlistdetails
+						if(cityCode === airport.iata_code)
+							option(value=airport.iata_code, selected='') #{airport.iata_code} (#{airport.city_name})
+						else
+							option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+			.col-lg-2
+				label Inward Date
+				.input-group
+					//input#inwardcargo_igm_search_awb_input.form-control(type='search', placeholder='Search AWB Number', name='inwardcargo_igm_search_awb_input',aria-controls="zero_config")
+					input#inwardcargo_igm_search_igms_using_date_input.form-control(type='text', placeholder='Select Date', name='inwardcargo_igm_search_igms_using_date_input', autocomplete="off")
+			.col-lg-2
+				label IGM / Flight Number
+				select#inwardcargo_igm_no_date.select2.form-control.custom-select(type='text', name='inwardcargo_igm_no_date', autocomplete="off")
+					if(igmlist)
+						each igm in igmlist
+							if(selectedIgm === igm.igm_number)
+								option(value=igm.igm_number, selected='') #{igm.igm_number} - #{igm.flight_number}
+							else
+								option(value=igm.igm_number) #{igm.igm_number} - #{igm.flight_number}
+			.col-lg-2
+				label &nbsp
+				if(igmlist && igmlist.length > 0)
+					button#inwardcargo_igm_change_igm_number.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='button', onclick='showIgmChangeReasonModel()') Change IGM Number
+				else
+					button#inwardcargo_igm_change_igm_number.btn.btn-danger.waves-effect.waves-light.save-category.w-100(data-toggle="modal" data-target="#inwardcargo-igm-change-igm-number-modal" disabled) Change IGM Number
+			.col-lg-1
+				label &nbsp
+				if(igmlist && igmlist.length > 0)
+					button#inwardcargo_igm_add_awb_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='button', data-toggle="modal" data-target="#inwardcargo-igm-add-awb-manually-modal") + AWB
+				else
+					button#inwardcargo_igm_add_awb_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type='button' data-toggle="modal" data-target="#inwardcargo-igm-add-awb-manually-modal" disabled) + AWB
+			.col-lg-1
+				label &nbsp
+				if(airportlistdetails.length > 0)
+					button#inwardcargo_igm_upload_new_igm_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type="button" data-toggle="modal" data-target="#inwardcargo_igm_upload_new_igm_modal") + IGM
+				else
+					button#inwardcargo_igm_upload_new_igm_btn.btn.btn-danger.waves-effect.waves-light.save-category.w-100(type="button" data-toggle="modal" data-target="#inwardcargo_igm_upload_new_igm_modal" disabled) + IGM
+			.col-lg-2
+				label &nbsp
+				button#inwardcargo_pending_igm_btn.btn.btn-warning.waves-effect.waves-light.w-100(type="button" data-toggle="modal" data-target="#inwardcargo_pending_igm_modal") IGM Approval Status
+					//-span.fas.fa-question.mr-1
+		.row#zero_config_wrapper.mb-3
+			.card(style='width: 100%;')
+				.card-body
+					.table-responsive
+						table#zero_config.table
+							thead.thead-light
+								tr
+									//th(scope='col', width='0%') ID
+									th(scope='col') AWB
+									th(scope='col') Consignee
+									//-th(scope='col') From
+									//-th(scope='col') To
+									th(scope='col') Pc/Wt
+									
+									th(scope='col') HAWBs
+									th(scope='col') Commodity
+									th(scope='col') CAN-DO-INV
+									//th(scope='col') DO
+									//th(scope='col') Invoice
+									//th(scope='col') Invoice
+									th(scope='col') Credit Period
+									th(scope='col') Type
+							tbody.customtable
+								if(partawblist)
+									each partawb in partawblist
+										each awb_user_data in awb_user_datas
+											if(awb_user_data.awb_number === partawb.awb_number)
+												tr(onclick="window.open('/awb?inwardcargo_igm_awb_number=" + awb_user_data.awb_number + "', '_blank')")
+													//td #{partawb.id}
+													td 
+														p #{partawb.awb_number}
+														.badge.badge-warning(style='font-size:16px')
+															i.mdi.mdi-airplane-takeoff
+															span.pl-1 #{partawb.origin}
+														.badge.badge-dark(style='font-size:16px')
+															span.pr-1 #{partawb.destination}
+															i.mdi.mdi-airplane-landing
+													td 
+														=awb_user_data.consignee_name
+													//-td #{partawb.origin}
+													//-td #{partawb.destination}
+													td #{partawb.no_of_pieces_received} pc(s) / #{sails.config.globals.price_formatter(partawb.weight_received)} kg
+													td 
+														=awb_user_data.no_of_hawb
+													td #{partawb.commodity}
+													td
+														if partawb.can_document
+															label.badge.badge-dark.w-100.m-0 CAN ISSUED
+														else
+															label.badge.badge-secondary.w-100.m-0 CAN PENDING
+															
+														//td
+														br
+														if partawb.do_document
+															label.badge.badge-info.w-100.m-0 DO ISSUED
+														else
+															label.badge.badge-secondary.w-100.m-0 DO PENDING
+														//td
+														br
+														if awb_user_data.invoice_document
+															label.badge.badge-success.w-100.m-0 INVOICED
+														else
+															label.badge.badge-danger.w-100.m-0 NOT INV
+													td 
+														=awb_user_data.consignee_credit_period
+													td 
+														=awb_user_data.consignee_type
+	#inwardcargo_pending_igm_modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='pendingIGM', aria-hidden='true', style='display: none;')
+		.modal-dialog.modal-lg(role='')
+			.modal-content
+				.modal-header
+					h5#UploadModalLabel.modal-title
+						i.mdi.mdi-cloud-upload Pending IGM requests for #{cityCode}
+					button.close(type='button', data-dismiss='modal', aria-label='Close')
+						span(aria-hidden='true') ×
+				.modal-body
+					table#zero_config.table
+						thead.thead-light
+							tr
+								th(scope='col') IGM No
+								th(scope='col') IGM Date
+								th(scope='col') Flight No
+								th(scope='col') Flight Date
+								th(scope='col') Inward Date
+								th(scope='col') Uploaded By
+								th(scope='col') Status
+						tbody.customtable
+							each pending_request_igm in pending_request_igms
+								tr
+									td=pending_request_igm.igm_number
+									td=sails.config.custom.getReadableDate(pending_request_igm.igm_date)
+									td=pending_request_igm.flight_number
+									td=sails.config.custom.getReadableDate(pending_request_igm.flight_date)
+									td=sails.config.custom.getReadableDate(pending_request_igm.inward_date)
+									td=pending_request_igm.uploaded_by
+									td=pending_request_igm.status
+					
+	#inwardcargo_igm_upload_new_igm_modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='UploadModalLabel', aria-hidden='true', style='display: none;')
+		.modal-dialog(role='document')
+			.modal-content
+				form(enctype='multipart/form-data', action='/igm', method='POST', onsubmit='return validateIGMCreationData()')
+					input(type='hidden', name='_csrf', value=_csrf)
+					input#inwardcargo_igm_city_hidden(type='hidden', value=cityCode, name='inwardcargo_igm_city')
+					.modal-header
+						h5#UploadModalLabel.modal-title
+							i.mdi.mdi-cloud-upload Upload IGM for #{cityCode}
+						button.close(type='button', data-dismiss='modal', aria-label='Close')
+							span(aria-hidden='true') ×
+					.modal-body
+						.form-group.row
+							.col-sm-5.text-right
+								label.control-label.col-form-label(for='inwardcargo_igm_number') Igm Number
+							.col-sm-7
+								input#inwardcargo_igm_number.form-control(type='text', placeholder='Enter Igm Number', name='inwardcargo_igm_number', autocomplete="off", readonly)
+						.form-group.row.mb-3
+							.col-sm-5.text-right
+								label.control-label.col-form-label(for='inwardcargo_igm_igm_date') IGM Date
+							.col-sm-7
+								input#inwardcargo_igm_igm_date.form-control(type='text', placeholder='IGM Date', name='inwardcargo_igm_igm_date', autocomplete="off")
+						.form-group.row.mb-3
+							.col-sm-5.text-right
+								label.control-label.col-form-label(for='inwardcargo_igm_inward_date') IGM Inward Date
+							.col-sm-7
+								input#inwardcargo_igm_inward_date.form-control(type='text', placeholder='Inward Date', name='inwardcargo_igm_inward_date', autocomplete="off")
+						.form-group.row
+							label.col-sm-5.text-right.control-label.col-form-label Select Options
+							.col-sm-7
+								.custom-control.custom-radio
+									input#inwardcargo_igm_createoption_manually.custom-control-input(type='radio', name='inwardcargo_igm_createoption', value='inwardcargo_igm_createoption_manually')
+									label.custom-control-label(for='inwardcargo_igm_createoption_manually') Create FFM
+								.custom-control.custom-radio
+									input#inwardcargo_igm_createoption_ffm.custom-control-input(type='radio', name='inwardcargo_igm_createoption', value='inwardcargo_igm_createoption_ffm')
+									label.custom-control-label(for='inwardcargo_igm_createoption_ffm') Upload FFM (Manual)
+								.custom-control.custom-radio
+									input#inwardcargo_igm_createoption_pick_from_available.custom-control-input(type='radio', name='inwardcargo_igm_createoption', value='inwardcargo_igm_createoption_pick_from_available',checked='')
+									label.custom-control-label(for='inwardcargo_igm_createoption_pick_from_available') Select FFM
+						.form-group.row
+							.col-sm-5.text-right
+								label.control-label.col-form-label(for='inwardcargo_igm_flight_number') Flight Number
+							.col-sm-7
+								input#inwardcargo_igm_flight_number.form-control(type='text', placeholder='Enter Flight Number', name='inwardcargo_igm_flight_number', autocomplete="off")
+						.custom-file.mb-3
+							input#inwardcargo_igm_upload_new_igm_file.custom-file-input.form-control(type='file', name='inwardcargo_igm_upload_new_igm_file', accept=".IN",disabled)
+							label#inwardcargo_igm_upload_new_igm_file_label.custom-file-label(for='inwardcargo_igm_upload_new_igm_file')
+						.form-group.row
+							.col-sm-5.text-right
+								label.control-label.col-form-label(for='inwardcargo_igm_available_igm') Available IGM FFM
+							.col-sm-7
+								select#inwardcargo_igm_upload_select_igm_from_available_igm.select2.form-control.custom-select(type='text', name='inwardcargo_igm_upload_select_igm_from_available_igm', autocomplete="off")
+									each pending_igm in pending_igms
+										option(value=pending_igm.id, igm_inward_date=pending_igm.flight_date, igm_no=pending_igm.igm_number, flight_no=pending_igm.flight_number)=sails.config.custom.getReadableDate(pending_igm.flight_date) + ' - ' + pending_igm.flight_number + (pending_igm.igm_number ? ' (' + pending_igm.igm_number + ')' : '')
+							//.invalid-feedback Unsupported File Format
+							
+						//.form-group.mb-3.text-center
+							ul.list-style-none
+								li(style='padding-top:1rem;padding-right:1rem;padding-left:1rem;')
+									label.customcheckbox(style='font-size: 16px;font-weight: 600') To create a new IGM manually, do not select the file
+										input#inwardcargo_igm_new_igm_manually.listCheckbox(type='checkbox', name='inwardcargo_igm_new_igm_manually')
+										span.checkmark
+					.modal-footer
+						button.btn.btn-secondary(type='button', data-dismiss='modal') 
+							i.fa.fa-times-circle(aria-hidden='true')
+							| &nbsp&nbspClose
+						button#inwardcargo_igm_submit_igm.btn.btn-primary(type='submit')
+							span
+							i.fas.fa-chevron-circle-right.pr-2
+							| Create IGM
+	// Modal Change igm number
+	#inwardcargo-igm-change-igm-number-modal.modal.fade.none-border
+		.modal-dialog
+			.modal-content
+					.modal-header
+						h4.modal-title
+							i#inwardcargo-igm-change-igm-number-modal-title.mdi.mdi-city
+							| Current Igm Number (#{selectedIgm})
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						.row
+							#inwardcargo_igm_change_igm_number_input_block.col-md-6
+								label.control-label Enter New IGM Number
+								input#inwardcargo_igm_change_igm_number_input.form-control.form-white(placeholder='Enter New IGM Number', type='text', name='inwardcargo_igm_change_igm_number_input', autocomplete="off")
+							#inwardcargo_igm_confirm_igm_number_input_block.col-md-6
+								label.control-label Confirm New IGM Number
+								input#inwardcargo_igm_confirm_igm_number_input.form-control.form-white(placeholder='Confirm IGM Number', type='text', name='inwardcargo_igm_confirm_igm_number_input', autocomplete="off" )
+							#inwardcargo_changeimgreason_reason_select_input_block.col-md-6
+								label.control-label Select Reason
+								select#inwardcargo_changeimgreason_reason_select.select2.form-control.custom-select(style='width: 100%; height:36px;', type='text', name='inwardcargo_changeimgreason_reason_select', autocomplete="off")
+							#inwardcargo_changeimgreason_explanation_reason_input_block.col-md-6
+								label.control-label Reason Explanation
+								input#inwardcargo_changeimgreason_explanation_reason_input.form-control.form-white(placeholder='Enter Reason Explanation', type='text', name='inwardcargo_changeimgreason_explanation_reason_input', autocomplete="off")
+					.modal-footer
+						button#inwardcargo_igm_igm_number.btn.btn-danger.waves-effect.waves-light.save-category(type='button', name='inwardcargo_igm_igm_number', onclick='changeIgm(\''+selectedIgm+'\')') Save
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+	// END MODAL
+	// Modal Change igm number
+	#inwardcargo-igm-add-awb-manually-modal.modal.fade.none-border
+		.modal-dialog
+			.modal-content
+					.modal-header
+						h4.modal-title
+							i#inwardcargo-igm-add-awb-manually-modal-title.mdi.mdi-city
+							| Add AWB
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+					.modal-body
+						.row.pb-3
+							#inwardcargo_igm_add_awb_manually_awb_number_input_block.col-md-6
+								label.control-label Enter AWB Number
+								input#inwardcargo_igm_add_awb_manually_awb_number_input.form-control.form-white(placeholder='Enter AWB Number', name='inwardcargo_igm_add_awb_manually_awb_number_input', autocomplete="off")
+							#inwardcargo_igm_add_awb_manually_igm_number_input_block.col-md-6
+								label.control-label IGM Number
+								input#inwardcargo_igm_add_awb_manually_igm_number_input.form-control.form-white(placeholder='IGM Number', type='text', name='inwardcargo_igm_add_awb_manually_igm_number_input', value=selectedIgm, autocomplete="off" readonly='')
+						.row.pb-3
+							#inwardcargo_igm_add_awb_manually_origin_input_block.col-md-6
+								label.control-label Origin
+								select#inwardcargo_igm_add_awb_manually_origin_input.select2.form-control.custom-select(type='text', name='inwardcargo_igm_add_awb_manually_origin_input', autocomplete="off")
+									each airport in allairportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+							#inwardcargo_igm_add_awb_manually_destination_input_block.col-md-6
+								label.control-label Destination
+								select#inwardcargo_igm_add_awb_manually_destination_input.select2.form-control.custom-select(type='text', name='inwardcargo_igm_add_awb_manually_destination_input', autocomplete="off")
+									each airport in allairportlistdetails
+										option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+						.row.pb-3
+							#inwardcargo_igm_add_awb_manually_igm_city_input_block.col-md-6
+								label.control-label IGM City
+								input#inwardcargo_igm_add_awb_manually_igm_city_input.form-control.form-white(placeholder='IGM City', type='text', name='inwardcargo_igm_add_awb_manually_igm_city_input' , value=cityCode, autocomplete="off" readonly='')
+							#inwardcargo_igm_add_awb_manually_flight_number_input_block.col-md-6
+								label.control-label Flight Number
+								input#inwardcargo_igm_add_awb_manually_flight_number_input.form-control.form-white(placeholder='Flight Number', type='text', name='inwardcargo_igm_add_awb_manually_flight_number_input' , value=flightNumber, autocomplete="off" readonly='')
+						.row.pb-3
+							#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input_block.col-md-6
+								label.control-label No Of Pieces Received
+								input#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input.form-control.form-white(placeholder='No Of Pieces Received', type='text', name='inwardcargo_igm_add_awb_manually_no_of_pieces_received_input', autocomplete="off")
+							#inwardcargo_igm_add_awb_manually_weight_received_input_block.col-md-6
+								label.control-label Weight Received (kg)
+								input#inwardcargo_igm_add_awb_manually_weight_received_input.form-control.form-white(placeholder='Weight Received', type='text', name='inwardcargo_igm_add_awb_manually_weight_received_input', autocomplete="off")
+						.row.pb-3
+							#inwardcargo_igm_add_awb_manually_commodity_input_block.col-md-6
+								label.control-label Commodity
+								input#inwardcargo_igm_add_awb_manually_commodity_input.form-control.form-white(placeholder='Commodity', type='text', name='inwardcargo_igm_add_awb_manually_commodity_input', autocomplete="off")
+					.modal-footer
+						button#inwardcargo_igm_add_awb_manually_btn.btn.btn-danger.waves-effect.waves-light.save-category(type='button', onclick='saveawbmanually()') Save
+						button.btn.btn-secondary.waves-effect(type='button', data-dismiss='modal') Close
+	// END MODAL
+		// ==============================================================
+		// End Container fluid
+		// ==============================================================
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/js/swal_helper.js')
+	include ../includes/csrf.pug
+	script.
+		//$('#zero_config').DataTable();
+		$('#menu_igm').addClass("selected");
+		var selecteddate = getUrlVars()["inwardcargo_igm_search_date"];
+		//- $("#inwardcargo_igm_search_igms_using_date_input").datepicker({defaultDate: selecteddate});
+		//- $('#inwardcargo_igm_search_igms_using_date_input').datepicker('setDate', selecteddate);
+		$( "#inwardcargo_igm_search_igms_using_date_input" ).datepicker({
+			dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+				var date = $(this).val();
+				var city = $("#inwardcargo_igm_city option:selected").val();
+				var selecteddate = getUrlVars()["inwardcargo_igm_search_date"];
+				location.href = '/igm?inwardcargo_igm_city=' + city +'&inwardcargo_igm_search_date='+date;
+			}
+		});
+		if(selecteddate)
+			$('#inwardcargo_igm_search_igms_using_date_input').datepicker('setDate', selecteddate);
+		else
+			$('#inwardcargo_igm_search_igms_using_date_input').datepicker('setDate', new Date());
+			
+			
+		$( "#inwardcargo_igm_igm_date" ).datepicker({ dateFormat: 'yy-mm-dd'});
+		$( "#inwardcargo_igm_inward_date" ).datepicker({ dateFormat: 'yy-mm-dd'});
+		$(document).ready(function () {
+			$('#inwardcargo_igm_flight_number').prop('readonly', true);
+			/*$('#inwardcargo_igm_search_awb_input').on( 'keyup', function () {
+				table.search( this.value ).draw();
+			} );*/
+			//table.column( 0 ).visible( false );
+			$('#inwardcargo_igm_upload_new_igm_file').change(function (e) {
+				var fileName = e.target.files[0].name;
+				$('#inwardcargo_igm_upload_new_igm_file_label').text(fileName);
+			});
+			$("#inwardcargo_igm_city").change(function () {
+				var city = $("#inwardcargo_igm_city option:selected").val();
+				getCity(city);
+			});
+			$("#inwardcargo_igm_no_date").change(function () {
+				var igmnodate = $("#inwardcargo_igm_no_date option:selected").val();
+				var city = $("#inwardcargo_igm_city option:selected").val();
+				var date = getUrlVars()["inwardcargo_igm_search_date"];
+				if(!date) {
+					date = $("#inwardcargo_igm_search_igms_using_date_input").val();
+				}
+				location.href = '/igm?inwardcargo_igm_city=' + city +'&inwardcargo_igm_no_date='+igmnodate+'&inwardcargo_igm_search_date='+date;
+			});
+			function getCity(city) {
+				location.href = '/igm?inwardcargo_igm_city=' + city;
+			}
+			
+			showIGMNumber();
+		});
+		
+		$('#inwardcargo_igm_upload_select_igm_from_available_igm').change(function() {
+			showIGMNumber();
+		});
+		
+		$("input[name=inwardcargo_igm_createoption]:radio").click(function() {
+			if($(this).attr("value")=="inwardcargo_igm_createoption_pick_from_available") {
+				$(".invalid-igm-no-options").remove();
+				
+				$('#inwardcargo_igm_number').prop('readonly', true);
+				$('#inwardcargo_igm_inward_date').prop('readonly', true);
+				showIGMNumber();
+				$("#inwardcargo_igm_upload_select_igm_from_available_igm").prop('disabled', false);
+				
+				$("#inwardcargo_igm_upload_new_igm_file").removeClass('is-invalid');
+				$('#inwardcargo_igm_upload_new_igm_file').prop('disabled', true);
+				$('#inwardcargo_igm_upload_new_igm_file_label').text("");
+				$('#inwardcargo_igm_upload_new_igm_file').val("");
+				
+				//$('#inwardcargo_igm_flight_number').prop('readonly', false);
+				$("#inwardcargo_igm_flight_number").removeClass('is-invalid');
+				$('#inwardcargo_igm_flight_number').prop('readonly', true);
+				//$('#inwardcargo_igm_flight_number').val('');
+			} else if($(this).attr("value")=="inwardcargo_igm_createoption_ffm") {
+				$(".invalid-igm-flightnumber").remove();
+				
+				$('#inwardcargo_igm_number').prop('readonly', false);
+				$('#inwardcargo_igm_number').val('');
+				$('#inwardcargo_igm_inward_date').prop('readonly', false);
+				$('#inwardcargo_igm_inward_date').val('');
+				$("#inwardcargo_igm_upload_select_igm_from_available_igm").prop('disabled', true);
+				
+				$('#inwardcargo_igm_upload_new_igm_file').prop('disabled', false);
+				
+				$("#inwardcargo_igm_flight_number").removeClass('is-invalid');
+				$('#inwardcargo_igm_flight_number').prop('readonly', false);
+				$('#inwardcargo_igm_flight_number').val('');
+				
+				$('#inwardcargo_igm_upload_new_igm_file_label').text('Choose IGM file...');
+			} else if($(this).attr("value")=="inwardcargo_igm_createoption_manually") {
+				$(".invalid-igm-file").remove();
+				
+				$('#inwardcargo_igm_number').prop('readonly', false);
+				$('#inwardcargo_igm_number').val('');
+				$('#inwardcargo_igm_inward_date').prop('readonly', false);
+				$('#inwardcargo_igm_inward_date').val('');
+				$("#inwardcargo_igm_upload_select_igm_from_available_igm").prop('disabled', true);
+				
+				$('#inwardcargo_igm_flight_number').prop('readonly', false);
+				$('#inwardcargo_igm_flight_number').val('');
+				
+				$("#inwardcargo_igm_upload_new_igm_file").removeClass('is-invalid');
+				$('#inwardcargo_igm_upload_new_igm_file').prop('disabled', true);
+				$('#inwardcargo_igm_upload_new_igm_file_label').text("");
+				$('#inwardcargo_igm_upload_new_igm_file').val("");
+			}
+		});
+		
+		function showIGMNumber() {
+			let selected_igm_no = $('select[name="inwardcargo_igm_upload_select_igm_from_available_igm"] option:selected').attr('igm_no');
+			
+			//	If you do not have the IGM number, then ask user to enter
+			if(selected_igm_no) {
+				$('#inwardcargo_igm_number').val(selected_igm_no);
+				$('#inwardcargo_igm_number').prop('readonly', true);
+			} else {
+				$('#inwardcargo_igm_number').prop('readonly', false);
+				$('#inwardcargo_igm_number').val('');
+			}
+			
+			let flight_no = $('select[name="inwardcargo_igm_upload_select_igm_from_available_igm"] option:selected').attr('flight_no');
+			$('#inwardcargo_igm_flight_number').val(flight_no);
+			
+			let igm_inward_date = $('select[name="inwardcargo_igm_upload_select_igm_from_available_igm"] option:selected').attr('igm_inward_date');
+			
+			$("#inwardcargo_igm_inward_date").datepicker({ dateFormat: 'yy-mm-dd'}).datepicker('setDate', new Date(Number(igm_inward_date)));;
+			
+			//$('#inwardcargo_igm_inward_date').datepicker().datepicker('setDate', igm_inward_date);
+		}
+		
+		function changeIgm(igmNumber) {
+			$( ".invalid-change-igm-number" ).remove();
+			$( ".invalid-confirm-igm-number" ).remove();
+			$( ".invalid-user-typed-reason" ).remove();
+			$("#inwardcargo_igm_change_igm_number_input").removeClass('is-invalid');
+			$("#inwardcargo_igm_confirm_igm_number_input").removeClass('is-invalid');
+			$("#inwardcargo_changeimgreason_explanation_reason_input").removeClass('is-invalid');
+			var newIgmNumber = $('#inwardcargo_igm_change_igm_number_input').val();
+			var confirmIgmNumber = $('#inwardcargo_igm_confirm_igm_number_input').val();
+			var selected_reason = $('#inwardcargo_changeimgreason_reason_select').val();
+			var user_typed_reason = $('#inwardcargo_changeimgreason_explanation_reason_input').val();
+			var isnewIgmNumber = /^[a-zA-Z0-9]*$/.test(newIgmNumber);
+			if(newIgmNumber=="") {
+				$("#inwardcargo_igm_change_igm_number_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_change_igm_number_input" ).after( "<div class='invalid-feedback invalid-change-igm-number'>The IGM number cannot be empty</div>");
+				return false;	
+			}else if(!isnewIgmNumber) {
+				$("#inwardcargo_igm_change_igm_number_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_change_igm_number_input" ).after( "<div class='invalid-feedback invalid-change-igm-number'>Please enter correct IGM number</div>");
+				return false;	
+			} else if(newIgmNumber != confirmIgmNumber) {
+				$("#inwardcargo_igm_confirm_igm_number_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_confirm_igm_number_input" ).after( "<div class='invalid-feedback invalid-confirm-igm-number'>New IGM number and confirm IGM number must be same</div>");
+				return false;
+				//toast({type: 'error',title: 'New Igm Number And Confirm Igm Number Must Be Same'});
+			} else if(user_typed_reason=="") {
+				$("#inwardcargo_changeimgreason_explanation_reason_input").addClass('is-invalid');
+				$( "#inwardcargo_changeimgreason_explanation_reason_input" ).after( "<div class='invalid-feedback invalid-user-typed-reason'>Reason explanation cannot be blank</div>");
+				return false;
+			} else {
+				getCSRFToken(function(_csrf) {
+					$.post("/changeigmnumber", {
+						_csrf: _csrf,
+						inwardcargo_igm_igm_number: igmNumber, 
+						inwardcargo_new_igm_number: newIgmNumber, 
+						inwardcargo_confirm_igm_number: confirmIgmNumber,  
+						selected_reason: selected_reason, 
+						user_typed_reason: user_typed_reason
+					}, function (data) {
+						if (data.error) {
+							errorSwal('Error', data.error);
+						} else {
+							if (data.value){
+								location.href = location.href.replace('inwardcargo_igm_no_date=' + igmNumber, 'inwardcargo_igm_no_date=' + newIgmNumber);
+							}
+						}
+					});
+				});
+			}			
+			return false;
+		}
+		
+		function saveawbmanually() {
+			$( ".invalid-awb-number" ).remove();
+			$( ".invalid-incorrect-awb-number" ).remove();
+			$( ".invalid-number-ofpieces" ).remove();
+			$( ".invalid-weight-received" ).remove();
+			$( ".invalid-commodity" ).remove();
+			$(".invalid-same-origindestination-number").remove();
+			$("#inwardcargo_igm_add_awb_manually_awb_number_input").removeClass('is-invalid');
+			$("#inwardcargo_igm_add_awb_manually_destination_input").removeClass('is-invalid');
+			$("#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input").removeClass('is-invalid');
+			$("#inwardcargo_igm_add_awb_manually_weight_received_input").removeClass('is-invalid');
+			$("#inwardcargo_igm_add_awb_manually_commodity_input").removeClass('is-invalid');
+			var awbNumber = $('#inwardcargo_igm_add_awb_manually_awb_number_input').val();
+			var igmNumber = $('#inwardcargo_igm_add_awb_manually_igm_number_input').val();
+			var awbOrigin = $('#inwardcargo_igm_add_awb_manually_origin_input').val();
+			var awbDestination = $('#inwardcargo_igm_add_awb_manually_destination_input').val();
+			var igmCity = $('#inwardcargo_igm_add_awb_manually_igm_city_input').val();
+			var inwardDate = $('#inwardcargo_igm_search_igms_using_date_input').val();
+			var flightNumber = $('#inwardcargo_igm_add_awb_manually_flight_number_input').val();
+			var numberofPiecesReceived = $('#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input').val();
+			var weightReceived = $('#inwardcargo_igm_add_awb_manually_weight_received_input').val();
+			var commodity = $('#inwardcargo_igm_add_awb_manually_commodity_input').val();
+			var isnumberofPiecesReceived = /^\d+$/.test(numberofPiecesReceived);
+			var awbNumberPostFix = '';
+			if(awbNumber.length == 12) {
+				awbNumberPostFix = awbNumber.substring(awbNumber.length-1);
+				awbNumber = awbNumber.substring(0, awbNumber.length-1);
+			}
+			
+			if(awbNumber.length != 11) {
+				$("#inwardcargo_igm_add_awb_manually_awb_number_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_add_awb_manually_awb_number_input" ).after( "<div class='invalid-feedback invalid-awb-number'>AWB number should be of 11 digit</div>");
+				return false;
+			}
+			var checksum_value = awbNumber.substring(awbNumber.length-1);
+			var awb_no = awbNumber.substring(3, awbNumber.length-1)
+			var remainder_after_div = awb_no % 7;
+			if(Number(checksum_value) != remainder_after_div) {
+				$("#inwardcargo_igm_add_awb_manually_awb_number_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_add_awb_manually_awb_number_input" ).after( "<div class='invalid-feedback invalid-incorrect-awb-number'>Incorrect AWB number entered. Please check and re-enter.</div>");
+				return false;
+			}
+			if(awbOrigin != awbDestination) {
+				getCSRFToken(function(_csrf) {
+					$.post("/saveawbmanually", {
+						_csrf: _csrf,
+						inwardcargo_igm_add_awb_manually_awb_number_input: awbNumber + awbNumberPostFix, 
+						inwardcargo_igm_add_awb_manually_igm_number_input: igmNumber, 
+						inwardcargo_igm_add_awb_manually_origin_input: awbOrigin,
+						inwardcargo_igm_add_awb_manually_destination_input: awbDestination,
+						inwardcargo_igm_add_awb_manually_igm_city_input: igmCity,
+						inwardcargo_igm_add_awb_manually_flight_number_input: flightNumber,
+						inwardcargo_igm_add_awb_manually_no_of_pieces_received_input: numberofPiecesReceived,
+						inwardcargo_igm_add_awb_manually_weight_received_input: weightReceived,
+						inwardcargo_igm_add_awb_manually_commodity_input: commodity,
+						inwardcargo_igm_add_awb_manually_inwarddate_input: inwardDate,
+						}, function (data) {
+						if (data.error) {
+							errorSwal('Error', data.error);
+						} else if (numberofPiecesReceived <= 0 ) {
+							$("#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input").addClass('is-invalid');
+							$( "#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input" ).after( "<div class='invalid-feedback invalid-number-ofpieces'>Number of pieces must be greater than 0</div>");
+							return false;
+						}else if (!isnumberofPiecesReceived ) {
+							$("#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input").addClass('is-invalid');
+							$( "#inwardcargo_igm_add_awb_manually_no_of_pieces_received_input" ).after( "<div class='invalid-feedback invalid-number-ofpieces'>Number should be whole number</div>");
+							return false;
+						}else if (weightReceived <= 0 ) {
+							$("#inwardcargo_igm_add_awb_manually_weight_received_input").addClass('is-invalid');
+							$( "#inwardcargo_igm_add_awb_manually_weight_received_input" ).after( "<div class='invalid-feedback invalid-weight-received'>Received weight must be greater than 0</div>");
+							return false;
+						} else if (commodity == "") {
+							$("#inwardcargo_igm_add_awb_manually_commodity_input").addClass('is-invalid');
+							$( "#inwardcargo_igm_add_awb_manually_commodity_input" ).after( "<div class='invalid-feedback invalid-commodity'>Commodity cannot be empty</div>");
+							return false;
+						} else {
+							if (data.value){
+								toast({type: 'success',title: 'AWB created successfully'});
+								location.reload();
+							}
+						}
+					});
+				});
+			} else {
+				//alert('New Igm Nuber And Confirm Igm Number Must Be Same');
+					$("#inwardcargo_igm_add_awb_manually_destination_input").addClass('is-invalid');
+					$( "#inwardcargo_igm_add_awb_manually_destination_input" ).after( "<div class='invalid-feedback invalid-same-origindestination-number'>Origin and Destination cannot be same</div>");
+					return false;
+			}
+		}
+		
+		function validateIGMCreationData() {
+			$( ".invalid-igm-number" ).remove();
+			$( ".invalid-igm-date" ).remove();
+			$( ".invalid-igm-inward-date" ).remove();
+			$( ".invalid-igm-file" ).remove();
+			$( ".invalid-igm-no-options" ).remove();
+			$( ".invalid-igm-flightnumber" ).remove();
+			$("#inwardcargo_igm_number").removeClass('is-invalid');
+			$("#inwardcargo_igm_igm_date").removeClass('is-invalid');
+			$("#inwardcargo_igm_inward_date").removeClass('is-invalid');
+			$("#inwardcargo_igm_flight_number").removeClass('is-invalid');
+			$("#inwardcargo_igm_upload_new_igm_file").removeClass('is-invalid');
+			
+			$('#inwardcargo_igm_city_hidden').val($("#inwardcargo_igm_city option:selected").val());
+			var igmNumber = $('#inwardcargo_igm_number').val();
+			var isigmNumber = /^[a-zA-Z0-9]*$/.test(igmNumber);
+			if($("#inwardcargo_igm_number").val()=="" ) {
+				$("#inwardcargo_igm_number").addClass('is-invalid');
+				$( "#inwardcargo_igm_number" ).after( "<div class='invalid-feedback invalid-igm-number'>IGM number cannot be blank</div>");
+				return false;
+				//alert("Enter the igm number");
+			}else if(!isigmNumber) {
+				$("#inwardcargo_igm_number").addClass('is-invalid');
+				$( "#inwardcargo_igm_number" ).after( "<div class='invalid-feedback invalid-igm-number'>Please enter correct IGM number</div>");
+				return false;
+			}else if($("#inwardcargo_igm_igm_date").val()=="") {
+				$("#inwardcargo_igm_igm_date").addClass('is-invalid');
+				$( "#inwardcargo_igm_igm_date" ).after( "<div class='invalid-feedback invalid-igm-date'>IGM date cannot be blank</div>");
+				return false;
+				//alert("Enter igm date");
+			}
+			else if($("#inwardcargo_igm_inward_date").val()=="") {
+				$("#inwardcargo_igm_inward_date").addClass('is-invalid');
+				$( "#inwardcargo_igm_inward_date" ).after( "<div class='invalid-feedback invalid-igm-inward-date'>IGM inward date cannot be blank</div>");
+				return false;
+				//alert("Enter inward igm date");
+			} 
+			else if($("input[name=inwardcargo_igm_createoption]:checked").val()=="inwardcargo_igm_createoption_pick_from_available") {
+				if($('#inwardcargo_igm_upload_select_igm_from_available_igm').val()) {
+					showFakeLoader();
+					return true;
+				} else {
+					$("#inwardcargo_igm_upload_select_igm_from_available_igm").addClass('is-invalid');
+					$( "#inwardcargo_igm_upload_select_igm_from_available_igm" ).after( "<div class='invalid-feedback invalid-igm-no-options'>There is no IGM available for selection</div>");
+					return false;
+				}
+			}else if($("input[name=inwardcargo_igm_createoption]:checked").val()=="inwardcargo_igm_createoption_ffm") {
+				if($('#inwardcargo_igm_flight_number').val()) {
+					if($('#inwardcargo_igm_upload_new_igm_file').val()) {
+						$('#inwardcargo_igm_submit_igm').attr('disabled','disabled');
+						showFakeLoader();
+						return true;
+					} else {
+						$("#inwardcargo_igm_upload_new_igm_file").addClass('is-invalid');
+						$( "#inwardcargo_igm_upload_new_igm_file" ).after( "<div class='invalid-feedback invalid-igm-file'>Please upload new IGM file</div>");
+						return false;
+					}
+				}
+				else {
+					$("#inwardcargo_igm_flight_number").addClass('is-invalid');
+					$( "#inwardcargo_igm_flight_number" ).after( "<div class='invalid-feedback invalid-igm-flightnumber'>IGM flight number cannot be blank</div>");
+					//alert('please enter flight no');
+					return false;
+				}
+			} else if($("input[name=inwardcargo_igm_createoption]:checked").val()=="inwardcargo_igm_createoption_manually"){
+				if($('#inwardcargo_igm_flight_number').val()) {
+					$('#inwardcargo_igm_submit_igm').attr('disabled','disabled');
+					showFakeLoader();
+					return true;
+				}
+				else {
+					$("#inwardcargo_igm_flight_number").addClass('is-invalid');
+					$( "#inwardcargo_igm_flight_number" ).after( "<div class='invalid-feedback invalid-igm-flightnumber'>IGM flight number cannot be blank</div>");
+					//alert('please enter flight no');
+					return false;
+				}
+				
+			}
+			
+			return false
+		}
+		
+		function getAwb() {
+			$("#inwardcargo_igm_search_awb_input").removeClass('is-invalid');
+			$( ".invalid-awb-number" ).remove();
+			$("#inwardcargo_igm_search_igmnumber_input").removeClass('is-invalid');
+			$( ".invalid-igm-number" ).remove();
+			var awb_number = $('#inwardcargo_igm_search_awb_input').val();
+			var awbNumberPostFix = '';
+			if(awb_number.length == 12) {
+				awbNumberPostFix = awb_number.substring(awb_number.length-1);
+				awb_number = awb_number.substring(0, awb_number.length-1);
+			}
+			
+			var isawb_number = /^\d+$/.test(awb_number);
+			var checksum_value = awb_number.substring(awb_number.length-1);
+			var awb_no = awb_number.substring(3, awb_number.length-1)
+			var remainder_after_div = awb_no % 7;
+			if(awb_number.length != 11 && awb_number=="" ) {
+				$("#inwardcargo_igm_search_awb_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_search_awb_input" ).after( "<div class='invalid-feedback invalid-awb-number'>AWB number should be of 11 digit</div>");
+				return false;
+			} else if(Number(checksum_value) != remainder_after_div) {
+				$("#inwardcargo_igm_search_awb_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_search_awb_input" ).after( "<div class='invalid-feedback invalid-awb-number'>Incorrect AWB number entered. Please check and re-enter.</div>");
+				return false;
+				} else if(awb_number.length == 11){
+					window.open('/awb?inwardcargo_igm_awb_number=' + (awb_number + awbNumberPostFix), '_blank');
+					} else {
+						$("#inwardcargo_igm_search_awb_input").addClass('is-invalid');
+						$( "#inwardcargo_igm_search_awb_input" ).after( "<div class='invalid-feedback invalid-awb-number'>AWB number should be of 11 digit</div>");
+						return false;
+					} 
+				
+			}
+		
+		function findIgm() {
+			$("#inwardcargo_igm_search_igmnumber_input").removeClass('is-invalid');
+			$( ".invalid-igm-number" ).remove();
+			$("#inwardcargo_igm_search_awb_input").removeClass('is-invalid');
+			$( ".invalid-awb" ).remove();
+			var igm_number = $('#inwardcargo_igm_search_igmnumber_input').val();
+			var isigm_number = /^[a-zA-Z0-9]*$/.test(igm_number);
+			if(igm_number && isigm_number) {
+				getCSRFToken(function(_csrf) {
+					$.post('/searchusingigmno', {
+						_csrf: _csrf,
+						inwardcargo_igm_search_igmnumber_input: igm_number
+					}, function(data) {
+						if(data) {
+							if(data.error) {
+								errorSwal('Error', data.error);
+							} else {
+								var igmnodate = data.inwardcargo_igm_no_date;
+								var city = data.inwardcargo_igm_city;
+								$('#inwardcargo_igm_search_igms_using_date_input').datepicker('setDate', new Date(data.igm_date));
+								var date = $('#inwardcargo_igm_search_igms_using_date_input').val();
+								location.href = '/igm?inwardcargo_igm_city=' + city +'&inwardcargo_igm_no_date='+igmnodate+'&inwardcargo_igm_search_date='+date;;
+							}
+						} else {
+							errorSwal('Error', 'Bad response from the server');
+							//alert('Bad response from the server');
+						}
+					});
+				});
+			} else if(isigm_number==""){
+				$("#inwardcargo_igm_search_igmnumber_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_search_igmnumber_input" ).after( "<div class='invalid-feedback invalid-igm-number'>IGM number cannot be blank</div>");
+				//alert('Igm Number cannot be blank');
+			} else if(!isigm_number){
+				$("#inwardcargo_igm_search_igmnumber_input").addClass('is-invalid');
+				$( "#inwardcargo_igm_search_igmnumber_input" ).after( "<div class='invalid-feedback invalid-igm-number'>Please enter correct IGM number</div>");
+				//alert('Igm Number cannot be blank');
+			}  
+		}
+		
+		function showIgmChangeReasonModel() {
+			$.get( "/getreasonsforchangeigm?"+Date.now(),{selected_reason: 'Reasons for changing IGM'},function( reasondata ) {
+				var reason_option = '';
+				 $('#inwardcargo_changeimgreason_reason_select').empty();
+				 $('#inwardcargo_changeimgreason_explanation_reason_input').val('');
+				for( i = 0; i < reasondata.value.length; i++) {
+					reason_option = reason_option + '<option value='+'"'+reasondata.value[i].reason+'"'+'>'+reasondata.value[i].reason+'</option>';
+				}
+				$("#inwardcargo_changeimgreason_reason_select").append(reason_option);
+				$('#inwardcargo-igm-change-igm-number-modal').modal('show');
+			});
+		}
+		
+		// Read a page's GET URL variables and return them as an associative array.
+		function getUrlVars()
+		{
+			var vars = [], hash;
+			var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+			for(var i = 0; i < hashes.length; i++)
+			{
+				hash = hashes[i].split('=');
+				vars.push(hash[0]);
+				vars[hash[0]] = hash[1];
+			}
+			return vars;
+		}
+		
+	if flash_message != ''
+		script.
+			swal({
+				title: 'Success',
+				text: !{'"' + flash_message + '"'},
+				//imageUrl: '/images/alert_cross.png',
+				background: '#fff',
+				imageWidth: 150,
+				imageHeight: 150,
+				confirmButtonText: 'OK'
+			});

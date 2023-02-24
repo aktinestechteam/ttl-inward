@@ -1,0 +1,17 @@
+//- Please note that this file should always be included after the complete inclusion of jQuery
+script.
+	function getCSRFToken(callback) {
+		if(#{sails.config.security.csrf}) {
+			$.get( "/csrfToken?"+Date.now(), function( data ) {
+				if(data && data._csrf) {
+					callback(data._csrf);
+				} else {
+					callback(null);
+					//location.href='/loginldap';
+					location.href='/login';
+				}
+			});
+		} else {
+			callback('');
+		}
+	}

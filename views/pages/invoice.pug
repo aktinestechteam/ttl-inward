@@ -1,0 +1,251 @@
+doctype html
+- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};	
+- var isCreditCustomer = awb_user_data_objs[0].consignee_credit_period != 'none';
+- var payment_not_received = invoice.payment_received_date == 0;
+
+- var index = 1;
+
+- var total_do = 0;
+- var total_bb = 0;
+- var total_baggage = 0;
+- var total_directdelivery = 0;
+- var total_cartage = 0;
+- var total_freightcharge = 0;
+- var total_collectfee = 0;
+- var total_misc = 0;
+- var total_igst = 0;
+- var total_cgst = 0;
+- var total_sgst = 0;
+
+each awb_user_data in awb_user_data_objs	
+	- total_do += awb_user_data.do_charge;
+	- total_bb += awb_user_data.break_bulk_charge;
+	- total_baggage += awb_user_data.baggage_charge;
+	- total_directdelivery += awb_user_data.direct_delivery_charge;
+	- total_cartage += awb_user_data.cartage_charge;
+	- total_freightcharge += awb_user_data.collect_charge;
+	- total_collectfee += awb_user_data.collect_fee;
+	- total_misc += awb_user_data.misc_charges;
+	- total_igst += awb_user_data.igst;
+	- total_cgst += awb_user_data.cgst;
+	- total_sgst += awb_user_data.sgst;
+	
+- var total = total_do + total_bb + total_baggage + total_directdelivery + total_cartage + total_freightcharge + total_collectfee + total_misc + total_igst + total_cgst + total_sgst;
+
+html(dir='ltr')
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.min.css', rel='stylesheet')
+		link(href='/dist/css/custom.css', rel='stylesheet')
+		link(href='/dist/css/sweetalert2.min.css', rel='stylesheet')
+		style.
+			.borderless tr, .borderless td, .borderless th {
+				border: none !important;
+			}
+		//link(rel='stylesheet', href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')-cdn
+		link(rel='stylesheet', href='/dist/css/jquery-ui.css')
+		script(src='https://code.jquery.com/jquery-1.12.4.js')
+		script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			//- script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')-cdn
+			//- script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')-cdn
+			script(src='/dist/js/html5shiv.js')
+			script(src='/dist/js/respond.min.js')
+	- var void_watermark = '';
+	if(print === false || print === undefined || print === '')
+		- void_watermark = invoice.void_on ? 'background-image: url(/images/void_watermark.png)' : (invoice.payment_received_date > 0 ? '' : 'background-image: url(/images/payment_pending_watermark.png)');
+	body(style=void_watermark)
+		.container-fluid
+			.main-wrapper
+				.text-right(style='font-size: 16px') Original for recipient
+				include ../includes/invoice_common.pug
+				.pagebreak(style='page-break-after: always')
+				if isCreditCustomer
+					include ../includes/invoice_credit_details.pug
+					
+			if(payment_not_received && invoice.void_on === 0 && (print === false || print === undefined || print === ''))
+				.pt-3.pb-5.print
+					form.mx-5(action='/invoice', method='post', onsubmit='return validatePaymentReceived()')
+						input(type='hidden', name='_csrf', value=_csrf)
+						.input-group.row
+							.col-2
+								span Payment Mode
+								select#inwardcargo_invoice_payment_mode_input.form-control.mr-2(type='text', name='inwardcargo_invoice_payment_mode_input')
+									option(value='CASH' selected) CASH
+									option(value='CHQ') CHQ
+									option(value='RTGS') RTGS
+									//-option(value='NEFT') NEFT
+									option(value='DD') DD
+									option(value='UPI') UPI
+							.col-2
+								span Cash/Cheque/DD/RTGS/UPI Date
+								input#inwardcargo_invoice_payment_instrument_date_input.form-control.mr-2(type='text', placeholder='Cheque/DD/RTGS/UPI Date', name='inwardcargo_invoice_payment_instrument_date_input', autocomplete="off")
+							.col-2
+								span Cheque/DD/RTGS/UPI Number
+								input#inwardcargo_invoice_payment_reference_number_input.form-control.mr-2(type='text', placeholder='Cheque/DD/RTGS/UPI Number', name='inwardcargo_invoice_payment_reference_number_input', autocomplete="off")
+							.col-2
+								span Enter Bank Name
+								input#inwardcargo_invoice_payment_drawn_on_input.form-control.mr-2(type='text', placeholder='Enter Bank Name', name='inwardcargo_invoice_payment_drawn_on_input', autocomplete="off")
+							//.col-2
+								span Check if TDS applied
+								span.form-control.mr-2.text-center
+									input#inwardcargo_invoice_payment_apply_tds_input.mr-2(type='checkbox', name='inwardcargo_invoice_payment_apply_tds_input', autocomplete="off")
+									span#inwardcargo_invoice_payment_tds_amount TDS
+							.col-2
+								span Amount Received
+								input#inwardcargo_invoice_payment_amount_input.form-control.mr-2(type='text', placeholder='Payment Amount', name='inwardcargo_invoice_payment_amount_input', autocomplete="off", value=Math.ceil(invoice.amount_billed), readonly='')
+							input#inwardcargo_invoice_payment_invoice_id_input.form-control.mr-2(type='hidden', name='inwardcargo_invoice_payment_invoice_id_input',value=invoice.id, autocomplete="off")
+							.col-2
+								span Enter Comments
+								input#inwardcargo_invoice_payment_comment_input.form-control.mr-2(type='text', placeholder='Comments...', name='inwardcargo_invoice_payment_comment_input', autocomplete="off")
+							.col-3
+								span Click to submit Payment received
+								button.btn.btn-danger.waves-effect.waves-light.save-category.mr-2#inwardcargo_invoice_payment_invoice_pay_button(type='submit') Full Payment Received
+
+		//script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		//- script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		//- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support
+		script(src='/dist/js/promise.min.js')
+		script(src='/dist/js/bootstrap.min.js')
+		script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+		script(src='/dist/js/sweetalert2.all.min.js')
+		script(src='/dist/js/sweetalert2.min.js')
+		script(src='/js/swal_helper.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$( "#inwardcargo_invoice_payment_amount_input").on('input propertychange', function() {
+				var number_regex = /^[0-9]+$/;
+				var original_amt = #{invoice.amount_billed};
+				var user_entered_value = $(this).val();
+				if(user_entered_value) {
+					$("#inwardcargo_invoice_payment_invoice_pay_button").removeAttr('disabled');
+				} else {
+					$("#inwardcargo_invoice_payment_invoice_pay_button").attr('disabled', '');
+					user_entered_value = 0;
+				}
+				
+				var tds = Math.round(original_amt - user_entered_value);
+				if (tds < 0 || !user_entered_value.match(number_regex)) {
+					//	When tds is negative, then we are not dealing properly, hence we should set the amount to original in the edit text area and then set tds to 0 so that the button shows texts correctly.
+					$( "#inwardcargo_invoice_payment_amount_input").val(Math.round(original_amt));
+					tds = 0;
+				}
+
+				if(tds === 0)
+					$("#inwardcargo_invoice_payment_invoice_pay_button").html('Full Payment Received')
+				else
+					$("#inwardcargo_invoice_payment_invoice_pay_button").html('Payment Received (less TDS = ' + tds + ')')
+				
+			});
+			
+			$( "#inwardcargo_invoice_payment_apply_tds_input").on('change', function() {
+				if(this.checked) {
+					$('#inwardcargo_invoice_payment_amount_input').removeAttr('readonly');
+				} else {
+					$('#inwardcargo_invoice_payment_amount_input').attr('readonly', '');
+				}
+			});
+			
+			$( "#inwardcargo_invoice_payment_instrument_date_input" ).datepicker();
+			$( "#inwardcargo_invoice_payment_instrument_date_input" ).datepicker("option", "dateFormat", 'yy-mm-dd' );
+			$('#inwardcargo_invoice_payment_instrument_date_input').change(function() {
+				var date = $("#inwardcargo_invoice_payment_instrument_date_input").val();
+			});
+			
+			function pdf() {
+				location.href = '/invoicepdf';
+			}
+			
+			function validatePaymentReceived() {
+				var payment_mode = $('#inwardcargo_invoice_payment_mode_input').val();
+				var payment_instrumment_date = $('#inwardcargo_invoice_payment_instrument_date_input').val();
+				var payment_reference_number = $('#inwardcargo_invoice_payment_reference_number_input').val();
+				var payment_drawn_on = $('#inwardcargo_invoice_payment_drawn_on_input').val();
+				var payment_amount = $('#inwardcargo_invoice_payment_amount_input').val();
+				
+				if(!payment_amount) {
+					errorSwal('Error','Please Enter Amount');
+					return false;
+				}
+				
+				if(payment_mode === 'CASH'){
+					if(!payment_instrumment_date) {
+						errorSwal('Error','Please select a date');
+						return false;
+					}
+				}
+				else if(payment_mode === 'CHQ'){
+					if(!payment_instrumment_date) {
+						errorSwal('Error','Please enter date mentioned on cheque');
+						return false;
+					}
+					if(!payment_reference_number) {
+						errorSwal('Error','Please enter cheque number');
+						return false;
+					}
+					if(!payment_drawn_on) {
+						errorSwal('Error','Please enter the bank name mentioned on cheque');
+						return false;
+					}
+				}
+				else if(payment_mode === 'RTGS'){
+					if(!payment_instrumment_date) {
+						errorSwal('Error','Please enter RTGS date');
+						return false;
+					}
+					if(!payment_reference_number) {
+						errorSwal('Error','Please enter RTGS Transaction number');
+						return false;
+					}
+					if(!payment_drawn_on) {
+						errorSwal('Error','Please enter the party who performed the RTGS Transaction');
+						return false;
+					}
+				}
+				else if(payment_mode === 'DD'){
+					if(!payment_instrumment_date) {
+						errorSwal('Error','Please enter date mentioned on DD');
+						return false;
+					}
+					if(!payment_reference_number) {
+						errorSwal('Error','Please enter DD number');
+						return false;
+					}
+					if(!payment_drawn_on) {
+						errorSwal('Error','Please enter the bank name mentioned on DD');
+						return false;
+					}
+				}
+				else if(payment_mode === 'UPI'){
+					if(!payment_instrumment_date) {
+						errorSwal('Error','Please enter transaction date of UPI');
+						return false;
+					}
+					if(!payment_reference_number) {
+						errorSwal('Error','Please enter UPI Transaction number');
+						return false;
+					}
+					/*if(!payment_drawn_on) {
+						errorSwal('Error','Please enter the bank name mentioned on DD');
+						return false;
+					}*/
+				}
+				return true;
+			}

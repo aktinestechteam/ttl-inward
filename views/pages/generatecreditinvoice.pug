@@ -1,0 +1,142 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	link(href='/libs/datatables.net-bs4/css/dataTables.bootstrap4.css', rel='stylesheet')
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		label.control-label.col-lg-1.my-auto  City
+		select#inwardcargo_consignees_list_city.select2.form-control.custom-select.col-lg-2(style='width: 100%; height:36px;', placeholder='Enter', type='text', name='inwardcargo_consignees_list_city', autocomplete="off")
+			each airport in airportlistdetails
+				if(selectedCity == airport.iata_code)
+					option(value=airport.iata_code selected='') #{airport.iata_code} (#{airport.city_name})
+				else
+					option(value=airport.iata_code) #{airport.iata_code} (#{airport.city_name})
+		label.control-label.col-lg-2.my-auto Consignee List
+		select#inwardcargo_consignees_list_consignee.select2.form-control.custom-select.col-lg-2(style='width: 100%; height:36px;', placeholder='Enter', type='text', name='inwardcargo_consignees_list_consignee', autocomplete="off")
+			each consignee in consigneelist
+				if(selectedConsignee == consignee.id)
+					option(value=consignee.id selected='') #{consignee.name}
+				else
+					option(value=consignee.id) #{consignee.name}
+		if(consigneelist[0] == undefined)
+				button.btn.btn-danger.waves-effect.waves-light.save-category.mx-4(type='button', disabled='disabled') Generate Invoice
+		else
+			button.btn.btn-danger.waves-effect.waves-light.save-category.mx-4(type='button', onclick='generatecreditinvoice()') Generate Invoice
+		.col-12.mt-3
+			.card
+				.table-responsive
+					table.table
+						thead.thead-light
+							tr
+								th(scope='col')
+									b AWB Number
+								th(scope='col')
+									b DO Number
+								th(scope='col')
+									b Issue Date
+								//- th(scope='col')
+								//- 	b Source
+								//- th(scope='col')
+									b Dest
+								th(scope='col')
+									b Add
+						tbody.customtable
+							each do_document,i in dolist
+								tr
+									td #{do_document.awb_number}
+									td #{do_document.do_number}
+									td #{new Date(do_document.do_issue_date).toLocaleString('en-US', date_format_options)}
+									//- td
+									//- td
+									td
+										label.customcheckbox
+											input.listCheckbox(type='checkbox', value=awbuserdatas[i].id, name='inward_cargo_awbuserdatas_ids[]')
+											span.checkmark
+	include ../includes/footer.pug
+	
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/extra-libs/DataTables/datatables.min.js')
+	script(src='/js/swal_helper.js')
+	include ../includes/csrf.pug
+	script.
+		$( "#inwardcargo_consignees_list_city" ).change(function() {
+			var iata_code = $("#inwardcargo_consignees_list_city option:selected").val();
+			location.href = '/generatecreditinvoice?inwardcargo_consignees_list_city=' + iata_code;
+		});
+		$( "#inwardcargo_consignees_list_consignee" ).change(function() {
+			var iata_code = $("#inwardcargo_consignees_list_city option:selected").val();
+			var consigneeid = $("#inwardcargo_consignees_list_consignee option:selected").val();
+			location.href = '/generatecreditinvoice?inwardcargo_consignees_list_city=' + iata_code +'&inwardcargo_consignees_list_consignee='+consigneeid;
+		});
+		
+		function generatecreditinvoice() {
+			//var awbuserdataids = $('input[name="inward_cargo_awbuserdatas_ids"]:checked').val();
+			
+			var awbuserdataids = $('input[name="inward_cargo_awbuserdatas_ids[]"]:checked').map(function () {
+				return this.value; // $(this).val()
+			}).get();
+			
+			var iata_code = $("#inwardcargo_consignees_list_city option:selected").val();
+			var consigneeid = $("#inwardcargo_consignees_list_consignee option:selected").val();
+			if(awbuserdataids) {
+				getCSRFToken(function(_csrf) {
+					$("#fakeloader").fadeIn();
+					$.post("/generatecreditinvoice", {_csrf: _csrf, inward_cargo_awbuserdatas_ids: awbuserdataids, inwardcargo_consignees_list_consignee: consigneeid, inwardcargo_consignees_list_city:iata_code}, function (data) {
+						$("#fakeloader").fadeOut();
+						if (data.error) {
+							swal({
+								title: 'Error!',
+								text: data.error,
+								imageUrl: '/images/alert_cross.png',
+								background: '#ffffff',
+								imageWidth: 150,
+								imageHeight: 150,
+								confirmButtonText: 'OK'
+							});
+						} else {
+							if (data.result)
+								//-console.log(data.result);
+								var win = window.open('/invoice?invoice_id=' + data.result, '_blank');
+								if (win) {
+									//Browser has allowed it to be opened
+									win.focus();
+								} else {
+									//Browser has blocked it
+									alert('Please allow popups for this website');
+								}
+								location.reload();
+								//location.href = '/airportlist';
+
+						}
+					});
+				});
+			} else {
+				errorSwal('Error!', 'There are no awb selected/available');
+				return false;
+			}
+		}
+		
+		//- function checkemptydata() {
+		//- 	var awbuserdataids = $('input[name="inward_cargo_awbuserdatas_ids"]:checked').val();
+		//- 	if(awbuserdataids) {
+		//- 		setTimeout(function(){ 
+		//- 			location.reload();
+		//- 			return true;
+		//- 		}, 3000);
+		//- 	} else {
+		//- 		errorSwal('Error!', 'There are no awb selected/available');
+		//- 		return false;
+		//- 	}
+		//- }

@@ -1,0 +1,520 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	link(href='/libs/toastr/build/toastr.min.css', rel='stylesheet')
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Elements
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title.m-b-0 Badges
+					table.table
+						thead
+							tr
+								th(scope='col') Badges
+								th(scope='col') Description
+						tbody
+							tr
+								td
+									span.badge.badge-primary Primary
+								td
+									code .badge .badge-primary
+							tr
+								td
+									span.badge.badge-secondary Secondary
+								td
+									code .badge .badge-secondary
+							tr
+								td
+									span.badge.badge-success Success
+								td
+									code .badge .badge-success
+							tr
+								td
+									span.badge.badge-danger Danger
+								td
+									code .badge .badge-danger
+							tr
+								td
+									span.badge.badge-warning Warning
+								td
+									code .badge .badge-warning
+							tr
+								td
+									span.badge.badge-info Info
+								td
+									code .badge .badge-info
+							tr
+								td
+									span.badge.badge-light Light
+								td
+									code .badge .badge-light
+							tr
+								td
+									span.badge.badge-dark Dark
+								td
+									code .badge .badge-dark
+					.card-body
+						h5.card-title.m-b-0 Pills
+					table.table
+						thead
+							tr
+								th(scope='col') Pills
+								th(scope='col') Description
+						tbody
+							tr
+								td
+									span.badge.badge-pill.badge-primary Primary
+								td
+									code badge badge-pill badge-primary
+							tr
+								td
+									span.badge.badge-pill.badge-secondary Secondary
+								td
+									code badge badge-pill badge-secondary
+							tr
+								td
+									span.badge.badge-pill.badge-success Success
+								td
+									code badge badge-pill badge-success
+							tr
+								td
+									span.badge.badge-pill.badge-danger Danger
+								td
+									code badge badge-pill badge-danger
+							tr
+								td
+									span.badge.badge-pill.badge-warning Warning
+								td
+									code badge badge-pill badge-warning
+							tr
+								td
+									span.badge.badge-pill.badge-info Info
+								td
+									code badge badge-pill badge-info
+							tr
+								td
+									span.badge.badge-pill.badge-light Light
+								td
+									code badge badge-pill badge-light
+							tr
+								td
+									span.badge.badge-pill.badge-dark Dark
+								td
+									code badge badge-pill badge-dark
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title Notification
+						.row
+							.col-md-3.col-sm-12
+								button#ts-success.btn.btn-lg.btn-block.btn-outline-success(type='button') Success
+							.col-md-3.col-sm-12
+								button#ts-info.btn.btn-lg.btn-block.btn-outline-info(type='button') Info
+							.col-md-3.col-sm-12
+								button#ts-warning.btn.btn-lg.btn-block.btn-outline-warning(type='button') Warning
+							.col-md-3.col-sm-12
+								button#ts-error.btn.btn-lg.btn-block.btn-outline-danger(type='button') Error
+		// ==============================================================
+		// Sales Cards
+		// ==============================================================
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title Icon Box
+						.row
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-cyan.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-view-dashboard
+										h6.text-white Dashboard
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-success.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-chart-areaspline
+										h6.text-white Charts
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-warning.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-collage
+										h6.text-white Widgets
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-danger.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-border-outside
+										h6.text-white Tables
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-info.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-arrow-all
+										h6.text-white Full Width
+							// Column
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-danger.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-receipt
+										h6.text-white Forms
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-info.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-relative-scale
+										h6.text-white Buttons
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-cyan.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-pencil
+										h6.text-white Elements
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-success.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-calendar-check
+										h6.text-white Calnedar
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-info.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-arrow-all
+										h6.text-white Full Width
+							// Column
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-danger.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-border-outside
+										h6.text-white Tables
+							// Column
+							.col-md-6.col-lg-2.col-xlg-3
+								.card.card-hover
+									.box.bg-warning.text-center
+										h1.font-light.text-white
+											i.mdi.mdi-alert
+										h6.text-white Errors
+							// Column
+		.row
+			.col-12
+				.card
+					.card-body
+						h5.card-title Progressbar
+						.progress.m-t-15
+							.progress-bar(role='progressbar', style='width: 25%', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.bg-success(role='progressbar', style='width: 25%', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.bg-info(role='progressbar', style='width: 50%', aria-valuenow='50', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.bg-warning(role='progressbar', style='width: 75%', aria-valuenow='75', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.bg-danger(role='progressbar', style='width: 100%', aria-valuenow='100', aria-valuemin='0', aria-valuemax='100')
+						.m-t-15
+							code
+								| &lt;div class=&quot;progress m-t-15&quot;&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar&quot; role=&quot;progressbar&quot; style=&quot;width: 25%&quot; aria-valuenow=&quot;25&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;/div&gt;
+								br
+								|                                         &lt;/div&gt;
+					.card-body.border-top
+						h5.card-title Striped Progressbar
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped(role='progressbar', style='width: 10%', aria-valuenow='10', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.bg-success(role='progressbar', style='width: 25%', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.bg-info(role='progressbar', style='width: 50%', aria-valuenow='50', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.bg-warning(role='progressbar', style='width: 75%', aria-valuenow='75', aria-valuemin='0', aria-valuemax='100')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.bg-danger(role='progressbar', style='width: 100%', aria-valuenow='100', aria-valuemin='0', aria-valuemax='100')
+						.m-t-15
+							code
+								| &lt;div class=&quot;progress m-t-15&quot;&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar progress-bar-striped bg-success&quot; role=&quot;progressbar&quot; style=&quot;width: 25%&quot; aria-valuenow=&quot;25&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;/div&gt;
+								br
+								|                                         &lt;/div&gt;
+					.card-body.border-top
+						h5.card-title Multiple Bars
+						.progress.m-t-15
+							.progress-bar(role='progressbar', style='width: 15%', aria-valuenow='15', aria-valuemin='0', aria-valuemax='100')
+							.progress-bar.bg-success(role='progressbar', style='width: 30%', aria-valuenow='30', aria-valuemin='0', aria-valuemax='100')
+							.progress-bar.bg-info(role='progressbar', style='width: 20%', aria-valuenow='20', aria-valuemin='0', aria-valuemax='100')
+						.m-t-15
+							code
+								| &lt;div class=&quot;progress m-t-15&quot;&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar&quot; role=&quot;progressbar&quot; style=&quot;width: 15%&quot; aria-valuenow=&quot;15&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;/div&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar bg-success&quot; role=&quot;progressbar&quot; style=&quot;width: 30%&quot; aria-valuenow=&quot;30&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;/div&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar bg-info&quot; role=&quot;progressbar&quot; style=&quot;width: 20%&quot; aria-valuenow=&quot;20&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;/div&gt;
+								br
+								|                                         &lt;/div&gt;
+					.card-body.border-top
+						h5.card-title Animated Progress
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.progress-bar-animated(style='width:40%')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.progress-bar-animated.bg-warning(style='width:50%')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.progress-bar-animated.bg-success(style='width:60%')
+						.progress.m-t-15
+							.progress-bar.progress-bar-striped.progress-bar-animated.bg-cyan(style='width:70%')
+						.m-t-15
+							code
+								| &lt;div class=&quot;progress m-t-15&quot;&gt;
+								br
+								|                                             &lt;div class=&quot;progress-bar progress-bar-striped progress-bar-animated bg-cyan&quot; style=&quot;width:70%&quot;&gt;&lt;/div&gt;
+								br
+								|                                         &lt;/div&gt;
+				.card
+					.card-body
+						h5.card-title Different Models
+						// Button trigger modal
+						button.btn.btn-success.margin-5(type='button', data-toggle='modal', data-target='#Modal1')
+							| View Popup
+						// Button trigger modal
+						button.btn.btn-warning.margin-5.text-white(type='button', data-toggle='modal', data-target='#Modal2')
+							| Alert
+						// Button trigger modal
+						button.btn.btn-info.margin-5(type='button', data-toggle='modal', data-target='#Modal3')
+							| Image Popup
+						// Modal
+						#Modal1.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true ')
+							.modal-dialog(role='document ')
+								.modal-content
+									.modal-header
+										h5#exampleModalLabel.modal-title Popup Header
+										button.close(type='button', data-dismiss='modal', aria-label='Close')
+											span(aria-hidden='true ') ×
+									.modal-body
+										| Here is the text coming you can put also image if you want…
+						// Modal
+						#Modal2.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+							.modal-dialog(role='document')
+								.modal-content
+									.modal-header
+										h5#exampleModalLabel.modal-title Alert Model
+										button.close(type='button', data-dismiss='modal', aria-label='Close')
+											span(aria-hidden='true') ×
+									.modal-body
+										| Lorem ipsum dolor sit amet...
+									.modal-footer
+										button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+										button.btn.btn-primary(type='button') Save changes
+						// Modal
+						#Modal3.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+							.modal-dialog(role='document')
+								.modal-content
+									.modal-header
+										h5#exampleModalLabel.modal-title Image Header
+										button.close(type='button', data-dismiss='modal', aria-label='Close')
+											span(aria-hidden='true') ×
+									.modal-body
+										img(src='/images/background/img5.jpg', width='100% ')
+									.modal-footer
+										button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+				.card
+					.card-body
+						h5.card-title Tooltips
+						button.btn.btn-secondary(type='button', data-toggle='tooltip', data-placement='top', title='Tooltip on top')
+							| Tooltip on top
+						button.btn.btn-secondary(type='button', data-toggle='tooltip', data-placement='right', title='Tooltip on right')
+							| Tooltip on right
+						button.btn.btn-secondary(type='button', data-toggle='tooltip', data-placement='bottom', title='Tooltip on bottom')
+							| Tooltip on bottom
+						button.btn.btn-secondary(type='button', data-toggle='tooltip', data-placement='left', title='Tooltip on left')
+							| Tooltip on left
+				.card
+					.card-body
+						.row
+							.col-md-4
+								h5.card-title Default Pagination
+								nav(aria-label='Page navigation example')
+									ul.pagination
+										li.page-item
+											a.page-link(href='#') Previous
+										li.page-item
+											a.page-link(href='#') 1
+										li.page-item
+											a.page-link(href='#') 2
+										li.page-item
+											a.page-link(href='#') 3
+										li.page-item
+											a.page-link(href='#') Next
+							.col-md-4
+								h5.card-title Pagination with icons
+								nav(aria-label='Page navigation example')
+									ul.pagination
+										li.page-item
+											a.page-link(href='#', aria-label='Previous')
+												span(aria-hidden='true') «
+												span.sr-only Previous
+										li.page-item
+											a.page-link(href='#') 1
+										li.page-item
+											a.page-link(href='#') 2
+										li.page-item
+											a.page-link(href='#') 3
+										li.page-item
+											a.page-link(href='#', aria-label='Next')
+												span(aria-hidden='true') »
+												span.sr-only Next
+							.col-md-4
+								h5.card-title Disabled & Active States
+								nav(aria-label='...')
+									ul.pagination
+										li.page-item.disabled
+											a.page-link(href='#', tabindex='-1') Previous
+										li.page-item
+											a.page-link(href='#') 1
+										li.page-item.active
+											a.page-link(href='#')
+												| 2
+												span.sr-only (current)
+										li.page-item
+											a.page-link(href='#') 3
+										li.page-item
+											a.page-link(href='#') Next
+				.card
+					.card-body
+						h5.card-title Popovers
+						.m-t-15
+							button.btn.btn-secondary(type='button', data-container='body', data-toggle='popover', data-placement='top', data-content='Vivamus sagittis lacus vel augue laoreet rutrum faucibus.')
+								| Popover on top
+							button.btn.btn-secondary(type='button', data-container='body', data-toggle='popover', data-placement='right', data-content='Vivamus sagittis lacus vel augue laoreet rutrum faucibus.')
+								| Popover on right
+							button.btn.btn-secondary(type='button', data-container='body', data-toggle='popover', data-placement='bottom', data-content='Vivamus\
+	                        sagittis lacus vel augue laoreet rutrum faucibus.')
+								| Popover on bottom
+							button.btn.btn-secondary(type='button', data-container='body', data-toggle='popover', data-placement='left', data-content='Vivamus sagittis lacus vel augue laoreet rutrum faucibus.')
+								| Popover on left
+				.card
+					.card-body
+						h5.card-title Notificaion
+						.alert.alert-primary(role='alert')
+							| A simple primary alert—check it out!
+						.alert.alert-secondary(role='alert')
+							| A simple secondary alert—check it out!
+						.alert.alert-success(role='alert')
+							| A simple success alert—check it out!
+						.alert.alert-danger(role='alert')
+							| A simple danger alert—check it out!
+						.alert.alert-warning(role='alert')
+							| A simple warning alert—check it out!
+						.alert.alert-info(role='alert')
+							| A simple info alert—check it out!
+					.card-body.border-top
+						h5.card-title Additional Content
+						.alert.alert-success(role='alert')
+							h4.alert-heading Well done!
+							p
+								| Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.
+							hr
+							p.mb-0
+								| Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+						.alert.alert-warning(role='alert')
+							h4.alert-heading Well done!
+							p
+								| Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.
+							hr
+							p.mb-0
+								| Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+						.alert.alert-danger(role='alert')
+							h4.alert-heading Well done!
+							p
+								| Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.
+							hr
+							p.mb-0
+								| Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+
+block specific-js
+	script(src='/libs/toastr/build/toastr.min.js')
+	script.
+		$(function () {
+			// Success Type
+			$('#ts-success').on('click', function () {
+				toastr.success('Have fun storming the castle!', 'Miracle Max Says');
+			});
+			// Success Type
+			$('#ts-info').on('click', function () {
+				toastr.info('We do have the Kapua suite available.', 'Turtle Bay Resort');
+			});
+			// Success Type
+			$('#ts-warning').on('click', function () {
+				toastr.warning('My name is Inigo Montoya. You killed my father, prepare to die!');
+			});
+			// Success Type
+			$('#ts-error').on('click', function () {
+				toastr.error('I do not think that word means what you think it means.', 'Inconceivable!');
+			});
+		});

@@ -1,0 +1,422 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/libs/select2/dist/css/select2.min.css')
+	link(rel='stylesheet', type='text/css', href='/libs/jquery-minicolors/jquery.minicolors.css')
+	link(rel='stylesheet', type='text/css', href='/libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')
+	link(rel='stylesheet', type='text/css', href='/libs/quill/dist/quill.snow.css')
+	link(href='/dist/css/style.min.css', rel='stylesheet')
+
+
+block content
+	// ==============================================================
+	// Bread crumb and right sidebar toggle
+	// ==============================================================
+	.page-breadcrumb
+		.row
+			.col-12.d-flex.no-block.align-items-center
+				h4.page-title Form Basic
+				.ml-auto.text-right
+					nav(aria-label='breadcrumb')
+						ol.breadcrumb
+							li.breadcrumb-item
+								a(href='#') Home
+							li.breadcrumb-item.active(aria-current='page') Library
+	// ==============================================================
+	// End Bread crumb and right sidebar toggle
+	// ==============================================================
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-md-6
+				.card
+					form.form-horizontal
+						.card-body
+							h4.card-title Personal Info
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='fname') First Name
+								.col-sm-9
+									input#fname.form-control(type='text', placeholder='First Name Here')
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='lname') Last Name
+								.col-sm-9
+									input#lname.form-control(type='text', placeholder='Last Name Here')
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='lname') Password
+								.col-sm-9
+									input#lname.form-control(type='password', placeholder='Password Here')
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='email1') Company
+								.col-sm-9
+									input#email1.form-control(type='text', placeholder='Company Name Here')
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='cono1') Contact No
+								.col-sm-9
+									input#cono1.form-control(type='text', placeholder='Contact No Here')
+							.form-group.row
+								label.col-sm-3.text-right.control-label.col-form-label(for='cono1') Message
+								.col-sm-9
+									textarea.form-control
+						.border-top
+							.card-body
+								button.btn.btn-primary(type='button') Submit
+				.card
+					.card-body
+						h5.card-title Form Elements
+						.form-group.row
+							label.col-md-3.m-t-15 Single Select
+							.col-md-9
+								select.select2.form-control.custom-select(style='width: 100%; height:36px;')
+									option Select
+									optgroup(label='Alaskan/Hawaiian Time Zone')
+										option(value='AK') Alaska
+										option(value='HI') Hawaii
+									optgroup(label='Pacific Time Zone')
+										option(value='CA') California
+										option(value='NV') Nevada
+										option(value='OR') Oregon
+										option(value='WA') Washington
+									optgroup(label='Mountain Time Zone')
+										option(value='AZ') Arizona
+										option(value='CO') Colorado
+										option(value='ID') Idaho
+										option(value='MT') Montana
+										option(value='NE') Nebraska
+										option(value='NM') New Mexico
+										option(value='ND') North Dakota
+										option(value='UT') Utah
+										option(value='WY') Wyoming
+									optgroup(label='Central Time Zone')
+										option(value='AL') Alabama
+										option(value='AR') Arkansas
+										option(value='IL') Illinois
+										option(value='IA') Iowa
+										option(value='KS') Kansas
+										option(value='KY') Kentucky
+										option(value='LA') Louisiana
+										option(value='MN') Minnesota
+										option(value='MS') Mississippi
+										option(value='MO') Missouri
+										option(value='OK') Oklahoma
+										option(value='SD') South Dakota
+										option(value='TX') Texas
+										option(value='TN') Tennessee
+										option(value='WI') Wisconsin
+									optgroup(label='Eastern Time Zone')
+										option(value='CT') Connecticut
+										option(value='DE') Delaware
+										option(value='FL') Florida
+										option(value='GA') Georgia
+										option(value='IN') Indiana
+										option(value='ME') Maine
+										option(value='MD') Maryland
+										option(value='MA') Massachusetts
+										option(value='MI') Michigan
+										option(value='NH') New Hampshire
+										option(value='NJ') New Jersey
+										option(value='NY') New York
+										option(value='NC') North Carolina
+										option(value='OH') Ohio
+										option(value='PA') Pennsylvania
+										option(value='RI') Rhode Island
+										option(value='SC') South Carolina
+										option(value='VT') Vermont
+										option(value='VA') Virginia
+										option(value='WV') West Virginia
+						.form-group.row
+							label.col-md-3.m-t-15 Multiple Select
+							.col-md-9
+								select.select2.form-control.m-t-15(multiple='multiple', style='height: 36px;width: 100%;')
+									optgroup(label='Alaskan/Hawaiian Time Zone')
+										option(value='AK') Alaska
+										option(value='HI') Hawaii
+									optgroup(label='Pacific Time Zone')
+										option(value='CA') California
+										option(value='NV') Nevada
+										option(value='OR') Oregon
+										option(value='WA') Washington
+									optgroup(label='Mountain Time Zone')
+										option(value='AZ') Arizona
+										option(value='CO') Colorado
+										option(value='ID') Idaho
+										option(value='MT') Montana
+										option(value='NE') Nebraska
+										option(value='NM', selected='') New Mexico
+										option(value='ND') North Dakota
+										option(value='UT') Utah
+										option(value='WY') Wyoming
+									optgroup(label='Central Time Zone')
+										option(value='AL') Alabama
+										option(value='AR') Arkansas
+										option(value='IL') Illinois
+										option(value='IA') Iowa
+										option(value='KS') Kansas
+										option(value='KY') Kentucky
+										option(value='LA') Louisiana
+										option(value='MN') Minnesota
+										option(value='MS') Mississippi
+										option(value='MO') Missouri
+										option(value='OK') Oklahoma
+										option(value='SD', selected='') South Dakota
+										option(value='TX') Texas
+										option(value='TN') Tennessee
+										option(value='WI') Wisconsin
+									optgroup(label='Eastern Time Zone')
+										option(value='CT') Connecticut
+										option(value='DE') Delaware
+										option(value='FL') Florida
+										option(value='GA') Georgia
+										option(value='IN') Indiana
+										option(value='ME') Maine
+										option(value='MD') Maryland
+										option(value='MA') Massachusetts
+										option(value='MI') Michigan
+										option(value='NH') New Hampshire
+										option(value='NJ') New Jersey
+										option(value='NY') New York
+										option(value='NC') North Carolina
+										option(value='OH') Ohio
+										option(value='PA') Pennsylvania
+										option(value='RI') Rhode Island
+										option(value='SC') South Carolina
+										option(value='VT') Vermont
+										option(value='VA') Virginia
+										option(value='WV') West Virginia
+						.form-group.row
+							label.col-md-3 Radio Buttons
+							.col-md-9
+								.custom-control.custom-radio
+									input#customControlValidation1.custom-control-input(type='radio', name='radio-stacked', required='')
+									label.custom-control-label(for='customControlValidation1') First One
+								.custom-control.custom-radio
+									input#customControlValidation2.custom-control-input(type='radio', name='radio-stacked', required='')
+									label.custom-control-label(for='customControlValidation2') Second One
+								.custom-control.custom-radio
+									input#customControlValidation3.custom-control-input(type='radio', name='radio-stacked', required='')
+									label.custom-control-label(for='customControlValidation3') Third One
+						.form-group.row
+							label.col-md-3 Checkboxes
+							.col-md-9
+								.custom-control.custom-checkbox.mr-sm-2
+									input#customControlAutosizing1.custom-control-input(type='checkbox')
+									label.custom-control-label(for='customControlAutosizing1') First One
+								.custom-control.custom-checkbox.mr-sm-2
+									input#customControlAutosizing2.custom-control-input(type='checkbox')
+									label.custom-control-label(for='customControlAutosizing2') Second One
+								.custom-control.custom-checkbox.mr-sm-2
+									input#customControlAutosizing3.custom-control-input(type='checkbox')
+									label.custom-control-label(for='customControlAutosizing3') Third One
+						.form-group.row
+							label.col-md-3 File Upload
+							.col-md-9
+								.custom-file
+									input#validatedCustomFile.custom-file-input(type='file', required='')
+									label.custom-file-label(for='validatedCustomFile') Choose file...
+									.invalid-feedback Example invalid custom file feedback
+						.form-group.row
+							label.col-md-3(for='disabledTextInput') Disabled input
+							.col-md-9
+								input#disabledTextInput.form-control(type='text', placeholder='Disabled input', disabled='')
+					.border-top
+						.card-body
+							button.btn.btn-primary(type='button') Submit
+				.card
+					.card-body
+						h4.card-title Forms Control
+						.form-group
+							label(for='hue-demo') Hue
+							input#hue-demo.form-control.demo(type='text', data-control='hue', value='#ff6161')
+						.form-group
+							label(for='position-bottom-left') Bottom left (default)
+							input#position-bottom-left.form-control.demo(type='text', data-position='bottom left', value='#0088cc')
+						.form-group
+							label(for='position-top-right') Top right
+							input#position-top-right.form-control.demo(type='text', data-position='top right', value='#0088cc')
+						label Datepicker
+						.input-group
+							input.form-control.mydatepicker(type='text', placeholder='mm/dd/yyyy')
+							.input-group-append
+								span.input-group-text
+									i.fa.fa-calendar
+						label.m-t-15 Autoclose Datepicker
+						.input-group
+							input#datepicker-autoclose.form-control(type='text', placeholder='mm/dd/yyyy')
+							.input-group-append
+								span.input-group-text
+									i.fa.fa-calendar
+					.border-top
+						.card-body
+							button.btn.btn-success(type='submit') Save
+							button.btn.btn-primary(type='submit') Reset
+							button.btn.btn-info(type='submit') Edit
+							button.btn.btn-danger(type='submit') Cancel
+			.col-md-6
+				.card
+					.card-body
+						h5.card-title.m-b-0 Form Elements
+						.form-group.m-t-20
+							label
+								| Date Mask
+								small.text-muted dd/mm/yyyy
+							input#date-mask.form-control.date-inputmask(type='text', placeholder='Enter Date')
+						.form-group
+							label
+								| Phone
+								small.text-muted (999) 999-9999
+							input#phone-mask.form-control.phone-inputmask(type='text', placeholder='Enter Phone Number')
+						.form-group
+							label
+								| International Number
+								small.text-muted +19 999 999 999
+							input#international-mask.form-control.international-inputmask(type='text', placeholder='International Phone Number')
+						.form-group
+							label
+								| Phone / xEx
+								small.text-muted (999) 999-9999 / x999999
+							input#xphone-mask.form-control.xphone-inputmask(type='text', placeholder='Enter Phone Number')
+						.form-group
+							label
+								| Purchase Order
+								small.text-muted aaaa 9999-****
+							input#purchase-mask.form-control.purchase-inputmask(type='text', placeholder='Enter Purchase Order')
+				.card
+					.card-body
+						h5.card-title Form Elements
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span Tooltip Input
+							.col-lg-8.col-md-12
+								input#validationDefault05.form-control(type='text', data-toggle='tooltip', title='A Tooltip for the input !', placeholder='Hover For tooltip', required='')
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span Type Ahead Input
+							.col-lg-8.col-md-12
+								input.form-control(type='text', placeholder='Type here for auto complete..', required='')
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span Prepended Input
+							.col-lg-8.col-md-12
+								.input-group
+									.input-group-prepend
+										span#basic-addon1.input-group-text #
+									input.form-control(type='text', placeholder='Prepend', aria-label='Username', aria-describedby='basic-addon1')
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span Appended Input
+							.col-lg-8.col-md-12
+								.input-group
+									input.form-control(type='text', placeholder='5.000', aria-label="Recipient 's username", aria-describedby='basic-addon2')
+									.input-group-append
+										span#basic-addon2.input-group-text $
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span.text-success Input with Sccess
+							.col-lg-8.col-md-12
+								input#validationServer01.form-control.is-valid(type='text')
+								.valid-feedback
+									| Woohoo!
+						.row.mb-3.align-items-center
+							.col-lg-4.col-md-12.text-right
+								span.text-danger Input with Error
+							.col-lg-8.col-md-12
+								input#validationServer01.form-control.is-invalid(type='text')
+								.invalid-feedback
+									| Please correct the error
+				.card
+					.card-body
+						.row.mb-3
+							.col-lg-12
+								input.form-control(type='text', placeholder='col-md-12')
+						.row.mb-3
+							.col-lg-11
+								input.form-control(type='text', placeholder='col-md-11')
+							.col-lg-1.p-l-0
+								input.form-control(type='text', placeholder='col-md-1')
+						.row.mb-3
+							.col-lg-10
+								input.form-control(type='text', placeholder='col-md-10')
+							.col-lg-2
+								input.form-control(type='text', placeholder='col-md-2')
+						.row.mb-3
+							.col-lg-9
+								input.form-control(type='text', placeholder='col-md-9')
+							.col-lg-3
+								input.form-control(type='text', placeholder='col-md-3')
+						.row.mb-3
+							.col-lg-8
+								input.form-control(type='text', placeholder='col-md-8')
+							.col-lg-4
+								input.form-control(type='text', placeholder='col-md-4')
+						.row.mb-3
+							.col-lg-7
+								input.form-control(type='text', placeholder='col-md-7')
+							.col-lg-5
+								input.form-control(type='text', placeholder='col-md-5')
+						.row.mb-3
+							.col-lg-6
+								input.form-control(type='text', placeholder='col-md-6')
+							.col-lg-6
+								input.form-control(type='text', placeholder='col-md-6')
+						.row.mb-3
+							.col-lg-5
+								input.form-control(type='text', placeholder='col-md-5')
+							.col-lg-7
+								input.form-control(type='text', placeholder='col-md-7')
+						.row.mb-3
+							.col-lg-2
+								input.form-control(type='text', placeholder='col-md-2')
+							.col-lg-3
+								input.form-control(type='text', placeholder='col-md-3')
+							.col-lg-4
+								input.form-control(type='text', placeholder='col-md-4')
+							.col-lg-2
+								input.form-control(type='text', placeholder='col-md-2')
+							.col-lg-1.p-l-0
+								input.form-control(type='text', placeholder='col-md-1')
+		// editor
+		.row
+			.col-12
+				.card
+					.card-body
+						h4.card-title Quill Editor
+						// Create the editor container
+						#editor(style='height: 300px;')
+							p Hello World!
+							p
+								| Some initial
+								strong bold
+								|  text
+							p
+								br
+		// ==============================================================
+		// End PAge Content
+		// ==============================================================
+		// ==============================================================
+		// Right sidebar
+		// ==============================================================
+		// .right-sidebar
+		// ==============================================================
+		// End Right sidebar
+		// ==============================================================
+	// ==============================================================
+	// End Container fluid
+	// ==============================================================
+	// ==============================================================
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+	// ==============================================================
+	

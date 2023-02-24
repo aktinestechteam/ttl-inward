@@ -1,0 +1,1979 @@
+- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};	
+- var date = new Date();
+
+- var in_edit_mode = !invoicedetails.chqreq_document;
+
+html(xmlns:v='urn:schemas-microsoft-com:vml', xmlns:o='urn:schemas-microsoft-com:office:office', xmlns:x='urn:schemas-microsoft-com:office:excel', xmlns='http://www.w3.org/TR/REC-html40')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    meta(name='ProgId', content='Excel.Sheet')
+    meta(name='Generator', content='Microsoft Excel 15')
+    // Favicon icon
+    //link(rel='icon', href='/images/favicon_avs.ico')
+    link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+    title #{sails.config.globals.app_name}
+    link(rel='File-List', href='CHQ%20REQUEST%20FOR%20DCM%20-%20credit%20note%20_files/filelist.xml')
+    style(id='CHQ REQUEST FOR DCM - credit note _19098_Styles').
+      <!--table
+      {mso-displayed-decimal-separator:"\.";
+      mso-displayed-thousand-separator:"\,";}
+      .font519098
+      {color:black;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Tahoma, sans-serif;
+      mso-font-charset:0;}
+      .font619098
+      {color:black;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Tahoma, sans-serif;
+      mso-font-charset:0;}
+      .font719098
+      {color:black;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Tahoma, sans-serif;
+      mso-font-charset:0;}
+      .font819098
+      {color:black;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Tahoma, sans-serif;
+      mso-font-charset:0;}
+      .font919098
+      {color:black;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Tahoma;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;}
+      .xl1519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl6319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl6419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl6519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl6619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl6719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl6819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl6919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:.5pt solid windowtext;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:.5pt solid windowtext;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:.5pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl7619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl7719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl7819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border:.5pt solid windowtext;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl7919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl8019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl8119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl8219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl8319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl8419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl8519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl8619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl8719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl8819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Verdana, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl8919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl9019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl9119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl9219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl9319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl9419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:black;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Verdana, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:1.0pt solid windowtext;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl9519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl9619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl9719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:right;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:none;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl9819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:none;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl9919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl10019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:right;
+      vertical-align:bottom;
+      border-top:1.0pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:1.0pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:8.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:1.0pt solid windowtext;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl10719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl10819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl10919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl11019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:.5pt solid windowtext;
+      border-right:1.0pt solid windowtext;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:silver;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl11119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:8.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl11219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl11319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:9.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl11419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl11519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl11619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:12.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:1.0pt solid windowtext;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl11719098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:"Medium Date";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:none;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl11819098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl11919098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:center;
+      vertical-align:top;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:normal;}
+      .xl12019098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:"_-* \#\,\#\#0\.00_-\;\\-* \#\,\#\#0\.00_-\;_-* \0022-\0022??_-\;_-\@_-";
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl12119098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:1.0pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl12219098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl12319098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:10.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:.5pt solid windowtext;
+      border-left:.5pt solid windowtext;
+      mso-background-source:auto;
+      mso-pattern:auto;
+      white-space:nowrap;}
+      .xl12419098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial;
+      mso-generic-font-family:auto;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:.5pt solid windowtext;
+      border-bottom:none;
+      border-left:none;
+      background:yellow;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl12519098
+      {padding:0px;
+      mso-ignore:padding;
+      color:red;
+      font-size:8.0pt;
+      font-weight:700;
+      font-style:normal;
+      text-decoration:none;
+      font-family:"Times New Roman", serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:general;
+      vertical-align:bottom;
+      border-top:none;
+      border-right:none;
+      border-bottom:none;
+      border-left:1.0pt solid windowtext;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      .xl12619098
+      {padding:0px;
+      mso-ignore:padding;
+      color:windowtext;
+      font-size:10.0pt;
+      font-weight:400;
+      font-style:normal;
+      text-decoration:none;
+      font-family:Arial, sans-serif;
+      mso-font-charset:0;
+      mso-number-format:General;
+      text-align:center;
+      vertical-align:bottom;
+      background:white;
+      mso-pattern:black none;
+      white-space:nowrap;}
+      -->
+  body
+    form(action='/chqreq', method='post', onsubmit='return check_entered_values()')
+      input(type='hidden', name='_csrf', value=_csrf)
+      div(id='CHQ REQUEST FOR DCM - credit note _19098', x:publishsource='Excel', align='center')
+        table(style='border-collapse:\
+        collapse;table-layout:fixed;width:782pt', width='1040', cellspacing='0', cellpadding='0', border='0')
+          colgroup
+            col(style='mso-width-source:userset;mso-width-alt:7497;width:154pt', width='205')
+            col(style='width:48pt', width='64')
+            col(style='mso-width-source:userset;mso-width-alt:2121;width:44pt', width='58')
+            col(style='mso-width-source:userset;mso-width-alt:3145;width:65pt', width='86')
+            col(style='mso-width-source:userset;mso-width-alt:2889;width:59pt', width='79')
+            col(style='mso-width-source:userset;mso-width-alt:3108;width:64pt', width='85')
+            col(style='mso-width-source:userset;mso-width-alt:1499;width:31pt', width='41')
+            col(style='mso-width-source:userset;mso-width-alt:3218;width:66pt', width='88')
+            col(style='mso-width-source:userset;mso-width-alt:2742;width:56pt', width='75')
+            col(style='mso-width-source:userset;mso-width-alt:2413;width:50pt', width='66')
+            col(style='mso-width-source:userset;mso-width-alt:3145;width:65pt', width='86')
+            col(style='mso-width-source:userset;mso-width-alt:3913;width:80pt', width='107')
+          tbody
+            tr(style='height:15.75pt', height='21')
+              td.xl9519098(style='height:15.75pt;width:154pt', width='205', height='21') #{sails.config.globals.airlines_name}
+              td.xl9619098(style='width:48pt', width='64')  
+              td.xl9619098(style='width:44pt', width='58')  
+              td.xl9719098(style='width:65pt', width='86') Prepared by:
+              td.xl9819098(style='width:59pt', width='79') Signature
+              td.xl9919098(colspan='2', style='width:95pt', width='126') #{req.user.username}
+              td.xl10019098(style='width:66pt', width='88')  
+              td.xl9619098(style='width:56pt', width='75')  
+              td.xl9619098(style='width:50pt', width='66')  Cheque Request Schedule
+              td.xl10019098(style='width:65pt', width='86')  
+              td.xl10119098(style='width:80pt', width='107') 
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl6619098 Name (Caps)
+              td.xl6419098  
+              td.xl6419098  
+              td.xl6519098  
+              td.xl1519098
+              td.xl12319098 INVOICE
+              td.xl1519098
+                if in_edit_mode
+                  | X/#{invoicedetails.invoice_number}
+                else
+                  | #{chqreq.dcm_number}
+                span(style='mso-spacerun:yes')  
+              td.xl10319098  
+            tr(style='height:15.75pt', height='21')
+              td.xl10219098(style='height:15.75pt', height='21')  
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl6719098 Tel extn
+              td.xl6519098(align='right') 9999509039
+              td.xl6519098  
+              td.xl6519098  
+              td.xl1519098
+              td.xl12319098 Date
+              td.xl6519098 #{in_edit_mode ? new Date().toLocaleString('en-US', date_format_options) : new Date(chqreq.dcm_issue_date).toLocaleString('en-US', date_format_options)}
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10619098(style='height:12.75pt', height='17') Payee Details
+              td.xl6919098  
+              td.xl6919098  
+              td.xl7019098 Cheque Amount
+              td.xl7119098 Debit
+              td.xl7219098 Credit
+              td.xl7219098 Co. (3)
+              td.xl7219098 Centre (5)
+              td.xl7219098 Account (4)
+              td.xl7319098(style='border-top:none') Activity (6)
+              td.xl7319098(style='border-top:none') Rchg (3)
+              td.xl10719098(style='border-top:none') Line Ref (10)
+            tr(style='height:12.75pt', height='17')
+              td.xl11919098(style='height:12.75pt;width:154pt', width='205', height='17') #{awbuserdatas[0].consignee_name}
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl12019098
+                if in_edit_mode
+                  input#chqreq_do_amount_debit(name='chqreq_do_amount_debit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098 
+                if in_edit_mode
+                  input#chqreq_do_amount_credit(name='chqreq_do_amount_credit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098  
+              td.xl12419098 #{constants.gst_budget_code}
+              td.xl12419098(align='right') #{constants.gst_budget_account}
+              td.xl7719098  
+              td.xl7619098(style='border-left:none')  
+              td.xl10819098  
+            tr(style='height:12.75pt', height='17')
+              td.xl11919098(style='height:12.75pt;white-space:pre-wrap', height='17') #{awbuserdatas[0].consignee_address} #{awbuserdatas[0].consignee_address2}
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7819098
+                | Line Descriptio
+                span(style='display:none') n (36)
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7419098 Project (9)
+              td.xl7319098 Destination (15)
+              td.xl11019098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8719098#chqreq_net_do_amount #{in_edit_mode ? '' : Math.abs(chqreq.do_amount)}
+                //-input(type='number', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl8619098
+                | Credit Note DO Amount
+                span(style='display:none') O Amount
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098
+                if in_edit_mode
+                  | X/#{invoicedetails.invoice_number}
+                else
+                  | #{chqreq.dcm_number}
+                span(style='mso-spacerun:yes')  
+              td.xl6519098  
+              td.xl6819098  
+              td.xl6819098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8019098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl12519098(style='height:12.75pt', height='17') Bank Details:
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8219098  
+              td.xl7119098 Debit
+              td.xl7219098 Credit
+              td.xl7219098 Co. (3)
+              td.xl7219098 Centre (5)
+              td.xl7219098 Account (4)
+              td.xl7319098(style='border-top:none') Activity (6)
+              td.xl7319098(style='border-top:none') Rchg (3)
+              td.xl10719098(style='border-top:none') Line Ref (10)
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl12019098
+                if in_edit_mode
+                  input#chqreq_cgst_debit(name='chqreq_cgst_debit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098
+                if in_edit_mode
+                  input#chqreq_cgst_credit(name='chqreq_cgst_credit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098  
+              td.xl7719098 DEL00
+              //-#{constants.gst_budget_code}
+              td.xl7719098(align='right') 8586
+              //-#{constants.gst_budget_account}
+              td.xl12219098 INGSTC
+              td.xl7619098(style='border-left:none')  
+              td.xl12119098 #{current_city + (date.getYear()-100) + ('0'+(date.getMonth()+1)).slice(-2)}
+            tr(style='height:13.5pt', height='18')
+              td.xl10219098(style='height:13.5pt', height='18')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7819098
+                | Line Descriptio
+                span(style='display:none') n (36)
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7419098 Project (9)
+              td.xl7319098 Destination (15)
+              td.xl11019098  
+            tr(style='height:13.5pt', height='18')
+              td.xl10519098(style='height:13.5pt', height='18')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl11819098 #{in_edit_mode ? '' : Math.abs(chqreq.cgst)}
+                //-input(type='number', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl6519098(colspan='2') Credit Note CGST Amount
+              td.xl6519098  
+              td.xl6519098
+                if in_edit_mode
+                  | X/#{invoicedetails.invoice_number}
+                else
+                  | #{chqreq.dcm_number}
+                span(style='mso-spacerun:yes')  
+              td.xl6519098  
+              td.xl6819098  
+              td.xl6819098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8019098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl11119098(style='height:12.75pt', height='17')
+                span(style='mso-spacerun:yes')  
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8219098  
+              td.xl7119098 Debit
+              td.xl7219098 Credit
+              td.xl7219098 Co. (3)
+              td.xl7219098 Centre (5)
+              td.xl7219098 Account (4)
+              td.xl7319098(style='border-top:none') Activity (6)
+              td.xl7319098(style='border-top:none') Rchg (3)
+              td.xl10719098(style='border-top:none') Line Ref (10)
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl12019098
+                if in_edit_mode
+                  input#chqreq_sgst_debit(name='chqreq_sgst_debit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098
+                if in_edit_mode
+                  input#chqreq_sgst_credit(name='chqreq_sgst_credit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098  
+              td.xl7719098 DEL00
+              //-#{constants.gst_budget_code}
+              td.xl7719098(align='right') 8586
+              //-#{constants.gst_budget_account}
+              td.xl12219098 INGSTS
+              td.xl7619098(style='border-left:none')  
+              td.xl12119098 #{current_city + (date.getYear()-100) + ('0'+(date.getMonth()+1)).slice(-2)}
+            tr(style='height:13.5pt', height='18')
+              td.xl10219098(style='height:13.5pt', height='18')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7819098
+                | Line Descriptio
+                span(style='display:none') n (36)
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7419098 Project (9)
+              td.xl7319098 Destination (15)
+              td.xl11019098  
+            tr(style='height:13.5pt', height='18')
+              td.xl10519098(style='height:13.5pt', height='18')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl11819098 #{in_edit_mode ? '' : Math.abs(chqreq.sgst)}
+                //-input(type='number', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl6519098(colspan='2') Credit Note SGST Amount
+              td.xl6519098  
+              td.xl6519098
+                if in_edit_mode
+                  | X/#{invoicedetails.invoice_number}
+                else
+                  | #{chqreq.dcm_number}
+                span(style='mso-spacerun:yes')  
+              td.xl6519098  
+              td.xl6819098  
+              td.xl6819098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8019098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl11119098(style='height:12.75pt', height='17')
+                span(style='mso-spacerun:yes')  
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8219098  
+              td.xl7119098 Debit
+              td.xl7219098 Credit
+              td.xl7219098 Co. (3)
+              td.xl7219098 Centre (5)
+              td.xl7219098 Account (4)
+              td.xl7319098(style='border-top:none') Activity (6)
+              td.xl7319098(style='border-top:none') Rchg (3)
+              td.xl10719098(style='border-top:none') Line Ref (10)
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl12019098
+                if in_edit_mode
+                  input#chqreq_igst_debit(name='chqreq_igst_debit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098
+                if in_edit_mode
+                  input#chqreq_igst_credit(name='chqreq_igst_credit', type='text', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl7719098  
+              td.xl7719098 DEL00
+              //-#{constants.gst_budget_code}
+              td.xl7719098(align='right') 8586
+              //-#{constants.gst_budget_account}
+              td.xl12219098 INGSTI
+              td.xl7619098(style='border-left:none')  
+              td.xl12119098 #{current_city + (date.getYear()-100) + ('0'+(date.getMonth()+1)).slice(-2)}
+            tr(style='height:13.5pt', height='18')
+              td.xl10219098(style='height:13.5pt', height='18')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7819098
+                | Line Descriptio
+                span(style='display:none') n (36)
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7419098 Project (9)
+              td.xl7319098 Destination (15)
+              td.xl11019098  
+            tr(style='height:13.5pt', height='18')
+              td.xl10519098(style='height:13.5pt', height='18')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl11819098 #{in_edit_mode ? '' : Math.abs(chqreq.igst)}
+                //-input(type='number', step='0.01', min='0.00', value=0, style='width:100%')
+              td.xl6519098(colspan='2') Credit Note IGST Amount
+              td.xl6519098  
+              td.xl6519098
+                if in_edit_mode
+                  | X/#{invoicedetails.invoice_number}
+                else
+                  | #{chqreq.dcm_number}
+                span(style='mso-spacerun:yes')  
+              td.xl6519098  
+              td.xl6819098  
+              td.xl6819098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8019098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl11119098(style='height:12.75pt', height='17')
+                span(style='mso-spacerun:yes')  
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8219098  
+              td.xl7119098 Debit
+              td.xl7219098 Credit
+              td.xl7219098 Co. (3)
+              td.xl7219098 Centre (5)
+              td.xl7219098 Account (4)
+              td.xl7319098(style='border-top:none') Activity (6)
+              td.xl7319098(style='border-top:none') Rchg (3)
+              td.xl10719098(style='border-top:none') Line Ref (10)
+            tr(style='height:12.75pt', height='17')
+              td.xl10519098(style='height:12.75pt', height='17')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8019098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl11119098(style='height:12.75pt', height='17')  
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8219098  
+              td.xl7119098  
+              td.xl7219098  
+              td.xl7219098  
+              td.xl7219098  
+              td.xl7219098  
+              td.xl7319098(style='border-top:none')  
+              td.xl7319098(style='border-top:none')  
+              td.xl10719098(style='border-top:none')  
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7619098  
+              td.xl7719098  
+              td.xl7719098  
+              td.xl7719098  
+              td.xl7719098  
+              td.xl7719098  
+              td.xl7619098(style='border-left:none')  
+              td.xl10819098  
+            tr(style='height:13.5pt', height='18')
+              td.xl10219098(style='height:13.5pt', height='18')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7519098  
+              td.xl7819098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7919098  
+              td.xl7419098  
+              td.xl7319098  
+              td.xl11019098  
+            tr(style='height:13.5pt', height='18')
+              td.xl10519098(style='height:13.5pt', height='18')  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl8319098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6519098  
+              td.xl6819098  
+              td.xl6819098  
+              td.xl10419098  
+            tr(style='height:12.75pt', height='17')
+              td.xl10219098(style='height:12.75pt', height='17')  
+              td.xl1519098
+              td.xl1519098
+              td.xl7619098  
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl10819098  
+            tr(style='height:13.5pt', height='18')
+              td.xl11219098(style='height:13.5pt', height='18')
+                | Total amount in figures
+                | (INR)
+              td.xl8119098  
+              td.xl8119098  
+              td.xl8419098  
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl6619098 Approved by
+              td.xl8519098
+                span(style='mso-spacerun:yes')  
+              td.xl8519098
+                span(style='mso-spacerun:yes')   
+              td.xl11319098
+                span(style='mso-spacerun:yes')  
+            tr(style='height:16.5pt', height='22')
+              td.xl11119098(style='height:16.5pt', height='22')
+                | Notes: Unused lines must
+                | be ruled off
+              td.xl1519098
+              td.xl1519098
+              td.xl8719098
+                if !in_edit_mode
+                  span(style='mso-spacerun:yes') #{Math.abs(Math.round(chqreq.do_amount + chqreq.igst + chqreq.cgst + chqreq.sgst))}
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl6319098 Signature
+              td.xl9419098(colspan='2') #{constants.approved_by}
+              td.xl9019098  
+            tr(style='height:13.5pt', height='18')
+              td.xl11219098(style='height:13.5pt', height='18')
+                | Total amount in words
+                | (& CCY)
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl1519098
+              td.xl6619098 Name (Caps)
+              td.xl12619098(colspan='2')  
+              td.xl11419098  
+            tr(style='height:16.5pt', height='22')
+              td.xl11519098(colspan='2', style='height:16.5pt', height='22') #{sails.config.globals.local_currency_symbol} 
+                if !in_edit_mode
+                  include ../includes/number2string.pug
+                  +number2string(Math.abs(Math.round(chqreq.do_amount + chqreq.igst + chqreq.cgst + chqreq.sgst)))
+              td.xl9319098  
+              td.xl9319098  
+              td.xl9319098  
+              td.xl9319098  
+              td.xl9319098  
+              td.xl9319098  
+              td.xl11619098 Title
+              td.xl8819098(colspan='2') #{constants.approver_title}
+              td.xl9219098  
+            tr(style='height:13.5pt', height='18')
+              td.xl6519098(style='height:13.5pt', height='18')  
+              td.xl6519098  
+              td.xl6419098  
+              td.xl6419098  
+              td.xl6419098  
+              td.xl6419098  
+              td.xl8119098  
+              td.xl8119098  
+              td.xl6619098 Date
+              td.xl11719098  
+              td.xl6419098  
+              td.xl6419098  
+            //if supportMisalignedColumns
+              | [if supportMisalignedColumns]
+            tr(style='', height='0')
+              td(style='width:154pt', width='205')
+                input(type='text', name='chqreq_invoice_id', value=invoicedetails.id, style='display: none')
+              td(style='width:48pt', width='64')
+                input(type='text', name='chqreq_city', value=current_city, style='display: none')
+              td(style='width:44pt', width='58')
+              td(style='width:65pt', width='86')
+              td(style='width:59pt', width='79')
+              td(style='width:64pt', width='85')
+              td(style='width:31pt', width='41')
+              td(style='width:66pt', width='88')
+              td(style='width:56pt', width='75')
+              td(style='width:50pt', width='66')
+              td(style='width:65pt', width='86')
+              td(style='width:80pt', width='107')
+                if in_edit_mode
+                  button(type='submit') Submit
+            // [endif]
+      // -------------------------
+      // END OF OUTPUT FROM EXCEL PUBLISH AS WEB PAGE WIZARD
+      // -------------------------
+      //This is for error swal
+    include ../includes/matrix_javascript.pug
+    script(src='/js/swal_helper.js')
+    script.
+      function check_entered_values() {
+        var chqreq_do_amount_debit = $('#chqreq_do_amount_debit').val();
+        var chqreq_do_amount_credit = $('#chqreq_do_amount_credit').val();
+        var chqreq_cgst_debit = $('#chqreq_cgst_debit').val();
+        var chqreq_cgst_credit = $('#chqreq_cgst_credit').val();
+        var chqreq_sgst_debit = $('#chqreq_sgst_debit').val();
+        var chqreq_sgst_credit = $('#chqreq_sgst_credit').val();
+        var chqreq_igst_debit = $('#chqreq_igst_debit').val();
+        var chqreq_igst_credit = $('#chqreq_igst_credit').val();
+        if(!(chqreq_do_amount_debit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_do_amount_credit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_cgst_debit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_cgst_credit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_sgst_debit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_sgst_credit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_igst_debit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(!(chqreq_igst_credit>=0)) {
+            errorSwal('Error','Number should be greater than or equal to zero');
+            return false;
+        } else if(chqreq_do_amount_debit=="" && chqreq_do_amount_credit=="" && chqreq_cgst_debit=="" && chqreq_cgst_credit=="" &&      chqreq_sgst_debit=="" && chqreq_sgst_credit=="" && chqreq_igst_debit=="" && chqreq_igst_credit=="") {
+            errorSwal('Error','There is no entered debit or credit');
+            return false;
+        } else if(chqreq_do_amount_debit==0 && chqreq_do_amount_credit==0 && chqreq_cgst_debit==0 && chqreq_cgst_credit==0 && chqreq_sgst_debit==0 && chqreq_sgst_credit==0 && chqreq_igst_debit==0 && chqreq_igst_credit==0) {
+            errorSwal('Error','All fields should not be zero');
+            return false;
+        }
+        return true;
+     }

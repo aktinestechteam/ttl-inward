@@ -1,0 +1,226 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+	// Custom CSS
+	link(rel='stylesheet', type='text/css', href='/extra-libs/multicheck/multicheck.css')
+	link(href='/libs/datatables.net-bs4/css/dataTables.bootstrap4.css', rel='stylesheet')
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		.row
+			.col-lg-4
+				.d-flex.no-block.justify-content-center.align-items-center.bg-dark
+					.bg-dark.border-top.border-secondary
+						div
+							form.form-horizontal.m-t-5(action="/register", method='post', onsubmit="return uservalidation()")
+								.row.p-b-15
+									.col-12
+										input(type='hidden', name='_csrf', value=_csrf)
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon1.input-group-text.bg-success.text-white
+													i.ti-user
+											input#inwardcargo_registeruser_username.form-control.form-control-lg(type='text', placeholder='Username', aria-label='Username', aria-describedby='basic-addon1', name='inwardcargo_registeruser_username', required='', autocomplete="off")
+										// email
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon1.input-group-text.bg-danger.text-white
+													i.ti-email
+											input#inwardcargo_registeruser_email.form-control.form-control-lg(type='email', placeholder='Email Address', aria-label='Username', aria-describedby='basic-addon1', name='inwardcargo_registeruser_email' , required='', autocomplete="off")
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon2.input-group-text.bg-warning.text-white
+													i.ti-pencil
+											input#inwardcargo_registeruser_password.form-control.form-control-lg(type='password', placeholder='Password', aria-label='Password', aria-describedby='basic-addon1', name='inwardcargo_registeruser_password', autocomplete="off")
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon2.input-group-text.bg-info.text-white
+													i.ti-pencil
+											input#inwardcargo_registeruser_confirmpassword.form-control.form-control-lg(type='password', placeholder=' Confirm Password', aria-label='Password', aria-describedby='basic-addon1', name='inwardcargo_registeruser_confirmpassword', autocomplete="off")
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon2.input-group-text.bg-info.text-white
+													i.fas.fa-hand-pointer
+											select#inwardcargo_registeruser_city.select2.form-control.form-control-lg(multiple='', type='text', name='inwardcargo_registeruser_city[]', required='', autocomplete="off")
+												option(value='', disabled='', selected='') Choose city
+												each airport in airportlistdetails
+													option(value=airport.iata_code) #{airport.iata_code}
+
+										.input-group.mb-2
+											.input-group-prepend
+												span#basic-addon2.input-group-text.bg-info.text-white
+													i.fas.fa-hand-pointer
+											select#inwardcargo_registeruser_role.select2.form-control.form-control-lg(type='text', name='inwardcargo_registeruser_role', required='', autocomplete="off")
+												option(value='') Select Role
+												option(value='user') User
+												option(value='approver') Approver
+												option(value='admin') Admin
+								.row.border-top.border-secondary
+									.col-12
+										.form-group
+											.p-t-20
+												button.btn.btn-block.btn-lg.btn-info(type='submit') Save User
+							.m-b-10
+								button.btn.btn-block.btn-lg.btn-info(type='button', onclick='showchangepasswordmodal()') Forgot Password ?
+							// Modal
+							#inwardcargo_passwordchangemodal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='passwordchangemodallabel', aria-hidden='true')
+								.modal-dialog(role='document')
+									.modal-content
+										.modal-header
+											h5#inwardcargo_passwordchangemodallabel.modal-title Change Password
+											button.close(type='button', data-dismiss='modal', aria-label='Close')
+												span(aria-hidden='true') ×
+										form.form-horizontal.m-t-5(action="/changepassword", method='post', onsubmit="return changepasswordvalidation()")
+											.modal-body
+												input(type='hidden', name='_csrf', value=_csrf)
+												.input-group.mb-2
+													.input-group-prepend
+														span#basic-addon1.input-group-text.bg-success.text-white
+															i.ti-user
+													input#inwardcargo_updatepassword_username.form-control.form-control-lg(type='text', placeholder='Username', aria-label='Username', aria-describedby='basic-addon1', name='inwardcargo_updatepassword_username', required='', autocomplete="off", readonly='')
+												.input-group.mb-2
+													.input-group-prepend
+														span#basic-addon2.input-group-text.bg-warning.text-white
+															i.ti-pencil
+													input#inwardcargo_updatepassword_password.form-control.form-control-lg(type='password', placeholder='Password', aria-label='Password', aria-describedby='basic-addon1', name='inwardcargo_updatepassword_password', required='', autocomplete="off")
+												.input-group.mb-2
+													.input-group-prepend
+														span#basic-addon2.input-group-text.bg-info.text-white
+															i.ti-pencil
+													input#inwardcargo_updatepassword_confirmpassword.form-control.form-control-lg(type='password', placeholder=' Confirm Password', aria-label='Password', aria-describedby='basic-addon1', name='inwardcargo_updatepassword_confirmpassword', required='', autocomplete="off")
+											.modal-footer
+												button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+												button.btn.btn-primary(type='submit') Save Password
+			.col-lg-8.table-responsive
+				table.table
+					thead
+						tr.table-danger
+							th(scope='col') Name
+							th(scope='col') Email
+							th(scope='col') Role
+							th(scope='col') City
+							th(scope='col') Delete
+					tbody
+						each user in userlist
+							tr
+								td(onclick="edituser('"+user.username+"', '"+user.email+"','"+user.role+"','"+user.iata_code+"',this)") #{user.username}
+								td(onclick="edituser('"+user.username+"', '"+user.email+"','"+user.role+"','"+user.iata_code+"',this)") #{user.email}
+								td(onclick="edituser('"+user.username+"', '"+user.email+"','"+user.role+"','"+user.iata_code+"',this)") #{user.role}
+								td(onclick="edituser('"+user.username+"', '"+user.email+"','"+user.role+"','"+user.iata_code+"',this)") 
+									each iata_code in user.iata_code
+										div #{iata_code},
+								td
+									button.btn.btn-info.waves-effect.waves-light.save-category(type='submit', name='inwardcargo_users_delete_userid', onclick="showConfirm('"+user.id+"')")
+										i.fa.fa-trash
+
+	include ../includes/footer.pug
+block specific-js
+	// this page js
+	script(src='/extra-libs/multicheck/datatable-checkbox-init.js')
+	script(src='/extra-libs/multicheck/jquery.multicheck.js')
+	script(src='/extra-libs/DataTables/datatables.min.js')
+	include ../includes/csrf.pug
+	script.
+		function edituser(name, email, role, cities, currenttd) {
+			$( "td" ).not( currenttd ).parent().css( "background-color", "#ffffff" );
+			$(currenttd).parent().css( "background-color", "#f5cfc4" );
+			$("#inwardcargo_registeruser_username").val(name);
+			$("#inwardcargo_registeruser_email").val(email);
+			$("#inwardcargo_registeruser_role").val(role);
+			$("#inwardcargo_registeruser_city").val('');
+			$("#inwardcargo_registeruser_password").attr("disabled", "disabled");
+			$("#inwardcargo_registeruser_confirmpassword").attr("disabled", "disabled");
+			$.each(cities.split(","), function(i,e){
+				$("#inwardcargo_registeruser_city option[value='" + e + "']").prop("selected", true);
+			});
+		}
+		
+		function showchangepasswordmodal() {
+			var name = $("#inwardcargo_registeruser_username").val();
+			$("#inwardcargo_updatepassword_username").val(name);
+			$('#inwardcargo_passwordchangemodal').modal('show');
+		}
+		
+		function showConfirm(userId) {
+			swal({
+				title: 'Are you sure?',
+				text: "You won't be able to revert this!",
+				type: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Yes, delete it!'
+			}).then(function (isConfirm) {
+				if (isConfirm.value == true) {
+					getCSRFToken(function(_csrf) {
+						$.post("/deleteuser", {
+							_csrf: _csrf,
+							inwardcargo_users_delete_userid: userId
+						}, function (data) {
+							if (data.error) {
+								swal({
+									title: 'Error!',
+									text: data.error,
+									imageUrl: '/images/alert_cross.png',
+									background: '#ffffff',
+									imageWidth: 150,
+									imageHeight: 150,
+									confirmButtonText: 'OK'
+								});
+							} else {
+								if (data.result)
+									location.reload();
+							}
+						});
+					});
+				}
+			});
+		}
+		function uservalidation() {
+			var name = $("#inwardcargo_registeruser_username").val();
+			var email = $("#inwardcargo_registeruser_email").val();
+			var password = $("#inwardcargo_registeruser_password").val();
+			var confirmpassword = $("#inwardcargo_registeruser_confirmpassword").val();
+			var role = $("#inwardcargo_registeruser_role").val();
+			var cities = $("#inwardcargo_registeruser_city").val();
+			if(password === confirmpassword) {
+				//- toast({
+				//- 	type: 'success',
+				//- 	title: 'User added successfully'
+				//- })
+				return true;
+			} else {
+				toast({
+					type: 'error',
+					title: 'Password and Confirm Password are not equal'
+				})
+				return false;
+			}
+		}
+		
+		function changepasswordvalidation() {
+			var name = $("#inwardcargo_updatepassword_username").val();
+			var password = $("#inwardcargo_updatepassword_password").val();
+			var confirmpassword = $("#inwardcargo_updatepassword_confirmpassword").val();
+			if(password === confirmpassword) {
+				//- toast({
+				//- 	type: 'success',
+				//- 	title: 'Password Changed Successfully'
+				//- })
+				return true;
+			} else {
+				toast({
+					type: 'error',
+					title: 'Password and Confirm Password are not equal'
+				})
+				return false;
+			}
+		}

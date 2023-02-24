@@ -1,0 +1,370 @@
+-----------------------------------
+	INSTALL WKHTMLTOPDF
+-----------------------------------
+sudo apt-get update
+sudo apt-get install xvfb libfontconfig wkhtmltopdf
+
+1. CAN Controller
+	a. set the wkhtmltopdf path
+	b. create the path at which the pdf is created
+
+2. create pdf folder at root
+3.insure wkhtmltopdf executable is available at predefined path.
+
+TEST IT BY CALLING
+
+		xvfb-run wkhtmltopdf www.mobigic.com/offices offices.pdf
+
+------------------------------------
+	Production Dependencies
+------------------------------------
+
+1. If your app is behind a proxy or load balancer (e.g. on a PaaS like Heroku), you may also need to set `sails.config.http.trustProxy` to `true`.
+2. Server should listen on port 80/443
+3. Server should disable logs
+4. If we are redirecting the port traffic from (lets say) 1337 to 443, then run 
+	a. sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 1337
+	b. Add your Node.js start script to the file you edited for port redirection, /etc/rc.local. That will run your Node.js launch script when the system starts.
+	c. REFERENCE - https://stackoverflow.com/questions/16573668/best-practices-when-running-node-js-with-port-80-ubuntu-linode
+5.
+
+------------------------------------
+	MONGO DB in Replication MODE
+------------------------------------
+Note: These steps are required to be done only if you want to run the replication mode for backup and DR. Otherwise it is not required.
+Note: We are performing only for 2 replica modes.
+https://vxcompany.com/2012/11/02/implement-mongodb-replication-in-3-simple-steps/
+
+1. mongod --dbpath="/db1" --replSet <anyname> --port 40001
+2. mongod --dbpath="/db2" --replSet <anyname> --port 40002
+3. mongod --dbpath="/arbiter" --replSet <anyname> --port 40003
+4. connect to port 40001 and initiate replication mode as rs.initiate()
+5. By now the mongod with port 40001 will be running in primary mode.
+6. Educate the mongod that there are others also in the ecosystem as secondary and arbiter
+7. rs.add({host: "<ip-address>:40002"})
+8. rs.add({host: "<ip-address>:40003", arbiterOnly: true})
+9. rs.status() will show you the current status of the replication setup.
+10. connect to port 40002 and it should be running in Secondary mode. You need to rs.slaveOk() so that it can work as slave.
+11. At this point in time, we have both the mongodb running with same priority. Hence if the primary (40001) breaks down, then arbiter will make 40002 as primary. Now if 40001 gets active, then we will have 40002 continuing to be primary and 40001 continues as secondary.
+12. If you want that 40001 should again become primary when it gets alive, then in that case we will have to change the priority of each mongod's configuration.
+13. cnf = rs.conf()
+14. cnf.members[n].priority = 0 to 1000		//	Also change the host name of the primary to the DNS basis or IP basis.
+15. rs.reconfig(cnf)
+16. higher the number means you are get higher priority in obtaining primary status. avoid using 0 and 1 as they are mostly reserved for arbiter.
+
+
+At this point the command should look like
+	mongod.exe --dbpath="g:\mongo_test\db1" --port 40001 --replSet jack
+
+*************************************
+//	Auth based replication
+https://docs.mongodb.com/manual/tutorial/enable-authentication/
+
+17. Create an admin for the db
+	use admin
+	db.createUser({user: 'admin', pwd: 'password', roles: [{role: 'root', db: 'admin'}]})
+18. Create a user for the inwardcargo db
+	use inwardcargo
+	db.createUser({user: 'ttg', pwd: 'pwd', roles: [{role: 'readWrite', db: 'inwardcargo'}]})
+	
+At this point the command should look like
+	mongod.exe --dbpath="g:\mongo_test\db1" --port 40001 --replSet jack			//	You should be able to connect to the DB using username and password in the connection string of the sailsjs
+		url: 'mongodb://ttg:pwd@127.0.0.1:40001,127.0.0.1:40002/inwardcargo?readPreference=primary&replicaSet=jack&connectTimeoutMS=3000&w=1'
+	
+19. create a key (mostly on ubuntu and you can bring it into the windows if you want) by the command
+	openssl rand -base64 756 > keyfile &&
+	chmod 400 /var/lib/mongodb/keyfile &&			//	Not really required, i did not do it, it was mentioned on the server
+	chown mongodb:mongodb /var/lib/mongodb/keyfile	//	Not really required, i did not do it, it was mentioned on the server
+20. run the mongod commands additionally with
+	--keyFile <keyfile>
+	e.g. mongod --dbpath="/db1" --replSet <anyname> --port 40001 --keyFile <keyfile>
+
+At this point the command should look like
+	mongod.exe --dbpath="g:\mongo_test\db1" --port 40001 --replSet jack --keyFile keyfile_name
+
+*************************************
+
+------------------------------------
+	Steps to install Application
+------------------------------------
+1. Get the entire application using git, switch to required branch
+2. Install NodeJS 8.12.0 LTS
+	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+	sudo apt-get install -y nodejs
+3. sudo npm install
+
+------------------------------------
+	Steps to install MongoDB
+------------------------------------
+1. sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+2. echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+3. sudo apt-get update
+4. sudo apt-get install -y mongodb-org=4.0.2 mongodb-org-server=4.0.2 mongodb-org-shell=4.0.2 mongodb-org-mongos=4.0.2 mongodb-org-tools=4.0.2
+	- if you face an error that libcurl3 is broken or cannot be installed, then 
+		sudo apt-get install libcurl3 openssl		//	And then rerun the command from above step.
+5. You may want to stop the default mongod that runs by
+	sudo service mongod stop
+
+--------------
+Architecture
+--------------
+1. Each VM in BOM region
+	a. 1GB RAM
+	b. 25GB HDD
+	c. 1 CPU
+2. IP Address in BOM region of
+	a. App
+		- public - 35.154.219.78
+		- public VPC - 172.16.98.10
+		- private VPC - 172.16.99.10
+	b. MobgoDB (accessible only via App instance)
+		- public VPC - 172.16.98.20
+		- private VPC - 172.16.99.20
+	c. mongod on port 27017
+	d. app internally on 1337
+2. IP Address in PAR region of
+	a. App
+		- public - 35.180.163.220
+		- public VPC - 172.16.101.10
+		- private VPC - 172.16.100.10
+	b. MobgoDB (accessible only via App instance)
+		- public VPC - 172.16.101.20
+		- private VPC - 172.16.100.20
+	c. mongod on port 27017
+	d. app internally on 1337
+3. External IPs
+	a. DB- None
+	b. App - 35.154.219.78
+4. Physical file paths in BOM Region
+	a. App- ~/servers/ttg_inward
+	a. DB- ~/mongo/ttg_inward
+5. Screen information
+	a. APP - screen -S ttg_inward_app_bom
+	b. DB - screen -S ttg_inward_db_bom
+
+------------------------------------
+	Steps to RUN MongoDB
+------------------------------------
+1. mongod --dbpath="/home/ubuntu/mongo/ttg_inward/" --bind_ip 0.0.0.0
+
+------------------------------------
+	Steps to App on 80
+------------------------------------
+1. sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 1337
+2. paste this in /etc/rc.local or 
+
+
+------------------------------------
+	Steps to SHUT DOWN MongoDB
+------------------------------------
+1. Shut down all the secondaries
+2. Then shut down arbiter
+3. Then shut down primary
+
+------------------------------------
+	Steps to Configure LDAP
+------------------------------------
+1. Go to globals.js file and update the LDAP authentication URL there
+2. Go to passport.js file and update the necessary bind string, bind credentials there
+
+------------------------------------
+	Apply Certificates - Experiment
+------------------------------------
+https://docs.mongodb.com/manual/tutorial/configure-ssl/
+	*** SETUP OF SINGLE MONGO SERVER ***
+1. openssl req -newkey rsa:2048 -new -x509 -days 365 -nodes -out mongodb-cert.crt -keyout mongodb-cert.key
+	Creates crt file (certificate) and key file (private key)
+2. cat mongodb-cert.key mongodb-cert.crt > mongodb.pem
+	copy the crt file into pem file (THIS FILE CONTAINS PRIVATE KEY AND CERTIFICATE)
+3. mongod --sslMode requireSSL --sslPEMKeyFile mongodb.pem --dbpath="/home/ubuntu/experiment/db/" --port 40001
+	Command to run the mongo deamon
+4. mongo --port 40001 --ssl --sslCAFile mongodb-cert.crt
+	command to connect to the mongo deamon by client
+
+https://docs.mongodb.com/manual/tutorial/configure-ssl-clients/
+http://mongodb.github.io/node-mongodb-native/2.0/tutorials/enterprise_features/
+	*** SETUP OF SINGLE MONGO CLIENT ***
+https://github.com/balderdashy/waterline/issues/1073	(shows how to set up the required information in sailsjs)
+1. 
+
+------------------------------------
+		OPENSSL Commands
+------------------------------------
+
+1. convert pem file to crt
+	openssl x509 -in foo.pem -inform PEM -out foo.crt
+
+------------------------------------
+		Adding a certificate
+------------------------------------
+1. add the .crt file to /usr/local/share/ca-certificates
+2. run sudo update-ca-certificates
+3. you should be able to see your pem file added to /etc/ssl/certs folder
+
+------------------------------------
+			SETTING INDEX
+------------------------------------
+
+db.dcm.createIndex({dcm_number: 1}, {unique: true})
+db.invoice.createIndex({invoice_number: 1}, {unique: true})
+db.awb.createIndex({awb_number: 1}, {unique: true})
+db.chequerequest.createIndex({dcm_number: 1}, {unique: true})
+db.do.createIndex({do_number: 1}, {unique: true})
+db.gst.createIndex({gst_code: 1}, {unique: true})
+db.igm.createIndex({igm_number: 1}, {unique: true})
+db.ports.createIndex({iata_code: 1}, {unique: true})
+db.user.createIndex({username: 1}, {unique: true})
+db.email.createIndex({subject: 1}, {unique: true})
+db.challan.createIndex({unique_challan: 1}, {unique: true})
+db.settings.createIndex({key: 1}, {unique: true});
+
+----------------------------------------------
+		GENERATING SSL USING OPENSSL
+----------------------------------------------
+
+//	using mongodb.pdf placed in F:\setups\Mongodb
+1. Create root CA and root CA's private key
+	openssl req -nodes -out ca.pem -new -x509 -keyout ca.key -config openssl.cnf
+		* Country Name (2 letter code) [AU]:IN
+		* State or Province Name (full name) [Some-State]:MH
+		* Locality Name (eg, city) []:MUMBAI
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:TTL
+		* Email Address []:
+2. Generate certificate request and private keys for the server
+	openssl req -nodes -newkey rsa:4096 -sha256 -keyout mongodb_node_1.key -out mongodb_node_1.csr -config openssl.cnf
+		* Country Name (2 letter code) [AU]:IN
+		* State or Province Name (full name) [Some-State]:MH
+		* Locality Name (eg, city) []:MUMBAI
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:mongodb01.ttgroupglobal.local
+		* Email Address []:
+	openssl req -nodes -newkey rsa:4096 -sha256 -keyout mongodb_node_2.key -out mongodb_node_2.csr -config openssl.cnf
+		* Country Name (2 letter code) [AU]:FR
+		* State or Province Name (full name) [Some-State]:PARIS
+		* Locality Name (eg, city) []:PARIS
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:mongodb02.ttgroupglobal.local
+		* Email Address []:
+3. Sign the certificate requests
+	openssl x509 -req -in mongodb_node_1.csr -CA ca.pem -CAkey ca.key -set_serial 00 -out mongodb_node_1.crt
+	openssl x509 -req -in mongodb_node_2.csr -CA ca.pem -CAkey ca.key -set_serial 00 -out mongodb_node_2.crt
+
+//	using https://www.codeproject.com/Articles/1227164/Using-Encryption-and-Authentication-to-Secure-Mong
+1. openssl genrsa -out mongoCA.key -aes256 4096
+	* password - ttgr0upg10b@1
+2. Generate CA Valid till (valid till 01 Nov 2020)
+	req -x509 -new -extensions v3_ca -key mongoCA.key -days 737 -out mongoCA.crt -config openssl.cnf
+		* Country Name (2 letter code) [AU]:IN
+		* State or Province Name (full name) [Some-State]:MH
+		* Locality Name (eg, city) []:MUMBAI
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:TTL
+		* Email Address []:
+3. generate key and certificate signing request for servers
+	openssl.exe req -new -newkey rsa:2048 -nodes -out mongo0.csr -keyout mongo0.key -passin pass:mumb@101 -config openssl.cnf
+		* Country Name (2 letter code) [AU]:IN
+		* State or Province Name (full name) [Some-State]:MH
+		* Locality Name (eg, city) []:MUMBAI
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:mongodb01.ttgroupglobal.local
+		* Email Address []:
+	openssl.exe req -new -newkey rsa:2048 -nodes -out mongo1.csr -keyout mongo1.key -passin pass:p@r1s02 -config openssl.cnf
+		* Country Name (2 letter code) [AU]:FR
+		* State or Province Name (full name) [Some-State]:PARIS
+		* Locality Name (eg, city) []:PARIS
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:mongodb02.ttgroupglobal.local
+		* Email Address []:
+	openssl.exe req -new -newkey rsa:2048 -nodes -out lb01.csr -keyout lb01.key -passin pass:l0@db@1@nc3r -config openssl.cnf
+		* Country Name (2 letter code) [AU]:IN
+		* State or Province Name (full name) [Some-State]:MH
+		* Locality Name (eg, city) []:MUMBAI
+		* Organization Name (eg, company) [Internet Widgits Pty Ltd]:TTL
+		* Organizational Unit Name (eg, section) []:TTL
+		* Common Name (eg, YOUR name) []:lb01.ttgroupglobal.local
+		* Email Address []:
+4. generate certificate (valid till 01 Nov 2020) using csr 
+	openssl x509 -CA mongoCA.crt -CAkey mongoCA.key -CAcreateserial -req -days 737 -in mongo0.csr -out mongo0.crt
+	openssl x509 -CA mongoCA.crt -CAkey mongoCA.key -CAcreateserial -req -days 737 -in mongo1.csr -out mongo1.crt
+	openssl x509 -CA mongoCA.crt -CAkey mongoCA.key -CAcreateserial -req -days 737 -in lb01.csr -out lb01.crt
+5. Apply SSL via PEMKeyFile to each of the mongod instance via their conf file
+6. To connect to the mongod instances you will require to do:
+	mongo --ssl --sslCAFile ~/ssl/mongoCA.crt --host mongodb01.ttgroupglobal.local
+7. To obtain PEM from .crt and .key file
+	cat mongodb-cert.key mongodb-cert.crt > mongodb.pem
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+		SET UP CONFIGURATION
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+1. How to access Mumbai Application ?
+	Use putty
+2. How to access Paris Application ?
+	a. Use putty
+	b. Other option is log to Mumbai application
+	c. A key with the name ttgrpparkey01.pem exists on ~/
+3. How to access Mumbai DB ?
+	a. Access Mumbai application
+	b. A key with the name TTGRPSTG1.pem exists on ~/
+4. How to access Paris DB ?
+	a. Access Mumbai DB and use ttgrpparkey01.pem exists on ~/
+	c. Access Mumbai application and use ttgrpparkey01.pem from ~/
+	
+command is SSH -i <keyname> instancename
+
+INSTANCE NAMES
+	Logical Name	Public IP		Private IP		VPC IP			FQDN							Port	ScreenName			Key
+	--------------------------------------------------------------------------------------------------------------------------
+	Mumbai App		35.154.219.78	172.16.98.10	172.16.99.10	web01.ttgroupglobal.local		1337	idos_mumbai			TTGRPSTG1.pem
+	Mumbai DB		 - - - - - -	172.16.98.20	172.16.99.20	mongodb01.ttgroupglobal.local	27017	idos_mumbai_mongo	TTGRPSTG1.pem
+	Paris App		35.180.163.220	172.16.100.10	172.16.101.10	web02.ttgroupglobal.local		1337	idos_paris			ttgrpparkey01.pem
+	Paris DB		 - - - - - -	172.16.100.20	172.16.101.20	mongodb02.ttgroupglobal.local	27017	idos_paris_mongo	ttgrpparkey01.pem
+	Arbiter			 - - - - - -	172.16.100.20	172.16.101.20	mongodb02.ttgroupglobal.local	27018	idos_paris_arbiter	ttgrpparkey01.pem
+	LDAP			13.233.67.245	172.16.98.50	172.16.98.50	ttgroupglobal.local				389
+	LDAPS			52.66.73.250	172.16.98.50	172.16.98.50	ttgroupglobal.local				636
+	--------------------------------------------------------------------------------------------------------------------------
+	
+	
+HELP !!!
+--------
+clearing all the required DB tables
+db.awb.drop(); db.awbuserdata.drop(); db.can.drop(); db.dcm.drop(); db.do.drop(); db.hawb.drop(); db.igm.drop(); db.igmpending.drop(); db.invoice.drop(); db.partawb.drop(); db.irn.drop();
+
+
+1. Change email ids from www.naval.com, navals.carrer to something meaningful. Ask Medha which email id it should send it
+2. Ask EMAIL id at which the IGM will be received
+3. Ask them to enter the Bank IFSC at all stations for challan
+4. set approval_manager_email in the cityConstants to "" in the db else it will display undefined in the modal for editing.
+5. set the deployment_name in custom.js
+6. change localhost to your domain in custom.js
+7. Email sent for invoice and CAN and payment received are blocked.
+
+
+For Approval Emails and Reports :
+
+BOM      : hancy.dsouza@ba.com
+DEL      : omprakash.dubey@ba.com
+MAA      : premraj.selvam@ba.com
+BLR      : laxman.rawat@ba.com
+HYD      : suresh.dumpala@ba.com
+
+STAGING CHANGES
+---------------
+1. Block sending of email in send-email.js file
+2. Block the CRON jobs
+3. Block sending of IRN requests.
+4. Block reading of emails.
+5. Change the database to which the application connects to. Set the new connection to localhost.
+6. Change the ldap server to which it connects to.
+7. Logging to file is disabled.
+8. base path is different

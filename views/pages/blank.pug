@@ -1,0 +1,28 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+
+block content
+	// footer
+	// ==============================================================
+	footer.footer.text-center
+		| All Rights Reserved by #{sails.config.globals.customer_name} Designed and Developed by 
+		a(href='https://mobigic.com') Mobigic Technologies Pvt Ltd
+		| .
+	// ==============================================================
+	// End footer
+block specific-js
+	script(type='text/javascript').
+	script(src='/libs/inputmask/dist/min/jquery.inputmask.bundle.min.js')
+	script(src='/dist/js/pages/mask/mask.init.js')
+	script(src='/libs/select2/dist/js/select2.full.min.js')
+	script(src='/libs/select2/dist/js/select2.min.js')
+	script(src='/libs/jquery-asColor/dist/jquery-asColor.min.js')
+	script(src='/libs/jquery-asGradient/dist/jquery-asGradient.js')
+	script(src='/libs/jquery-asColorPicker/dist/jquery-asColorPicker.min.js')
+	script(src='/libs/jquery-minicolors/jquery.minicolors.min.js')
+	script(src='/libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')
+
+

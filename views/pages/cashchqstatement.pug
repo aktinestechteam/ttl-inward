@@ -1,0 +1,119 @@
+doctype html
+html(dir='ltr')
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.min.css', rel='stylesheet')
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			//- script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')-cdn
+			//- script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')-cdn
+			script(src='/dist/js/html5shiv.js')
+			script(src='/dist/js/respond.min.js')
+	body
+		.main-wrapper.pt-5.mt-5
+			.container-fluid(style="padding-right: 20px;padding-left: 20px;")
+				.row
+						include ../includes/dateformat.pug
+						p.col-sm-10(style='font-size:16px;') 
+							+dateformat(new Date().getTime()) 
+						if challan_no
+							.col-sm-2.border.border-dark(style='font-size:16px;font-weight:800;') Challan No.
+								div#challan_no=challan_no
+							
+				.row
+					p.col-sm-12(style='font-size:16px;') Dear Sir / Madam,
+					- var mode_of_payment = ''
+					if invoiceslistdetails[0].payment_mode == 'CHQ'
+						- mode_of_payment = 'Cheques';
+					else
+						- mode_of_payment = 'Cash';
+					p.col-sm-12(style='font-size:16px;') Kindly accept the below #{mode_of_payment} and deposit the same in #{sails.config.globals.airlines_name} in our current account number 
+				.row
+					.col-sm-12
+						table.w-100.table-borderless.table-responsive-sm
+							thead
+								tr
+									th.border.border-dark(scope='col') Sr. No
+									if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+										th.border.border-dark(scope='col') Name of the Bank
+									if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+										th.border.border-dark(scope='col') Cheque Date
+									else
+										th.border.border-dark(scope='col') Date
+									if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+										th.border.border-dark(scope='col') Cheque/DD No.
+									if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+										th.border.border-dark(scope='col') Payment Mode
+									if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+										th.border.border-dark(scope='col') Chq. Amt.
+									else
+										th.border.border-dark(scope='col') Amt.
+							if(invoiceslistdetails)
+								tbody.border.border-dark
+									- var total = 0;
+									each invoice,i in invoiceslistdetails
+										- total = total + invoice.payment_amount;
+										if(invoiceslistdetails && (invoiceslistdetails[0].payment_mode == 'CHQ' || invoiceslistdetails[0].payment_mode == 'DD'))
+											tr
+												th.border-right.border-dark(scope='row') #{i+1}
+												td.border-right.border-dark #{invoice.payment_drawn_on}
+												td.border-right.border-dark 
+													include ../includes/dateformat.pug
+													+dateformat(new Date().getTime()) 
+													//+dateformat(invoice.payment_received_date) 
+												td.border-right.border-dark #{invoice.payment_reference_number}
+												td.border-right.border-dark #{invoice.payment_mode}
+												td.border-right.border-dark #{sails.config.globals.price_formatter(invoice.payment_amount)}
+									if(invoiceslistdetails && invoiceslistdetails[0].payment_mode == 'CASH')
+										tr
+											th.border-right.border-dark(scope='row') 1
+											td.border-right.border-dark 
+												include ../includes/dateformat.pug
+												+dateformat(invoiceslistdetails[0].payment_received_date) 
+											td.border-right.border-dark #{sails.config.globals.price_formatter(total)}
+									tr
+										th.border.border-dark(colspan=(invoiceslistdetails && invoiceslistdetails[0].payment_mode == 'CASH') ? 2 : 5)
+											include ../includes/number2string.pug
+											+number2string(Math.round(total))
+										td.border.border-dark 
+											b #{sails.config.globals.price_formatter(total)}
+				.row.mt-3
+					.col-sm-8
+						table.table-borderless.table-responsive-sm
+							tbody
+								tr
+									td.border.border-dark.pb-5(style='font-size:13px;') CASHIERS TRANSFER SCROLL NO.
+									td.border.border-dark.pb-5(style='font-size:13px;') CASHIER
+									td.border.border-dark.pb-5(style='font-size:13px;') CASHIERS TRANSFER SCROLL NO.
+									td.border.border-dark.pb-5(style='font-size:13px;') JOTTING BOOK
+				.row.mt-2
+					p.col-sm-12(style='font-size:16px;') Thanking you for your understanding,
+				.row
+					p.col-sm-12(style='font-size:16px;') Yours sincerely
+				.row.mt-5
+					p.col-sm-12(style='font-size:16px;') Operations Executive
+
+		script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$('[data-toggle="tooltip"]').tooltip();
+			function pdf() {
+				location.href = '/dopdf';
+			}

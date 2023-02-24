@@ -1,0 +1,267 @@
+.text-center
+	img(src='/images/airways_logo.png', alt='')
+	p#cantoaddress(style='font-size: 22px;font-weight: 600; white-space: pre-wrap') #{constants.registered_address}
+.container-fluid(style="padding-right: 20px;padding-left: 20px;")
+	.row
+		.col-sm-12
+			table.table.w-100.borderless
+				tbody.customtable
+					tr
+						td.p-0(style='font-size: 16px;font-weight: 600;') Consignee : 
+						td.p-0(style='font-size: 16px;font-weight: 600;white-space: pre-wrap')
+							|#{awb_user_data_objs[0].consignee_name}
+							|#{awb_user_data_objs[0].consignee_address} #{awb_user_data_objs[0].consignee_address2}
+						td.p-0.text-right(style='font-size: 16px;font-weight: 600;') Consignee GSTIN : #{awb_user_data_objs[0].consignee_gstn}
+	//- .row
+	//- 	.col-sm-6
+	//- 		.row
+	//- 			.col-sm-3
+	//- 				b#cantolabel(style='font-size: 16px;font-weight: 600;') Consignee :
+	//- 			.col-sm-9
+	//- 					p#cantoaddress(style='font-size: 16px;font-weight: 600;white-space: pre-wrap') #{awb_user_data_objs[0].consignee_address}
+	//- 	.col-sm-6
+	//- 		.row.text-right
+	//- 			.col-sm-12
+	//- 				b#canfromdate(style='font-size: 16px;font-weight: 600;') Consignee GSTIN : #{awb_user_data_objs[0].consignee_gstn}
+	.row
+		.col-sm-12
+			table.table.w-100.borderless
+				tbody.customtable
+					tr
+						td.p-0(style='font-size: 16px;') Statement ref :
+						td.p-0(style='font-size: 16px;') #{invoice.invoice_number}
+						td.p-0(style='font-size: 16px;') Period :
+						td.p-0(style='font-size: 16px;') #{new Date(invoice.credit_period_from).toLocaleString('en-US', date_format_options)} to #{new Date(invoice.credit_period_to).toLocaleString('en-US', date_format_options)}
+						td.p-0(style='font-size: 16px;') HSN / SAC :
+						td.p-0(style='font-size: 16px;') #{constants.hsn}
+					tr
+						td.p-0(style='font-size: 16px;') Date :
+						td.p-0(style='font-size: 16px;') #{new Date(invoice.invoice_issue_date).toLocaleString('en-US', date_format_options)}
+			.table-responsive.text-center
+				table.table.table-bordered(style='table-layout: fixed;width: 100%;')
+					colgroup
+						col(style = 'width: 3.25%;')
+						col(style = 'width: 5.00%;')
+						col(style = 'width: 6.75%;')
+						col(style = 'width: 8.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 6.25%;')
+						col(style = 'width: 8.00%;')
+					thead
+						tr
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong #
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Flt No.
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Flight Dt.
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong AWB No.
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong DO Charges
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong BB Charges
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Baggage Charges
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong DD Charges
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Cartage
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Freight Charge
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Collect Fee
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Misc. Charge
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong IGST (#{constants.igst_percentage}%)
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong CGST (#{constants.cgst_percentage}%)
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong SGST (#{constants.sgst_percentage}%)
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', scope='col')
+								strong Total
+					tbody
+						each awb_user_data in awb_user_data_objs
+							tr
+								- var subtotal = 0;
+								- var subtotal_do = awb_user_data.do_charge;
+								- var subtotal_bb = awb_user_data.break_bulk_charge;
+								- var subtotal_baggage = awb_user_data.baggage_charge;
+								- var subtotal_directdelivery = awb_user_data.direct_delivery_charge;
+								- var subtotal_cartage = awb_user_data.cartage_charge;
+								- var subtotal_freightcharge = awb_user_data.collect_charge;
+								- var subtotal_collectfee = awb_user_data.collect_fee;
+								- var subtotal_misc = awb_user_data.misc_charges;
+								- var subtotal_igst = awb_user_data.igst;
+								- var subtotal_cgst = awb_user_data.cgst;
+								- var subtotal_sgst = awb_user_data.sgst;
+								- var subtotal = subtotal_do + subtotal_bb + subtotal_baggage + subtotal_directdelivery + subtotal_cartage + subtotal_freightcharge + subtotal_collectfee + subtotal_misc + subtotal_igst + subtotal_cgst + subtotal_sgst;
+
+								th.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{index++}
+								each part_awb in part_awbs
+									if part_awb.awb_number === awb_user_data.awb_number
+										td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{part_awb.flight_number}
+										td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{new Date(part_awb.inward_date).toLocaleString('en-US', date_format_options)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{awb_user_data.awb_number}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_do)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_bb)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_baggage)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_directdelivery)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_cartage)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_freightcharge)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_collectfee)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_misc)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_igst)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_cgst)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(subtotal_sgst)}
+								td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(Math.round(subtotal))}
+						tr
+							th.p-0(style='word-wrap: break-word;border:1px solid black !important;', colspan="4")
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_do)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_bb)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_baggage)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_directdelivery)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_cartage)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_freightcharge)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_collectfee)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_misc)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_igst)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_cgst)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(total_sgst)}
+							td.p-0(style='word-wrap: break-word;border:1px solid black !important;') #{sails.config.globals.price_formatter(Math.ceil(total))}
+	if(dcms && dcms.length > 0)
+		.row
+			.container-fluid.px-0.mx-0
+				.table-responsive.text-center
+					table.table.table-bordered(style='table-layout: fixed;width: 100%;')
+						colgroup
+							col(style = 'width: 3.25%;')
+							col(style = 'width: 5.00%;')
+							col(style = 'width: 6.75%;')
+							col(style = 'width: 8.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 12.5%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 6.25%;')
+							col(style = 'width: 8.00%;')
+						thead
+							tr
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong 
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong D/C Note
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong Ref No.
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong Total Net Amount
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong IGST (#{constants.igst_percentage}%)
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong CGST (#{constants.cgst_percentage}%)
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong SGST (#{constants.sgst_percentage}%)
+								th.p-0(style='word-wrap: break-word;', scope='col')
+									strong Total
+						tbody
+							- var total_dcm_net_amount = 0
+							- var total_dcm_igst = 0
+							- var total_dcm_cgst = 0
+							- var total_dcm_sgst = 0
+							each dcm in dcms
+								tr
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0
+									td.p-0 #{dcm.revised_total > 0 ? 'Debit' : 'Credit'} Note
+									td.p-0 #{dcm.dcm_number}
+									- var each_dcm_net_amount = 0
+									each integer, i in dcm.incorrect_amount
+										- each_dcm_net_amount += dcm.correct_amount[i] - dcm.incorrect_amount[i];
+									- total_dcm_net_amount += each_dcm_net_amount
+									td.p-0 #{sails.config.globals.price_formatter(each_dcm_net_amount)}
+									td.p-0 #{sails.config.globals.price_formatter(dcm.igst-dcm.incorrect_igst)}
+									- total_dcm_igst += dcm.igst-dcm.incorrect_igst
+									td.p-0 #{sails.config.globals.price_formatter(dcm.cgst-dcm.incorrect_cgst)}
+									- total_dcm_cgst += dcm.cgst-dcm.incorrect_cgst
+									td.p-0 #{sails.config.globals.price_formatter(dcm.sgst-dcm.incorrect_sgst)}
+									- total_dcm_sgst += dcm.sgst-dcm.incorrect_sgst
+									td.p-0 #{sails.config.globals.price_formatter(Math.round(dcm.revised_total))}
+							tr
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0
+								td.p-0 #{sails.config.globals.price_formatter(Math.round(total_do + total_bb + total_baggage + total_directdelivery + total_cartage + total_freightcharge + total_collectfee + total_misc + total_dcm_net_amount))}
+								td.p-0 #{sails.config.globals.price_formatter(total_igst + total_dcm_igst)}
+								td.p-0 #{sails.config.globals.price_formatter(total_cgst + total_dcm_cgst)}
+								td.p-0 #{sails.config.globals.price_formatter(total_sgst + total_dcm_sgst)}
+								td.p-0 #{sails.config.globals.price_formatter(Math.round(total + total_dcm_igst + total_dcm_cgst + total_dcm_sgst + total_dcm_net_amount))}
+	.row
+		.col-sm-12
+			table.table.w-100.borderless
+				tbody.customtable
+					tr
+						td.p-0(style='font-size: 16px;font-weight: 600;')
+							include ../includes/number2string.pug
+							if dcms && dcms.length > 0
+								+number2string(Math.round(total + total_dcm_igst + total_dcm_cgst + total_dcm_sgst + total_dcm_net_amount))
+							else
+								+number2string(invoice.amount_billed)
+						td.p-0.text-right(style='font-size: 16px;font-weight: 600;') GSTIN : #{constants.gstin_number}
+		//- .col-sm-6
+		//- 	include ../includes/number2string.pug
+		//- 	if dcms && dcms.length > 0
+		//- 		+number2string(Math.round(total + total_dcm_igst + total_dcm_cgst + total_dcm_sgst + total_dcm_net_amount))
+		//- 	else
+		//- 		+number2string(invoice.amount_billed)
+		//- .col-sm-6
+		//- 	p.text-right(style='font-size: 16px;')
+		//- 		strong GSTIN : #{constants.gstin_number}
+	.row.pb-3
+		.col-sm-6
+			p(style='font-size: 20px;')
+				| Yours faithfully,
+	.row.pt-3
+		.col-sm-6
+			p(style='font-size: 20px;') #{constants.designation}

@@ -1,0 +1,135 @@
+doctype html
+html(dir='ltr')
+	- var date_format_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric'};
+	- var date_format_full_options = {timeZone: 'Asia/Kolkata', year: 'numeric', month:'short', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'};
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		// Tell the browser to be responsive to screen width
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Favicon icon
+		link(rel='icon', type='image/png', sizes="180x180", href='/images/client_logo.png')
+		title #{sails.config.globals.app_name}
+		// Custom CSS
+		link(href='/dist/css/style.min.css', rel='stylesheet')
+		// HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+		// WARNING: Respond.js doesn't work if you view the page via file://
+		//if lt IE 9
+			//- script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')-cdn
+			//- script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')-cdn
+			script(src='/dist/js/html5shiv.js')
+			script(src='/dist/js/respond.min.js')
+	-var void_watermark = DO.void_on ? 'background-image: url(/images/void_watermark.png)' : '';
+	body(style=void_watermark)
+		.main-wrapper
+			.text-center
+				img(src='/images/airways_logo.png', alt='')
+			.container-fluid(style="padding-right: 20px;padding-left: 20px;")
+				.row
+					.col-lg-6
+						.row
+							.col-lg-12
+								b#cantolabel(style='font-size: 16px;font-weight: 600;') To ,
+						.row
+							.col-lg-12
+								p#cantoaddress(style='font-size: 16px;font-weight: 600;')
+									| #{constant.customs_address}
+						//.row.pb-5
+							.col-lg-12
+								b#canfromphone(style='font-size: 16px;font-weight: 600;') Phone :  
+									| 01125652002
+				.row.pb-3
+					.col-lg-12.text-center
+						b
+							u#cancargoarivalnoticelabel(style='font-size: 25px;font-weight: 1000;') DELIVERY ORDER
+				.row
+					.col-lg-9
+					.col-lg-3
+						b#canfromdate(style='font-size: 20px;font-weight: 600;') No : #{DO.do_number}
+				.row.mb-4
+					.col-lg-9
+					.col-lg-3
+						b#canfromdate(style='font-size: 20px;font-weight: 600;') Date : #{new Date(DO.do_issue_date).toLocaleString('en-US', date_format_options)}
+
+				.row.pb-4
+					.col-lg-12
+						p#canawbinfo(style='font-size: 20px;')
+							| Please deliver to #{awb_user_data.consignee_name} or order the following packages which arrived ex #{part_awb.flight_number}  Dated #{new Date(igm.flight_date).toLocaleString('en-US', date_format_options)} IGM Number #{igm.igm_number} #{new Date(igm.inward_date).toLocaleString('en-US', date_format_options)}
+				.row.pb-5
+					.col-lg-12
+						table.table.table-bordered.w-100
+							thead.thead-light
+								tr
+									th(scope='col', style='font-size: 18px;font-weight: 600;') Air Waybill No
+									th(scope='col', style='font-size: 18px;font-weight: 600;') DD No
+									th(scope='col', style='font-size: 18px;font-weight: 600;') No. of Packages 
+									th(scope='col', style='font-size: 18px;font-weight: 600;') Weight (kg)
+									th(scope='col', style='font-size: 18px;font-weight: 600;') Description
+							tbody.customtable
+								tr
+									td(style='font-size: 18px;') #{part_awb.awb_number}
+									td(style='font-size: 18px;') NA
+									- var show_out_of_format = false;
+									//-	Display the format x/y if the received pieces are in partshipment, else display full
+									if(awb_user_data.expected_no_of_pieces === part_awb.no_of_pieces_received)
+										td(style='font-size: 18px;') #{part_awb.no_of_pieces_received}
+									else
+										- show_out_of_format = true;
+										td(style='font-size: 18px;') #{part_awb.no_of_pieces_received} / #{awb_user_data.expected_no_of_pieces} 
+									
+									//-	Same for weight, however we do not measure the weight for deciding total shipment as weight can be here and there, so banking on number of pieces received
+									if(show_out_of_format)
+										td(style='font-size: 18px;') #{Number(part_awb.weight_received).toFixed(2)} / #{Number(awb_user_data.expected_weight).toFixed(2)}
+									else
+										td(style='font-size: 18px;') #{Number(part_awb.weight_received).toFixed(2)}
+									
+									td(style='font-size: 18px;') #{part_awb.commodity}
+									
+									
+									
+									
+									
+										
+				.row.pb-5
+					.col-lg-6
+						p(style='font-size: 20px;')
+							| GST : #{awb_user_data.consignee_gstn},
+				.row
+					.col-lg-6
+						p(style='font-size: 20px;')
+							| HAWB #{awb_user_data.no_of_hawb}
+					.col-lg-6
+						p.text-right(style='font-size: 20px;')
+							| For #{sails.config.globals.airlines_name}
+			// ==============================================================
+			// Login box.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Page wrapper scss in scafholding.scss
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+			// ==============================================================
+			// Right Sidebar
+			// ==============================================================
+		// ==============================================================
+		// All Required js
+		// ==============================================================
+		script(src='/libs/jquery/dist/jquery.min.js')
+		// Bootstrap tether Core JavaScript
+		script(src='/libs/popper.js/dist/umd/popper.min.js')
+		script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+		// ==============================================================
+		// This page plugin js
+		// ==============================================================
+		script.
+			$('[data-toggle="tooltip"]').tooltip();
+			function pdf() {
+				location.href = '/dopdf';
+			}

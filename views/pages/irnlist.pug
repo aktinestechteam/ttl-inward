@@ -1,0 +1,47 @@
+extends ../layouts/matrix_layout.pug
+
+block variables
+	- var activePage = 'blank-page'
+	- var activeGroup = 'pages'
+
+block content
+	// ==============================================================
+	// Container fluid
+	// ==============================================================
+	.container-fluid
+		// ==============================================================
+		// Start Page Content
+		// ==============================================================
+		table.table.small
+			thead.thead-light
+				th Req Time
+				th Invoice No
+				th Error
+				th IRN
+			each irn in irnlist
+				tr(class=(irn.status == sails.config.custom.irn_job_status.failed || irn.status == sails.config.custom.irn_job_status.error) ? 'text-danger' : '')
+					td #{new Date(irn.createdAt)}
+					td
+						div=irn.invoice_number
+						div #{irn.type_of_invoice}
+						strong (#{irn.status})
+					td
+						div=irn.error_code
+						div=irn.error_message
+						if irn.invoice
+							div
+								a(href="/invoice?invoice_id="+irn.invoice.id, target="_blank") INVOICE
+							div
+								if !irn.invoice.dcm_document
+									a(href="/dcm?invoice_id="+irn.invoice.id+"&current_city="+irn.invoice.igm_city, target="_blank") DCM
+								else
+									span INVOICE VOIDED
+							div
+								if irn.invoice.dcm_document
+									a(href="/regenerateinvoice/"+irn.invoice.id, target="_blank") REGENERATE INVOICE
+					td
+						if(irn.irn)
+							span #{irn.irn.substr(0,22)} #{irn.irn.substr(22,22)} #{irn.irn.substr(44)}
+			
+
+block specific-js
